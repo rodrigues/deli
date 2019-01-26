@@ -23,11 +23,10 @@ defmodule Deli.Deploy do
     IO.puts("restarted.")
 
     :timer.sleep(1_000)
-
-    if service_active?(host), do: edeliver("ping #{target}")
+    check_service_status(host)
   end
 
-  defp service_active?(host) do
+  defp check_service_status(host) do
     app = Config.app()
     status = "ssh #{app}@#{host} 'systemctl status #{app}'" |> cmd_result
 
