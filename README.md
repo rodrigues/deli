@@ -19,7 +19,7 @@ Add `deli` to your deps:
 def deps do
   [
     # ...
-    {:deli, "~> 0.1.8"}
+    {:deli, "~> 0.1.9", runtime: false}
   ]
 end
 ```
@@ -33,7 +33,7 @@ config :deli,
       "staging-01.your_app.com",
       "staging-02.your_app.com"
     ],
-    production: [
+    prod: [
       "prod-01.your_app.com",
       "prod-02.your_app.com",
       "prod-03.your_app.com",
@@ -65,7 +65,8 @@ To target `prod` environment, do:
 $ mix deli -t prod
 ```
 
-Using `production` is equivalent to `prod`.
+It will ask for confirmation after release is built, before deploy.
+If you don't want that extra step, pass `-y` when calling this task.
 
 For more deploy options, do:
 

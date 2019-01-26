@@ -20,7 +20,7 @@ defmodule Deli.Deploy do
     id = "#{app}@#{host}"
 
     IO.puts("restarting #{id}")
-    cmd("ssh #{id} 'sudo systemctl restart #{id}'")
+    cmd("ssh #{id} 'sudo systemctl restart #{app}'")
     IO.puts("restarted #{id}")
 
     :timer.sleep(1_000)

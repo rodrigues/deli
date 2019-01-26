@@ -1,3 +1,8 @@
+*** v0.1.9
+
+[FIX] Fix error with restart
+[NEW] Improve documentation
+
 *** v0.1.8
 
 [NEW] Improve logging on restart / status
