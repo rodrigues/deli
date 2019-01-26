@@ -4,9 +4,10 @@ defmodule Deli.MixProject do
   def project do
     [
       app: :deli,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
+      application: application(),
       deps: deps(),
       dialyzer: dialyzer(),
       docs: docs(),
@@ -21,8 +22,7 @@ defmodule Deli.MixProject do
 
   def application do
     [
-      mod: {Deli.Application, []},
-      extra_applications: [:logger]
+      extra_applications: [:mix, :logger]
     ]
   end
 
