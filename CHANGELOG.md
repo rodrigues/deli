@@ -1,3 +1,7 @@
+* v0.1.5
+
+** [FIX] Remove absolute paths from gitignore
+
 * v0.1.4
 
 ** [FIX] Fix adding files to gitignore
