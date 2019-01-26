@@ -8,7 +8,14 @@ defmodule Deli.MixProject do
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      dialyzer: dialyzer()
+      dialyzer: dialyzer(),
+      docs: docs(),
+      package: package(),
+      source_url: "https://github.com/rodrigues/deli",
+      homepage_url: "https://hexdocs.pm/deli",
+      description: """
+      A deploy task for Elixir applications
+      """
     ]
   end
 
@@ -42,6 +49,18 @@ defmodule Deli.MixProject do
         unmatched_returns
       )a,
       ignore_warnings: ".dialyzer_ignore.exs"
+    ]
+  end
+
+  defp docs do
+    [main: "readme", extras: ["README.md"]]
+  end
+
+  defp package do
+    [
+      maintainers: ["Victor Rodrigues"],
+      licenses: ["MIT"],
+      links: %{github: "https://github.com/rodrigues/deli"}
     ]
   end
 end
