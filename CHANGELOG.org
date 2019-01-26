@@ -1,3 +1,7 @@
+* v0.1.8
+
+** [NEW] Improve logging on restart / status
+
 * v0.1.7
 
 ** [FIX] Resolve warning and improve logging
