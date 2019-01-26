@@ -8,5 +8,5 @@ defmodule Deli.Templates.Dockerfile do
     [:app]
   )
 
-  def build(:centos, args) when is_list(args), do: build_centos(args)
+  def build(:centos, app), do: build_centos(app)
 end
