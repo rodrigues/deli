@@ -76,7 +76,7 @@ $ mix help deli
 
 Releases should be configured in your application with [`distillery`](https://hexdocs.pm/distillery).
 
-At this point, this package exists to reuse a very simple flow for similarly configured apps. It might not be flexible enough for your needs yet.
+At the moment, this package exists for reusing among similarly configured apps. It might not be flexible enough for your needs yet.
 
 ## Potential future work
 
