@@ -1,3 +1,7 @@
+* v0.1.4
+
+** [FIX] Fix adding files to gitignore
+
 * v0.1.3
 
 ** [FIX] Fix generation of Dockerfile in case there isn't one in .deliver/Dockerfile
