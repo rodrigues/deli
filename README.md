@@ -80,7 +80,7 @@ At this point, this package exists to reuse a very simple flow for similarly con
 ## Potential future work
 
 - Remove edeliver dependency, replacing its steps by local code
-- Add documentation and tests
+- Add documentation, tests and typespecs
 - Log in debug mode
 - Extract code from task into specialized modules (versioning, docker, ...)
 - Allow configuration for other admin tools (systemctl / edeliver / ?)
