@@ -1,0 +1,109 @@
+FROM centos:7.6.1810
+
+ENV OTP_VERSION="21.2.2" \
+    ELIXIR_VERSION="1.8.0" \
+    REBAR3_VERSION="3.6.1" \
+    OTP_SUM="41b1c3a8343218157a683776e71d80a05ac4eb4019a90a760846608d78817690" \
+    ELIXIR_SUM="fe896d8b2914f982d2e6fceeb585f59a8f92ad872653fc46c13df9ff86d69234"
+
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+COPY authorized_keys /authorized_keys
+
+# Base dependencies
+RUN set -xe \
+  && yum update -y \
+  && yum clean all \
+  && yum reinstall -y glibc-common \
+  && localedef -i en_US -f UTF-8 en_US.UTF-8 \
+  && yum -y groupinstall "Development Tools" \
+  && yum -y install ncurses \
+      ncurses-devel \
+      unixODBC \
+      unixODBC-devel \
+      openssl-devel \
+      openssh-clients \
+      openssh-server \
+  && echo "NETWORKING=yes" > /etc/sysconfig/network \
+  && ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+
+# Create edeliver user and make it a sudoer
+RUN set -xe \
+  && useradd -s /bin/bash -c "edeliver" edeliver \
+  && mkhomedir_helper edeliver \
+  && mkdir -p /home/edeliver/.ssh \
+  && cp /authorized_keys/<%= app %>_id_rsa.pub /home/edeliver/.ssh/authorized_keys \
+  && chown -R edeliver:edeliver /home/edeliver/.ssh \
+  && mkdir -p /etc/sudoers.d \
+  && touch /etc/sudoers.d/edeliver \
+  && echo "edeliver ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/edeliver
+
+# Configure SSH for non-root public key authentication
+RUN set -xe \
+  && mkdir -p /var/run/sshd \
+  && sed -i \
+         -e 's~^PasswordAuthentication yes~PasswordAuthentication no~g' \
+         -e 's~^#PermitRootLogin yes~PermitRootLogin no~g' \
+         -e 's~^#UseDNS yes~UseDNS no~g' \
+         -e 's~^Host~#Host~g' \
+         -e 's~^ForwardX11Trusted~#ForwardX11Trusted~g' \
+         -e 's~^SendEnv~#SendEnv~g' \
+         -e 's~^\(.*\)/usr/libexec/openssh/sftp-server$~\1internal-sftp~g' \
+        /etc/ssh/sshd_config
+
+# Erlang/OTP
+RUN set -xe \
+  && OTP_SRC_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" \
+  && curl -fSL "$OTP_SRC_URL" -o otp-src.tar.gz \
+  && echo "${OTP_SUM}  otp-src.tar.gz" | sha256sum -c - \
+  && mkdir -p /usr/local/src/otp \
+  && tar -zxf otp-src.tar.gz -C /usr/local/src/otp --strip-components=1 \
+  && rm otp-src.tar.gz \
+  && cd /usr/local/src/otp \
+  && ./otp_build autoconf \
+  && ./configure --disable-hipe --without-javac --without-odbc --without-diameter --without-megaco --without-eldap --without-debugger --without-wx --without-et --without-observer \
+  && make \
+  && make install \
+  && find /usr/local -name examples | xargs rm -rf \
+  && cd /usr/local \
+  && rm -rf /usr/local/src/otp \
+  && cd /usr/local/src \
+  && git clone --branch ${REBAR3_VERSION} https://github.com/rebar/rebar3.git \
+  && cd rebar3 \
+  && ./bootstrap \
+  && cp rebar3 /usr/bin/rebar3 \
+  && cd / && rm -rf /usr/src/rebar3
+
+# Elixir
+RUN set -xe \
+  && ELIXIR_DOWNLOAD_URL="https://github.com/elixir-lang/elixir/archive/v${ELIXIR_VERSION}.tar.gz" \
+  && curl -fSL -o elixir-src.tar.gz $ELIXIR_DOWNLOAD_URL \
+  && echo "${ELIXIR_SUM}  elixir-src.tar.gz" | sha256sum -c - \
+  && mkdir -p /usr/local/src/elixir \
+  && tar -xzC /usr/local/src/elixir --strip-components=1 -f elixir-src.tar.gz \
+  && rm elixir-src.tar.gz \
+  && cd /usr/local/src/elixir \
+  && make install clean \
+  && cd /usr/local \
+  && rm -rf /usr/local/src/elixir \
+  && mix local.hex --force \
+  && mix hex.info
+
+RUN ssh-keygen -q -t rsa -f /etc/ssh/ssh_host_rsa_key -C '' -N ''
+RUN ssh-keygen -q -t dsa -f /etc/ssh/ssh_host_dsa_key -C '' -N ''
+
+WORKDIR /usr/local/builds
+
+RUN git init
+RUN git config receive.denyCurrentBranch ignore
+RUN chown -R edeliver:edeliver /usr/local/builds
+
+RUN echo "export LANG=en_US.UTF-8" >> /home/edeliver/.profile
+RUN echo "LANG=en_US.utf-8" >> /etc/environment
+RUN echo "LC_ALL=en_US.utf-8" >> /etc/environment
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
