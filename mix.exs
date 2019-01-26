@@ -30,7 +30,7 @@ defmodule Deli.MixProject do
     [
       {:edeliver, "~> 1.6.0"},
       {:distillery, "~> 2.0.10"},
-      {:ex_doc, "~> 0.19.1", only: :docs},
+      {:ex_doc, "~> 0.19.1", only: :dev},
       {:credo, "~> 1.0.0", only: :test},
       {:dialyxir, "~> 1.0.0-rc.4", only: :test}
     ]
