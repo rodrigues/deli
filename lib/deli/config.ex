@@ -3,7 +3,7 @@ defmodule Deli.Config do
   @default_docker_port 4441
 
   def app do
-    :app |> fetch!()
+    :app |> get(Mix.Project.get().project[:app])
   end
 
   def docker_build_target do

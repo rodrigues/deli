@@ -18,7 +18,7 @@ Add `deli` to your deps:
 def deps do
   [
     # ...
-    {:deli, "~> 0.1.0", only: :dev}
+    {:deli, "~> 0.1.2", only: :dev}
   ]
 end
 ```
@@ -27,7 +27,6 @@ Then add some configuration in your `config/config.exs`:
 
 ```elixir
 config :deli,
-  app: :your_app,
   hosts: [
     staging: [
       "staging-01.your_app.com",
