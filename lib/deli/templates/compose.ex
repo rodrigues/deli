@@ -1,4 +1,4 @@
-defmodule Deli.Templates.EdeliverCompose do
+defmodule Deli.Templates.Compose do
   require EEx
 
   EEx.function_from_file(

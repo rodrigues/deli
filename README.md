@@ -82,7 +82,6 @@ At this point, this package exists to reuse a very simple flow for similarly con
 - Remove edeliver dependency, replacing its steps by local code
 - Add documentation, tests and typespecs
 - Log in debug mode
-- Extract code from task into specialized modules (versioning, docker, ...)
 - Allow configuration for other admin tools (systemctl / edeliver / ?)
 - Allow configuring other docker build targets (currently only centos:7.6)
 - Allow configuring docker build elixir / otp / rebar versions
