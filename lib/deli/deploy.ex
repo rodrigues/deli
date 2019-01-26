@@ -18,9 +18,9 @@ defmodule Deli.Deploy do
   defp restart_target(target, host) do
     app = Config.app()
 
-    IO.puts("Restarting target...")
+    IO.puts("restarting...")
     cmd("ssh #{app}@#{host} 'sudo systemctl restart #{app}'")
-    IO.puts("Restarted target")
+    IO.puts("restarted.")
 
     :timer.sleep(1_000)
 
