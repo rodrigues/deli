@@ -1,32 +1,32 @@
 * v0.1.8
 
-** [NEW] Improve logging on restart / status
+[NEW] Improve logging on restart / status
 
 * v0.1.7
 
-** [FIX] Resolve warning and improve logging
+[FIX] Resolve warning and improve logging
 
 * v0.1.6
 
-** [FIX] Resolve double pinging after deploy
-** [NEW] Nicer restart info
+[FIX] Resolve double pinging after deploy
+[NEW] Nicer restart info
 
 * v0.1.5
 
-** [FIX] Remove absolute paths from gitignore
+[FIX] Remove absolute paths from gitignore
 
 * v0.1.4
 
-** [FIX] Fix adding files to gitignore
+[FIX] Fix adding files to gitignore
 
 * v0.1.3
 
-** [FIX] Fix generation of Dockerfile in case there isn't one in .deliver/Dockerfile
+[FIX] Fix generation of Dockerfile in case there isn't one in .deliver/Dockerfile
 
 * v0.1.2
 
-** [NEW] Deployed app inferred from Mix project
+[NEW] Deployed app inferred from Mix project
 
 * v0.1.1
 
-** [FIX] Application configuration
+[FIX] Application configuration
