@@ -94,7 +94,7 @@ defmodule Deli.Release do
     content = gitignore |> expand_path |> File.read!()
 
     unless content |> String.contains?(path) do
-      write_file(gitignore, "#{path |> expand_path}\n", [:append])
+      write_file(gitignore, "#{path}\n", [:append])
     end
   end
 
