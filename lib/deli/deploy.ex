@@ -12,15 +12,15 @@ defmodule Deli.Deploy do
   end
 
   defp restart_target(target) do
-    target |> Config.hosts() |> Enum.each(&restart_target(target, &1))
+    target |> Config.hosts() |> Enum.each(&restart_host/1)
   end
 
-  defp restart_target(target, host) do
+  defp restart_host(host) do
     app = Config.app()
 
-    IO.puts("restarting...")
+    IO.puts("restarting #{host}...")
     cmd("ssh #{app}@#{host} 'sudo systemctl restart #{app}'")
-    IO.puts("restarted.")
+    IO.puts("#{host} restarted.")
 
     :timer.sleep(1_000)
     check_service_status(host)
@@ -31,10 +31,10 @@ defmodule Deli.Deploy do
     status = "ssh #{app}@#{host} 'systemctl status #{app}'" |> cmd_result
 
     if status =~ ~r/Active\: active \(running\)/ do
-      IO.puts([IO.ANSI.green(), "#{app} running", IO.ANSI.reset()])
+      IO.puts([IO.ANSI.green(), "#{app} running at #{host}", IO.ANSI.reset()])
       true
     else
-      IO.puts([IO.ANSI.red(), "#{app} not running", IO.ANSI.reset()])
+      IO.puts([IO.ANSI.red(), "#{app} not running at #{host}", IO.ANSI.reset()])
       IO.puts(status)
       false
     end

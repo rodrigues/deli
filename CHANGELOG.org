@@ -1,3 +1,7 @@
+* v0.1.7
+
+** [FIX] Resolve warning and improve logging
+
 * v0.1.6
 
 ** [FIX] Resolve double pinging after deploy
