@@ -9,8 +9,9 @@ Git tags are enforced to keep versioning relevant, and matching with your `mix.e
 
 ## Configuration
 
-You don't need to think about edeliver with deli.
+You don't need to think about edeliver with deli (unless you want to).
 Deli generates any config needed for edeliver, and adds them to your gitignore by default.
+If you want to maintain a custom version, just remove from .gitignore.
 
 Add `deli` to your deps:
 
@@ -89,4 +90,5 @@ At this point, this package exists to reuse a very simple flow for similarly con
 - Parallel restarts
 - Retry / rollback strategy
 - Upgrades
+- Quiet mode
 - PRs are welcome! The intent is to keep this task simple to use over time, and add flexibility through configuration rather than CLI args or ENV, providing good defaults.
