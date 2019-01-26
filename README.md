@@ -9,10 +9,6 @@ Git tags are enforced to keep versioning relevant, and matching with your `mix.e
 
 ## Configuration
 
-You don't need to think about edeliver with deli (unless you want to).
-Deli generates any config needed for edeliver, and adds them to your gitignore by default.
-If you want to maintain a custom version, just remove from .gitignore.
-
 Add `deli` to your deps:
 
 ```elixir
@@ -75,6 +71,10 @@ $ mix help deli
 ```
 
 Releases should be configured in your application with [`distillery`](https://hexdocs.pm/distillery).
+
+You don't need to think about edeliver with deli (unless you want to).
+Deli generates any config needed for edeliver, and adds them to your gitignore by default.
+If you want to maintain a custom version, just remove from .gitignore.
 
 At the moment, this package exists for reusing among similarly configured apps. It might not be flexible enough for your needs yet.
 
