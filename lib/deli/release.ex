@@ -30,7 +30,7 @@ defmodule Deli.Release do
   defp ensure_edeliver_config do
     path = ".deliver/config"
 
-    unless path |> File.exists?() do
+    unless path |> file_exists? do
       content =
         EdeliverConfig.build(
           Config.app(),
@@ -48,7 +48,7 @@ defmodule Deli.Release do
   defp ensure_edeliver_dockerfile do
     path = ".deliver/Dockerfile"
 
-    unless path |> File.exists?() do
+    unless path |> file_exists? do
       content =
         Dockerfile.build(
           Config.docker_build_target(),
@@ -64,7 +64,7 @@ defmodule Deli.Release do
   defp ensure_docker_compose do
     path = ".deliver-docker-compose.yml"
 
-    unless path |> File.exists?() do
+    unless path |> file_exists? do
       content =
         Compose.build(
           Config.app(),
@@ -80,9 +80,9 @@ defmodule Deli.Release do
     app = Config.app()
     path = ".deliver/authorized_keys/#{app}_id_rsa"
 
-    unless path |> File.exists?() do
+    unless path |> file_exists? do
       # TODO generate key
-      IO.puts("TODO generate key")
+      IO.puts("TODO generate ssh key in #{path}")
       add_to_gitignore("/.deliver/authorized_keys/*")
     end
 
