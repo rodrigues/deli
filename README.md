@@ -1,6 +1,6 @@
 # Deli
 
-A simple deploy task for Elixir applications, using a few [`edeliver`](https://github.com/edeliver/edeliver) [tasks](https://hexdocs.pm/edeliver/Mix.Tasks.Edeliver.html#content) under the hood.
+Provides a deploy task for Elixir applications, using a few [`edeliver`](https://github.com/edeliver/edeliver) [tasks](https://hexdocs.pm/edeliver/Mix.Tasks.Edeliver.html#content) under the hood.
 
 Releases are built locally with docker containers, and systemd is used for controlling the app (`systemctl (restart | status)`).
 
