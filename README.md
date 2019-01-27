@@ -87,6 +87,9 @@ $ mix deli.release
 # Does only deploy/restart/check (release should be available)
 $ mix deli.deploy
 
+# Checks status
+$ mix deli.status -t prod
+
 # Opens a IEx session to a host in target staging
 $ eval $(mix deli.shell)
 ```
