@@ -1,8 +1,10 @@
 defmodule Deli.Shell do
+  alias Deli.Config
+
   @moduledoc "Provides conveniences for modules to deal with shell commands and files"
 
   def cmd(command) do
-    with 0 <- Mix.shell().cmd(command) do
+    with 0 <- command |> verbose_inspect |> Mix.shell().cmd() do
       :ok
     else
       signal ->
@@ -21,9 +23,25 @@ defmodule Deli.Shell do
   def cmd_result(command) do
     command
     |> to_charlist
+    |> verbose_inspect
     |> :os.cmd()
     |> to_string
     |> String.trim()
+  end
+
+  defp verbose_inspect(command) do
+    if Config.verbose?() do
+      IO.puts([
+        IO.ANSI.bright(),
+        "$ ",
+        IO.ANSI.reset(),
+        IO.ANSI.underline(),
+        command,
+        IO.ANSI.reset()
+      ])
+    end
+
+    command
   end
 
   def edeliver(command) do
