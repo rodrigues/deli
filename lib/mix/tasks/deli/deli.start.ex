@@ -37,6 +37,7 @@ defmodule Mix.Tasks.Deli.Start do
     controller = Config.controller()
     id = "#{app}@#{host}"
 
+    Check.run(host, false)
     IO.puts("starting #{id}...")
     :ok = app |> controller.start_host(host)
     IO.puts([IO.ANSI.green(), "started #{id}", IO.ANSI.reset()])

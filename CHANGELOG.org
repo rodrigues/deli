@@ -1,3 +1,7 @@
+*** v0.1.14
+
+- [NEW] Show previous status before start/stop
+
 *** v0.1.13
 
 - [NEW] Convenience admin commands

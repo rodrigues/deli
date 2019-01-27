@@ -37,6 +37,7 @@ defmodule Mix.Tasks.Deli.Stop do
     controller = Config.controller()
     id = "#{app}@#{host}"
 
+    Check.run(host)
     IO.puts("stopping #{id}...")
     :ok = app |> controller.stop_host(host)
     IO.puts([IO.ANSI.green(), "stopped #{id}", IO.ANSI.reset()])
