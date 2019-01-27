@@ -1,5 +1,6 @@
 defmodule Mix.Tasks.Deli.Restart do
   use Mix.Task
+  import Deli.Shell
   alias Deli.{Check, Config}
 
   @moduledoc """
@@ -22,10 +23,11 @@ defmodule Mix.Tasks.Deli.Restart do
 
   def run(args) do
     _ = Application.ensure_all_started(:deli)
+    app = Config.app()
     options = args |> parse_options
     target = options |> Keyword.get(:target, "staging")
 
-    if confirm_restart?(target, options) do
+    if "restart #{app} at target #{target}?" |> confirm?(options) do
       target |> Config.hosts() |> Enum.each(&restart_host/1)
     else
       IO.puts([IO.ANSI.green(), "restart cancelled by user", IO.ANSI.reset()])
@@ -44,25 +46,5 @@ defmodule Mix.Tasks.Deli.Restart do
 
     :timer.sleep(1_000)
     Check.run(host)
-  end
-
-  defp confirm_restart?(target, options) do
-    message = "restart #{Config.app()} #{target}?"
-
-    if options |> Keyword.get(:yes) do
-      IO.puts("#{message} (Y/n) YES")
-      true
-    else
-      message |> Mix.shell().yes?()
-    end
-  end
-
-  defp parse_options(args) do
-    options = [target: :string, yes: :boolean]
-    aliases = [t: :target, y: :yes]
-
-    args
-    |> OptionParser.parse(aliases: aliases, switches: options)
-    |> elem(0)
   end
 end

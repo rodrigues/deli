@@ -56,6 +56,24 @@ defmodule Deli.Shell do
     exit({:shutdown, 1})
   end
 
+  def confirm?(message, options) do
+    if options |> Keyword.get(:yes) do
+      IO.puts("#{message} (Y/n) YES")
+      true
+    else
+      message |> Mix.shell().yes?()
+    end
+  end
+
+  def parse_options(args) do
+    options = [version: :string, target: :string, yes: :boolean, assets: :boolean]
+    aliases = [v: :version, t: :target, y: :yes, a: :assets]
+
+    args
+    |> OptionParser.parse(aliases: aliases, switches: options)
+    |> elem(0)
+  end
+
   defp command_failed!(command, args, signal, content \\ nil)
        when is_binary(command) and is_list(args) and is_integer(signal) do
     details = "(#{signal})"

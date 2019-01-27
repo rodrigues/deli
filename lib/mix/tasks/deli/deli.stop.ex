@@ -1,5 +1,6 @@
 defmodule Mix.Tasks.Deli.Stop do
   use Mix.Task
+  import Deli.Shell
   alias Deli.{Check, Config}
 
   @moduledoc """
@@ -22,10 +23,11 @@ defmodule Mix.Tasks.Deli.Stop do
 
   def run(args) do
     _ = Application.ensure_all_started(:deli)
+    app = Config.app()
     options = args |> parse_options
     target = options |> Keyword.get(:target, "staging")
 
-    if confirm_stop?(target, options) do
+    if "stop #{app} at target #{target}?" |> confirm?(options) do
       target |> Config.hosts() |> Enum.each(&stop_host/1)
     else
       IO.puts([IO.ANSI.green(), "stop cancelled by user", IO.ANSI.reset()])
@@ -44,25 +46,5 @@ defmodule Mix.Tasks.Deli.Stop do
 
     :timer.sleep(1_000)
     Check.run(host, false)
-  end
-
-  defp confirm_stop?(target, options) do
-    message = "stop #{Config.app()} #{target}?"
-
-    if options |> Keyword.get(:yes) do
-      IO.puts("#{message} (Y/n) YES")
-      true
-    else
-      message |> Mix.shell().yes?()
-    end
-  end
-
-  defp parse_options(args) do
-    options = [target: :string, yes: :boolean]
-    aliases = [t: :target, y: :yes]
-
-    args
-    |> OptionParser.parse(aliases: aliases, switches: options)
-    |> elem(0)
   end
 end

@@ -1,6 +1,7 @@
 defmodule Mix.Tasks.Deli.Deploy do
   use Mix.Task
-  alias Deli.{Deploy, Versioning}
+  import Deli.Shell
+  alias Deli.{Config, Deploy, Versioning}
 
   @moduledoc """
   To deploy current master into staging, do:
@@ -22,35 +23,15 @@ defmodule Mix.Tasks.Deli.Deploy do
 
   def run(args) do
     _ = Application.ensure_all_started(:deli)
+    app = Config.app()
     options = args |> parse_options
-
     tag = options |> Versioning.fetch_version_tag()
     target = options |> Keyword.get(:target, "staging")
 
-    if confirm_deploy?(tag, target, options) do
+    if "deploy #{app}#{tag} to #{target}?" |> confirm?(options) do
       Deploy.run(target)
     else
       IO.puts([IO.ANSI.green(), "deploy cancelled by user", IO.ANSI.reset()])
     end
-  end
-
-  defp confirm_deploy?(tag, target, options) do
-    message = "deploy #{tag} to #{target}?"
-
-    if options |> Keyword.get(:yes) do
-      IO.puts("#{message} (Y/n) YES")
-      true
-    else
-      message |> Mix.shell().yes?()
-    end
-  end
-
-  defp parse_options(args) do
-    options = [version: :string, target: :string, yes: :boolean]
-    aliases = [v: :version, t: :target, y: :yes]
-
-    args
-    |> OptionParser.parse(aliases: aliases, switches: options)
-    |> elem(0)
   end
 end

@@ -1,5 +1,6 @@
 defmodule Mix.Tasks.Deli.Release do
   use Mix.Task
+  import Deli.Shell
   alias Deli.{Release, Versioning}
 
   @moduledoc """
@@ -37,14 +38,5 @@ defmodule Mix.Tasks.Deli.Release do
     else
       :deli |> Application.get_env(:assets, false)
     end
-  end
-
-  defp parse_options(args) do
-    options = [version: :string, target: :string, assets: :boolean]
-    aliases = [v: :version, t: :target, a: :assets]
-
-    args
-    |> OptionParser.parse(aliases: aliases, switches: options)
-    |> elem(0)
   end
 end
