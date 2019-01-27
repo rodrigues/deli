@@ -112,7 +112,7 @@ At the moment, this package exists for reusing among similarly configured apps. 
 
 - Remove edeliver dependency, replacing its steps by local code
 - Provide default distillery config
-- Parallel restarts / checks / ...
+- Concurrent restarts / checks / ...
 - Retry / rollback strategy
 - Upgrades
 - Accept regex pattern in the end of task(s) to filter hosts affected by command
