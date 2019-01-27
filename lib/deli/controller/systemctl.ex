@@ -28,7 +28,8 @@ defmodule Deli.Controller.Systemctl do
 
   @impl true
   def service_status(app, host) do
-    {:ok, result} = app |> systemctl(host, :status)
+    [command | args] = app |> systemctl(host, :status)
+    {:ok, result} = command |> cmd_result(args, [0, 3])
     result
   end
 
@@ -38,7 +39,7 @@ defmodule Deli.Controller.Systemctl do
   end
 
   defp systemctl(app, host, cmd, sudo \\ false) do
-    sudo = if sudo, do: "sudo ", else: ""
-    [:ssh, "#{app}@#{host}", "'#{sudo}systemctl #{cmd} #{app}'"]
+    sudo = if sudo, do: :sudo
+    [:ssh, "#{app}@#{host}", sudo, :systemctl, cmd, app]
   end
 end

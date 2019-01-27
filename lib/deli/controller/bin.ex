@@ -30,7 +30,7 @@ defmodule Deli.Controller.Bin do
   @impl true
   def service_status(app, host) do
     [command | args] = app |> bin(host, :ping)
-    {:ok, content} = command |> cmd_result(args, [0, 127])
+    {:ok, content} = command |> cmd_result(args, [0, 1, 127])
     content
   end
 
