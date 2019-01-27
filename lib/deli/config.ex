@@ -27,6 +27,10 @@ defmodule Deli.Config do
     :controller |> get(@defaults.controller)
   end
 
+  def verbose? do
+    :verbose |> get(false)
+  end
+
   def get(key, default) do
     :deli |> Application.get_env(key, default)
   end
