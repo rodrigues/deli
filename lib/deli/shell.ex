@@ -3,11 +3,14 @@ defmodule Deli.Shell do
 
   @moduledoc false
 
+  # When you want the output, use `cmd_result`
   def cmd(command, args \\ [], ok_signals \\ [0], opts \\ []) do
     command = command |> to_string
     args = args |> Enum.map(&to_string/1)
     verbose_inspect([command | args])
-    result? = Keyword.get(opts, :into) == ""
+
+    result? = opts |> Keyword.get(:result)
+    opts = opts |> Keyword.delete(:result)
 
     {content, signal} = command |> System.cmd(args, verbose_opts(opts))
 
@@ -19,7 +22,7 @@ defmodule Deli.Shell do
   end
 
   def cmd_result(command, args \\ [], ok_signals \\ [0], opts \\ []) do
-    opts = [into: ""] ++ opts
+    opts = [result: true, into: ""] ++ opts
     cmd(command, args, ok_signals, opts)
   end
 
@@ -88,7 +91,7 @@ defmodule Deli.Shell do
     if Config.verbose?() do
       [into: IO.stream(:stdio, :line), stderr_to_stdout: true] ++ opts
     else
-      opts
+      [into: ""] ++ opts
     end
   end
 

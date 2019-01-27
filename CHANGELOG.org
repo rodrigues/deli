@@ -1,3 +1,4 @@
+- [NEW] Quiet(er) mode without verbose
 - [NEW] Generate ssh keys transparently to interface local with release builder (docker)
 - [NEW] Replace :os.cmd calls for System.cmd, now with better output management
 - [NEW] Organize shell commands
