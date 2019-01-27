@@ -1,3 +1,9 @@
+*** v0.1.12
+
+- [NEW] Simplify controller configuration
+- [NEW] Set runtime false in deps
+- [NEW] Pass on credo and dialyzer
+
 *** v0.1.11
 
 - [NEW] Allow configuring another controller other than systemctl
