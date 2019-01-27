@@ -14,7 +14,8 @@ defmodule Deli.Config do
 
   def bin_path do
     app = app()
-    "/opt/#{app}/bin/#{app}"
+    path = "/opt/#{app}/bin/#{app}"
+    :bin_path |> get(path)
   end
 
   def docker_build_target do
