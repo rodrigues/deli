@@ -7,7 +7,7 @@ defmodule Deli.Shell do
   def cmd(command, args \\ [], ok_signals \\ [0], opts \\ []) do
     command = command |> to_string
     args = args |> Enum.map(&to_string/1)
-    verbose_inspect([command | args])
+    # verbose_inspect([command | args])
 
     result? = opts |> Keyword.get(:result)
     opts = opts |> Keyword.delete(:result)
@@ -96,20 +96,19 @@ defmodule Deli.Shell do
     exit({:shutdown, signal})
   end
 
-  defp verbose_inspect(command) do
-    if Config.verbose?() do
-      IO.puts([
-        IO.ANSI.bright(),
-        "$ ",
-        IO.ANSI.reset(),
-        IO.ANSI.underline(),
-        command_inspect(command),
-        IO.ANSI.reset()
-      ])
-    end
-
-    command
-  end
+  # defp verbose_inspect(command) do
+  #   if Config.verbose?() do
+  #     IO.puts([
+  #       IO.ANSI.bright(),
+  #       "$ ",
+  #       IO.ANSI.reset(),
+  #       IO.ANSI.underline(),
+  #       command_inspect(command),
+  #       IO.ANSI.reset()
+  #     ])
+  #   end
+  #   command
+  # end
 
   defp verbose_opts(opts) do
     if Config.verbose?() do
