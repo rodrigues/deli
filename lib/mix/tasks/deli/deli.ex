@@ -39,12 +39,12 @@ defmodule Mix.Tasks.Deli do
     if confirm_deploy?(tag, target, options) do
       Deploy.run(target)
     else
-      IO.puts([IO.ANSI.green(), "Deploy cancelled by user", IO.ANSI.reset()])
+      IO.puts([IO.ANSI.green(), "deploy cancelled by user", IO.ANSI.reset()])
     end
   end
 
   defp confirm_deploy?(tag, target, options) do
-    message = "Deploy #{tag} to #{target}?"
+    message = "deploy #{tag} to #{target}?"
 
     if options |> Keyword.get(:yes) do
       IO.puts("#{message} (Y/n) YES")

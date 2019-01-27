@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Deli.Start do
     if confirm_start?(target, options) do
       target |> Config.hosts() |> Enum.each(&start_host/1)
     else
-      IO.puts([IO.ANSI.green(), "Start cancelled by user", IO.ANSI.reset()])
+      IO.puts([IO.ANSI.green(), "start cancelled by user", IO.ANSI.reset()])
     end
   end
 
@@ -47,7 +47,7 @@ defmodule Mix.Tasks.Deli.Start do
   end
 
   defp confirm_start?(target, options) do
-    message = "Start #{Config.app()} #{target}?"
+    message = "start #{Config.app()} #{target}?"
 
     if options |> Keyword.get(:yes) do
       IO.puts("#{message} (Y/n) YES")

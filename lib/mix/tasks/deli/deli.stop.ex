@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Deli.Stop do
     if confirm_stop?(target, options) do
       target |> Config.hosts() |> Enum.each(&stop_host/1)
     else
-      IO.puts([IO.ANSI.green(), "Stop cancelled by user", IO.ANSI.reset()])
+      IO.puts([IO.ANSI.green(), "stop cancelled by user", IO.ANSI.reset()])
     end
   end
 
@@ -47,7 +47,7 @@ defmodule Mix.Tasks.Deli.Stop do
   end
 
   defp confirm_stop?(target, options) do
-    message = "Stop #{Config.app()} #{target}?"
+    message = "stop #{Config.app()} #{target}?"
 
     if options |> Keyword.get(:yes) do
       IO.puts("#{message} (Y/n) YES")
