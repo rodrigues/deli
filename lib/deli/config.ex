@@ -4,7 +4,7 @@ defmodule Deli.Config do
   @defaults %{
     docker_build_target: :centos,
     docker_port: 4441,
-    controller: Deli.Controller.Systemctl
+    controller: Deli.Controller.Bin
   }
 
   def app do

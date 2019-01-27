@@ -1,3 +1,7 @@
+*** v0.1.15
+
+- [NEW BREAKING] Binary default, systemctl as an option
+
 *** v0.1.14
 
 - [NEW] Show previous status before start/stop
