@@ -1,3 +1,7 @@
+*** v0.1.10
+
+- [NEW] Improve documentation
+
 *** v0.1.9
 
 - [FIX] Fix error with restart
