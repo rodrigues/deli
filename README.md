@@ -106,7 +106,7 @@ At the moment, this package exists for reusing among similarly configured apps. 
 ## Potential future work
 
 - Remove edeliver dependency, replacing its steps by local code
-- Provide default distillery config (distillery)
+- Provide default distillery config
 - Parallel restarts / checks / ...
 - Retry / rollback strategy
 - Upgrades
