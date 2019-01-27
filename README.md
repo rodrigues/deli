@@ -22,6 +22,8 @@ end
 
 You don't need to add `edeliver` or `distillery`, as they're already included.
 
+No need for edeliver config (for basic scenario). You will need to [setup distillery](https://hexdocs.pm/distillery).
+
 Then add some configuration in your `config/config.exs`:
 
 ```elixir
