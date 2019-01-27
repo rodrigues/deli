@@ -86,6 +86,9 @@ $ mix deli.release
 
 # Does only deploy/restart/check (release should be available)
 $ mix deli.deploy
+
+# Opens a IEx session to a host in target staging
+$ eval $(mix deli.shell)
 ```
 
 ### Configuring controller
