@@ -9,7 +9,6 @@ defmodule Deli.Release do
     target_mix_env = target |> Config.mix_env()
 
     ensure_edeliver_config()
-    ensure_edeliver_dockerfile()
     clear_previous_releases()
     boot_docker()
     clear_remote_releases()
@@ -19,6 +18,7 @@ defmodule Deli.Release do
 
   defp boot_docker do
     docker_port = Config.docker_port()
+    ensure_dockerfile()
     ensure_docker_compose()
     ensure_docker_authorized_keys()
     docker_compose("down --remove-orphans")
@@ -47,7 +47,7 @@ defmodule Deli.Release do
     end
   end
 
-  defp ensure_edeliver_dockerfile do
+  defp ensure_dockerfile do
     path = ".deliver/Dockerfile"
 
     unless path |> file_exists? do
