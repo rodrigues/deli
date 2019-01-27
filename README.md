@@ -108,8 +108,6 @@ At the moment, this package exists for reusing among similarly configured apps. 
 - Remove edeliver dependency, replacing its steps by local code
 - Accept regex pattern in the end of task(s) to filter hosts affected by command
 - Before confirmation, list all affected hosts
-- Log more details in verbose mode
-- Support a quiet mode
 - Add more docs, tests and typespecs
 - Add docker build target to latest debian and ubuntu
 - Allow configuring a docker image identifier as docker build target
