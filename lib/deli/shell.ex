@@ -1,4 +1,6 @@
 defmodule Deli.Shell do
+  @moduledoc "Provides conveniences for modules to deal with shell commands and files"
+
   def cmd(command) do
     with 0 <- Mix.shell().cmd(command) do
       :ok

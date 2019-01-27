@@ -3,6 +3,8 @@ defmodule Deli.Release do
   alias Deli.Config
   alias Deli.Templates.{Compose, Dockerfile, EdeliverConfig}
 
+  @moduledoc "Provisions a local docker and builds release"
+
   def build(tag, target) do
     target_mix_env = target |> Config.mix_env()
 
@@ -81,8 +83,7 @@ defmodule Deli.Release do
     path = ".deliver/authorized_keys/#{app}_id_rsa"
 
     unless path |> file_exists? do
-      # TODO generate key
-      IO.puts("TODO generate ssh key in #{path}")
+      IO.puts("You need to generate ssh key in #{path}")
       add_to_gitignore("/.deliver/authorized_keys/*")
     end
 

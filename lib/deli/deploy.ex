@@ -13,14 +13,25 @@ defmodule Deli.Deploy do
   end
 
   defp restart_target(target) do
-    target_mix_env = target |> Config.mix_env()
-    target |> Config.hosts() |> Enum.each(&restart_host(target_mix_env, &1))
+    target |> Config.hosts() |> Enum.each(&restart_host/1)
   end
 
-  defp restart_host(target, host) do
+  defp restart_host(host) do
     app = Config.app()
-    Config.restarter().restart_host(app, target, host)
+    controller = Config.controller()
+    id = "#{app}@#{host}"
+
+    IO.puts("restarting #{id}")
+    :ok = app |> controller.restart_host(host)
+    IO.puts("restarted #{id}")
+
     :timer.sleep(1_000)
-    Config.checker().check_service_status(app, host)
+
+    if app |> controller.service_running?(host) do
+      IO.puts([IO.ANSI.green(), "running #{id}", IO.ANSI.reset()])
+    else
+      IO.puts([IO.ANSI.red(), "not running #{id}", IO.ANSI.reset()])
+      IO.puts(app |> controller.service_status(host))
+    end
   end
 end

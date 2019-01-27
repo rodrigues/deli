@@ -1,9 +1,10 @@
 defmodule Deli.Config do
+  @moduledoc "Resolves deli configuration"
+
   @defaults %{
     docker_build_target: :centos,
     docker_port: 4441,
-    restarter: Deli.Controllers.Systemctl,
-    checker: Deli.Controllers.Systemctl
+    controller: Deli.Controller.Systemctl
   }
 
   def app do
@@ -22,12 +23,8 @@ defmodule Deli.Config do
     :hosts |> get([]) |> Keyword.get(mix_env(env), [])
   end
 
-  def restarter do
-    :restarter |> get(@defaults.restarter)
-  end
-
-  def checker do
-    :checker |> get(@defaults.checker)
+  def controller do
+    :controller |> get(@defaults.controller)
   end
 
   def get(key, default) do

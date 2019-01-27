@@ -26,7 +26,7 @@ defmodule Mix.Tasks.Deli do
   @shortdoc "Deploys application"
 
   def run(args) do
-    Application.ensure_all_started(:deli)
+    _ = Application.ensure_all_started(:deli)
     options = args |> parse_options
 
     if assets?(options), do: System.put_env("ASSETS", "1")

@@ -28,11 +28,11 @@ defmodule Deli.MixProject do
 
   defp deps do
     [
-      {:edeliver, "~> 1.6.0"},
-      {:distillery, "~> 2.0.10"},
-      {:ex_doc, "~> 0.19.1", only: :dev},
-      {:credo, "~> 1.0.0", only: :test},
-      {:dialyxir, "~> 1.0.0-rc.4", only: :test}
+      {:edeliver, "~> 1.6.0", runtime: false},
+      {:distillery, "~> 2.0.10", runtime: false},
+      {:ex_doc, "~> 0.19.1", only: :dev, runtime: false},
+      {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false}
     ]
   end
 

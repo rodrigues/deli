@@ -1,6 +1,8 @@
 defmodule Deli.Templates.Dockerfile do
   require EEx
 
+  @moduledoc false
+
   EEx.function_from_file(
     :def,
     :build_centos,
