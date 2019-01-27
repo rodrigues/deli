@@ -42,7 +42,7 @@ config :deli,
   ]
 ```
 
-```
+```bash
 $ mix deli
 ```
 
@@ -57,7 +57,7 @@ It will assume `staging` environment by default.
 
 To target `prod` environment, do:
 
-```
+```bash
 $ mix deli -t prod
 ```
 
@@ -66,7 +66,7 @@ If you don't want that extra step, pass `-y` when calling this task.
 
 Other convenience tasks provided by deli:
 
-```
+```bash
 # Starts all hosts for target prod
 $ mix deli.start -t prod
 
@@ -78,10 +78,8 @@ $ mix deli.stop -t prod -y
 
 By default, the release binary (`/opt/APP/bin/APP`) is used to control the app (start, stop, restart, status, ping), but systemd's `systemctl` can be configured as the app controller:
 
-```
-config :deli,
-  # ...,
-  controller: Deli.Controller.Systemctl
+```elixir
+config :deli, controller: Deli.Controller.Systemctl
 ```
 
 You can configure any module that implements the [`Deli.Controller` behaviour](https://hexdocs.pm/deli/Deli.Controller.html).
