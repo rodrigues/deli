@@ -106,15 +106,15 @@ At the moment, this package exists for reusing among similarly configured apps. 
 ## Potential future work
 
 - Remove edeliver dependency, replacing its steps by local code
-- Accept regex pattern in the end of task(s) to filter hosts affected by command
-- Before confirmation, list all affected hosts
-- Add more docs, tests and typespecs
-- Add docker build target to latest debian and ubuntu
-- Allow configuring a docker image identifier as docker build target
-- Allow configuring docker build elixir / otp / rebar versions (mind the checksums)
 - Provide default distillery config (distillery)
-- Default release service assets (nginx, systemd, logrotate etc)
 - Parallel restarts / checks / ...
 - Retry / rollback strategy
 - Upgrades
+- Accept regex pattern in the end of task(s) to filter hosts affected by command
+- Before confirmation, list all affected hosts
+- Add docker build target to latest debian and ubuntu
+- Allow configuring a docker image identifier as docker build target
+- Allow configuring docker build elixir / otp / rebar versions (mind the checksums)
+- Add more docs, tests and typespecs
+- Default release service assets (nginx, systemd, logrotate etc)
 - PRs are welcome! The intent is to keep this task simple to use over time, and add flexibility through configuration rather than CLI args or ENV, providing good defaults.
