@@ -1,5 +1,6 @@
 defmodule Deli.Controller.Bin do
   import Deli.Shell
+  alias Deli.Config
 
   @moduledoc "Provides support for bin on deploy"
 
@@ -39,6 +40,6 @@ defmodule Deli.Controller.Bin do
   end
 
   defp bin(app, host, cmd) do
-    [:ssh, "#{app}@#{host}", "'/opt/#{app}/bin/#{app} #{cmd}'"]
+    [:ssh, "#{app}@#{host}", "'#{Config.bin_path()} #{cmd}'"]
   end
 end

@@ -12,6 +12,11 @@ defmodule Deli.Config do
     :app |> get(Mix.Project.get().project[:app])
   end
 
+  def bin_path do
+    app = app()
+    "/opt/#{app}/bin/#{app}"
+  end
+
   def docker_build_target do
     :docker_build_target |> get(@defaults.docker_build_target)
   end
