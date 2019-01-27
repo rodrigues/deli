@@ -1,40 +1,31 @@
 defmodule Mix.Tasks.Deli.Deploy do
   use Mix.Task
-  alias Deli.{Deploy, Release, Versioning}
+  alias Deli.{Deploy, Versioning}
 
   @moduledoc """
   To deploy current master into staging, do:
 
-      $ mix deli
+      $ mix deli.deploy
 
   Or, if you want to specify a version or target environment, do:
 
-      $ mix deli --version=1.0.0 --target=prod
+      $ mix deli.deploy --version=1.0.0 --target=prod
 
-  It will ask for confirmation after release is built, before deploy.
+  It will ask for confirmation before it starts.
 
   If you don't want that extra step, pass `--yes`, or simply `-y` when calling it:
 
-      $ mix deli -t prod -y
-
-  You can also specify if you want assets to be included or not.
-  It defaults to false, but you can change that in `config :deli, assets: true`
-
-      $ mix deli -t prod -a -y
+      $ mix deli.deploy -t prod -y
   """
 
-  @shortdoc "Deploys application"
+  @shortdoc "Only deploys application (without release build)"
 
   def run(args) do
     _ = Application.ensure_all_started(:deli)
     options = args |> parse_options
 
-    if assets?(options), do: System.put_env("ASSETS", "1")
-
     tag = options |> Versioning.fetch_version_tag()
     target = options |> Keyword.get(:target, "staging")
-
-    Release.build(tag, target)
 
     if confirm_deploy?(tag, target, options) do
       Deploy.run(target)
@@ -54,17 +45,9 @@ defmodule Mix.Tasks.Deli.Deploy do
     end
   end
 
-  defp assets?(options) do
-    if options |> Keyword.get(:assets) do
-      true
-    else
-      :deli |> Application.get_env(:assets, false)
-    end
-  end
-
   defp parse_options(args) do
-    options = [version: :string, target: :string, assets: :boolean, yes: :boolean]
-    aliases = [v: :version, t: :target, a: :assets, y: :yes]
+    options = [version: :string, target: :string, yes: :boolean]
+    aliases = [v: :version, t: :target, y: :yes]
 
     args
     |> OptionParser.parse(aliases: aliases, switches: options)

@@ -1,6 +1,10 @@
+*** v0.1.16
+
+- [NEW] Add subtasks deli.release and deli.deploy
+
 *** v0.1.15
 
-- [NEW BREAKING] Binary default, systemctl as an option
+- [NEW] Binary default, systemctl as an option
 
 *** v0.1.14
 
