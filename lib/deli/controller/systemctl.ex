@@ -6,8 +6,18 @@ defmodule Deli.Controller.Systemctl do
   @behaviour Deli.Controller
 
   @impl true
+  def start_host(app, host) do
+    sudo_systemctl(app, host, :start)
+  end
+
+  @impl true
+  def stop_host(app, host) do
+    sudo_systemctl(app, host, :stop)
+  end
+
+  @impl true
   def restart_host(app, host) do
-    cmd("ssh #{app}@#{host} 'sudo systemctl restart #{app}'")
+    sudo_systemctl(app, host, :restart)
   end
 
   @impl true
@@ -18,6 +28,16 @@ defmodule Deli.Controller.Systemctl do
 
   @impl true
   def service_status(app, host) do
-    "ssh #{app}@#{host} 'systemctl status #{app}'" |> cmd_result
+    app |> systemctl(host, :status) |> cmd_result
+  end
+
+  defp sudo_systemctl(app, host, op) do
+    command = app |> systemctl(host, op, true)
+    cmd(command)
+  end
+
+  defp systemctl(app, host, cmd, sudo \\ false) do
+    sudo = if sudo, do: "sudo ", else: ""
+    "ssh #{app}@#{host} '#{sudo}systemctl #{cmd} #{app}'"
   end
 end

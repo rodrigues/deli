@@ -39,7 +39,7 @@ defmodule Mix.Tasks.Deli do
     if confirm_deploy?(tag, target, options) do
       Deploy.run(target)
     else
-      IO.puts([IO.ANSI.green(), "Deploy aborted by user", IO.ANSI.reset()])
+      IO.puts([IO.ANSI.green(), "Deploy cancelled by user", IO.ANSI.reset()])
     end
   end
 

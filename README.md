@@ -15,7 +15,7 @@ Add `deli` to your deps:
 def deps do
   [
     # ...
-    {:deli, "~> 0.1.12", runtime: false}
+    {:deli, "~> 0.1.13", runtime: false}
   ]
 end
 ```
@@ -51,7 +51,6 @@ The command above does full cycle deploy:
 - Deploys release to target environment (edeliver)
 - Restart target apps (systemctl)
 - Checks status (systemctl)
-- Pings application (edeliver)
 
 It will assume `staging` environment by default.
 
@@ -70,6 +69,19 @@ For more deploy options, do:
 $ mix help deli
 ```
 
+Other convenience tasks provided by deli:
+
+```
+# Starts all hosts for target prod
+$ mix deli.start -t prod
+
+# Stops all hosts for target prod, without confirmation
+$ mix deli.stop -t prod -y
+
+# Restarts all hosts for target staging
+$ mix deli.restart
+```
+
 Releases should be configured in your application with [`distillery`](https://hexdocs.pm/distillery).
 
 You don't need to think about edeliver with deli (unless you want to).
@@ -81,6 +93,7 @@ At the moment, this package exists for reusing among similarly configured apps. 
 ## Potential future work
 
 - Remove edeliver dependency, replacing its steps by local code
+- Accept regex pattern in the end of task(s) to filter hosts affected by command
 - Add documentation, tests and typespecs
 - Log in debug mode
 - Allow configuration for other admin tools (systemctl / edeliver / ?)
