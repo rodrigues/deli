@@ -1,5 +1,5 @@
 defmodule Deli.Config do
-  @moduledoc "Resolves deli configuration"
+  @moduledoc false
 
   @defaults %{
     docker_build_target: :centos,

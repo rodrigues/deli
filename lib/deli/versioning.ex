@@ -52,20 +52,22 @@ defmodule Deli.Versioning do
 
   defp create_version_tag(version) do
     tag = "v#{version}"
-    cmd("git tag #{tag}")
-    cmd("git push origin #{tag}")
+    cmd(:git, [:tag, tag])
+    cmd(:git, [:push, :origin, tag])
     tag
   end
 
   defp git_sha(sha_selector) do
-    "git rev-list -n 1 #{sha_selector}" |> cmd_result
+    {:ok, content} = :git |> cmd_result(["rev-list", "-n", 1, sha_selector])
+    content
   end
 
   defp git_tags do
-    cmd("git fetch --tags")
+    cmd(:git, [:fetch, "--tags"])
 
-    "git tag -l --sort version:refname"
-    |> cmd_result
+    {:ok, content} = :git |> cmd_result([:tag, "-l", "--sort", "version:refname"], [0])
+
+    content
     |> String.split("\n")
     |> Enum.filter(&(&1 != ""))
     |> Enum.map(fn "v" <> n -> n |> Version.parse!() end)

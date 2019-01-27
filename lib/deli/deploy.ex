@@ -7,7 +7,7 @@ defmodule Deli.Deploy do
   def run(target) do
     IO.puts("🤞")
     edeliver_target = target |> Config.edeliver_target()
-    edeliver("deploy release to #{edeliver_target}")
+    edeliver(:deploy, [:release, :to, edeliver_target])
     restart_target(target)
   end
 

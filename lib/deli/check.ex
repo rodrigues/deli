@@ -1,7 +1,7 @@
 defmodule Deli.Check do
   alias Deli.Config
 
-  @moduledoc "Checks if service is running at host"
+  @moduledoc false
 
   def run(host, running_good? \\ true) do
     app = Config.app()

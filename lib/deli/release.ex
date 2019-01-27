@@ -3,7 +3,7 @@ defmodule Deli.Release do
   alias Deli.Config
   alias Deli.Templates.{Compose, Dockerfile, EdeliverConfig}
 
-  @moduledoc "Provisions a local docker and builds release"
+  @moduledoc false
 
   def build(tag, target) do
     target_mix_env = target |> Config.mix_env()
@@ -13,7 +13,7 @@ defmodule Deli.Release do
     boot_docker()
     clear_remote_releases()
 
-    edeliver("build release --tag=#{tag} --mix-env=#{target_mix_env}")
+    edeliver(:build, [:release, "--tag", tag, "--mix-env", target_mix_env])
   end
 
   defp boot_docker do
@@ -21,12 +21,13 @@ defmodule Deli.Release do
     ensure_dockerfile()
     ensure_docker_compose()
     ensure_docker_authorized_keys()
-    docker_compose("down --remove-orphans")
-    docker_compose("build edeliver")
-    docker_compose("up -d edeliver")
+    docker_compose(:down, ["--remove-orphans"], [0, 1])
+    docker_compose(:build, [:edeliver])
+    docker_compose(:up, ["-d", :edeliver])
     :timer.sleep(1_000)
-    cmd("ssh-keygen -R \[0.0.0.0\]:#{docker_port}")
-    cmd("ssh-keyscan -p #{docker_port} 0.0.0.0 >> ~/.ssh/known_hosts")
+    cmd("ssh-keygen", ["-R", "\[0.0.0.0\]:#{docker_port}"])
+    {:ok, scan} = "ssh-keyscan" |> cmd_result(["-p", docker_port, "0.0.0.0"])
+    write_file("~/.ssh/known_hosts", "\n#{scan}\n", [:append])
   end
 
   defp ensure_edeliver_config do
@@ -87,7 +88,7 @@ defmodule Deli.Release do
       add_to_gitignore("/.deliver/authorized_keys/*")
     end
 
-    cmd("chmod 400 #{path}")
+    cmd(:chmod, [400, path])
   end
 
   defp add_to_gitignore(path) do
@@ -100,10 +101,11 @@ defmodule Deli.Release do
   end
 
   defp clear_previous_releases do
-    cmd("rm -rf .deliver/releases")
+    cmd(:rm, ["-rf", ".deliver/releases"], [0, 1])
   end
 
   defp clear_remote_releases do
-    docker_compose("exec edeliver bash -c \"rm -rf /usr/local/builds/*\"")
+    cmd = [:edeliver, :bash, "-c", "\"rm -rf /usr/local/builds/*\""]
+    docker_compose(:exec, cmd, [0, 127])
   end
 end

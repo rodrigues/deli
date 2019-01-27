@@ -1,3 +1,7 @@
+- [NEW] Replace :os.cmd calls for System.cmd, now with better output management
+- [NEW] Organize shell commands
+- [NEW] `@moduledoc false` on internal modules
+
 *** v0.1.16
 
 - [NEW] Add subtasks deli.release and deli.deploy

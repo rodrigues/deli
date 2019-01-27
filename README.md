@@ -91,7 +91,7 @@ By default, the release binary (`/opt/APP/bin/APP`) is used to control the app (
 config :deli, controller: Deli.Controller.Systemctl
 ```
 
-You can configure any module that implements the [`Deli.Controller` behaviour](https://hexdocs.pm/deli/Deli.Controller.html).
+You can configure any module that implements the [`Deli.Controller` behaviour](https://hexdocs.pm/deli/Deli.Controller.html). Beware during `v0.x.x` this contract is not stable.
 
 ### Edeliver and Distillery
 

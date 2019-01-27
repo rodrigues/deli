@@ -28,15 +28,17 @@ defmodule Deli.Controller.Bin do
 
   @impl true
   def service_status(app, host) do
-    app |> bin(host, :ping) |> cmd_result
+    [command | args] = app |> bin(host, :ping)
+    {:ok, content} = command |> cmd_result(args)
+    content
   end
 
   defp bin_cmd(app, host, op) do
-    command = app |> bin(host, op)
-    cmd(command)
+    [command | args] = app |> bin(host, op)
+    cmd(command, args)
   end
 
   defp bin(app, host, cmd) do
-    "ssh #{app}@#{host} '/opt/#{app}/bin/#{app} #{cmd}'"
+    [:ssh, "#{app}@#{host}", "'/opt/#{app}/bin/#{app} #{cmd}'"]
   end
 end
