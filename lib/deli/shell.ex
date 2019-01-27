@@ -115,7 +115,7 @@ defmodule Deli.Shell do
     if Config.verbose?() do
       [into: IO.stream(:stdio, :line), stderr_to_stdout: true] ++ opts
     else
-      [into: ""] ++ opts
+      opts ++ [into: ""]
     end
   end
 
