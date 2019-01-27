@@ -114,7 +114,7 @@ At the moment, this package exists for reusing among similarly configured apps. 
 - Allow configuring docker build elixir / otp / rebar versions (mind the checksums)
 - Provide default distillery config (distillery)
 - Default release service assets (nginx, systemd, logrotate etc)
-- Parallel restarts
+- Parallel restarts / checks / ...
 - Retry / rollback strategy
 - Upgrades
 - PRs are welcome! The intent is to keep this task simple to use over time, and add flexibility through configuration rather than CLI args or ENV, providing good defaults.
