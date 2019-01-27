@@ -40,6 +40,6 @@ defmodule Deli.Controller.Bin do
   end
 
   defp bin(app, host, cmd) do
-    [:ssh, "#{app}@#{host}", "'#{Config.bin_path()} #{cmd}'"]
+    [:ssh, "#{app}@#{host}", Config.bin_path(), cmd]
   end
 end
