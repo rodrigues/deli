@@ -27,7 +27,7 @@ defmodule Mix.Tasks.Deli.Release do
     if assets?(options), do: System.put_env("ASSETS", "1")
 
     tag = options |> Versioning.fetch_version_tag()
-    target = options |> Keyword.get(:target, "staging")
+    target = options |> Keyword.fetch!(:target)
 
     Release.build(tag, target)
   end

@@ -4,7 +4,8 @@ defmodule Deli.Config do
   @defaults %{
     docker_build_target: :centos,
     docker_port: 4441,
-    controller: Deli.Controller.Bin
+    controller: Deli.Controller.Bin,
+    target: :staging
   }
 
   def app do
@@ -50,4 +51,6 @@ defmodule Deli.Config do
   def edeliver_target(:prod), do: "production"
   def edeliver_target(env) when is_atom(env), do: env |> to_string
   def edeliver_target(target) when is_binary(target), do: target
+
+  def default_target, do: :staging
 end

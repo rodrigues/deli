@@ -25,7 +25,7 @@ defmodule Mix.Tasks.Deli.Restart do
     _ = Application.ensure_all_started(:deli)
     app = Config.app()
     options = args |> parse_options
-    target = options |> Keyword.get(:target, "staging")
+    target = options |> Keyword.fetch!(:target)
 
     if "restart #{app} at target #{target}?" |> confirm?(options) do
       target |> Config.hosts() |> Enum.each(&restart_host/1)

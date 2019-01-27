@@ -72,6 +72,12 @@ defmodule Deli.Shell do
     args
     |> OptionParser.parse(aliases: aliases, switches: options)
     |> elem(0)
+    |> ensure_target
+  end
+
+  defp ensure_target(opts) do
+    target = opts |> Keyword.get(:target, Config.default_target()) |> Config.mix_env()
+    opts |> Keyword.put(:target, target)
   end
 
   defp command_failed!(command, args, signal, content \\ nil)

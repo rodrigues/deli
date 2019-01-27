@@ -25,8 +25,8 @@ defmodule Mix.Tasks.Deli.Deploy do
     _ = Application.ensure_all_started(:deli)
     app = Config.app()
     options = args |> parse_options
+    target = options |> Keyword.fetch!(:target)
     tag = options |> Versioning.fetch_version_tag()
-    target = options |> Keyword.get(:target, "staging")
 
     if "deploy #{app}#{tag} to #{target}?" |> confirm?(options) do
       Deploy.run(target)
