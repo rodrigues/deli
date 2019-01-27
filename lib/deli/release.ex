@@ -83,8 +83,18 @@ defmodule Deli.Release do
     app = Config.app()
     path = ".deliver/authorized_keys/#{app}_id_rsa"
 
+    keygen_args = [
+      "-f",
+      ".deliver/authorized_keys/#{app}_id_rsa",
+      "-t",
+      :rsa,
+      "-b",
+      4096
+    ]
+
     unless path |> file_exists? do
-      IO.puts("You need to generate ssh key in #{path}")
+      cmd(:mkdir, ["-p", ".deliver/authorized_keys"])
+      cmd("ssh-keygen", keygen_args)
       add_to_gitignore("/.deliver/authorized_keys/*")
     end
 
