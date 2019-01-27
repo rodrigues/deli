@@ -2,7 +2,7 @@
 
 Provides a deploy task for Elixir applications, using a few [`edeliver`](https://github.com/edeliver/edeliver) [tasks](https://hexdocs.pm/edeliver/Mix.Tasks.Edeliver.html#content) under the hood.
 
-Releases are built locally with docker containers, and systemd is used for controlling the app (`systemctl (restart | status)`).
+Releases are built locally with docker containers, and systemd's systemctl is used by default for controlling the app (`systemctl (restart | status)`). You can configure another controller.
 
 
 Git tags are enforced to keep versioning relevant, and matching with your `mix.exs`.
@@ -15,7 +15,7 @@ Add `deli` to your deps:
 def deps do
   [
     # ...
-    {:deli, "~> 0.1.10", runtime: false}
+    {:deli, "~> 0.1.11", runtime: false}
   ]
 end
 ```

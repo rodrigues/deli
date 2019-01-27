@@ -1,3 +1,8 @@
+*** v0.1.11
+
+- [NEW] Allow configuring another controller other than systemctl
+- [FIX] Ensure target prod and production are equivalent (edeliver<->mix lingo)
+
 *** v0.1.10
 
 - [NEW] Improve documentation

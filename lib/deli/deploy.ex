@@ -6,39 +6,21 @@ defmodule Deli.Deploy do
 
   def run(target) do
     IO.puts("🤞")
-    edeliver("deploy release to #{target}")
+    edeliver_target = target |> Config.edeliver_target()
+    edeliver("deploy release to #{edeliver_target}")
     restart_target(target)
-    edeliver("ping #{target}")
+    edeliver("ping #{edeliver_target}")
   end
 
   defp restart_target(target) do
-    target |> Config.hosts() |> Enum.each(&restart_host/1)
+    target_mix_env = target |> Config.mix_env()
+    target |> Config.hosts() |> Enum.each(&restart_host(target_mix_env, &1))
   end
 
-  defp restart_host(host) do
+  defp restart_host(target, host) do
     app = Config.app()
-    id = "#{app}@#{host}"
-
-    IO.puts("restarting #{id}")
-    cmd("ssh #{id} 'sudo systemctl restart #{app}'")
-    IO.puts("restarted #{id}")
-
+    Config.restarter().restart_host(app, target, host)
     :timer.sleep(1_000)
-    check_service_status(host)
-  end
-
-  defp check_service_status(host) do
-    app = Config.app()
-    id = "#{app}@#{host}"
-    status = "ssh #{id} 'systemctl status #{app}'" |> cmd_result
-
-    if status =~ ~r/Active\: active \(running\)/ do
-      IO.puts([IO.ANSI.green(), "running #{id}", IO.ANSI.reset()])
-      true
-    else
-      IO.puts([IO.ANSI.red(), "not running #{id}", IO.ANSI.reset()])
-      IO.puts(status)
-      false
-    end
+    Config.checker().check_service_status(app, host)
   end
 end
