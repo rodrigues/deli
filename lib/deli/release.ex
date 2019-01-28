@@ -13,7 +13,7 @@ defmodule Deli.Release do
     boot_docker()
     clear_remote_releases()
 
-    edeliver(:build, [:release, "--tag", tag, "--mix-env", target_mix_env])
+    edeliver(:build, [:release, "--tag=#{tag}", "--mix-env=#{target_mix_env}"])
   end
 
   defp boot_docker do
