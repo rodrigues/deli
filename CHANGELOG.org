@@ -1,3 +1,5 @@
+*** v0.1.17
+
 - [NEW] mix deli.version
 - [NEW] mix deli.status
 - [NEW] mix deli.shell

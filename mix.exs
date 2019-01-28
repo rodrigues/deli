@@ -4,7 +4,7 @@ defmodule Deli.MixProject do
   def project do
     [
       app: :deli,
-      version: "0.1.16",
+      version: "0.1.17",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       application: application(),
@@ -14,9 +14,7 @@ defmodule Deli.MixProject do
       package: package(),
       source_url: "https://github.com/rodrigues/deli",
       homepage_url: "https://hexdocs.pm/deli",
-      description: """
-      A deploy task for Elixir applications
-      """
+      description: "A deploy task for Elixir applications"
     ]
   end
 
