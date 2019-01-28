@@ -17,7 +17,7 @@ defmodule Deli.Shell do
     if ok_signals |> Enum.member?(signal) do
       if result?, do: {:ok, content}, else: :ok
     else
-      command_failed!(command, args, signal)
+      command_failed!(command, args, signal, content)
     end
   end
 
@@ -89,8 +89,9 @@ defmodule Deli.Shell do
       IO.ANSI.reset(),
       IO.ANSI.red_background(),
       IO.ANSI.white(),
-      "Deploy command failed: `#{command_inspect([command | args])}`#{details}",
-      IO.ANSI.reset()
+      "Deploy command failed: `#{command_inspect([command | args])}`",
+      IO.ANSI.reset(),
+      details
     ])
 
     exit({:shutdown, signal})
