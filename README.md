@@ -90,6 +90,9 @@ $ mix deli.deploy
 # Checks status
 $ mix deli.status -t prod
 
+# Checks version
+$ mix deli.version
+
 # Opens a IEx session to a host in target staging
 $ eval $(mix deli.shell)
 ```
