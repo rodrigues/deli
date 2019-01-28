@@ -80,7 +80,7 @@ defmodule Deli.Shell do
     opts |> Keyword.put(:target, target)
   end
 
-  defp command_failed!(command, args, signal, content \\ nil)
+  defp command_failed!(command, args, signal, content)
        when is_binary(command) and is_list(args) and is_integer(signal) do
     details = "(#{signal})"
     details = if content, do: "\n#{details} #{content}", else: details
