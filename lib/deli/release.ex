@@ -95,7 +95,7 @@ defmodule Deli.Release do
     unless path |> file_exists? do
       cmd(:mkdir, ["-p", ".deliver/authorized_keys"])
       cmd("ssh-keygen", keygen_args)
-      add_to_gitignore("/.deliver/authorized_keys/*")
+      error!("Commit authorized keys before proceeding")
     end
 
     cmd(:chmod, [400, path])

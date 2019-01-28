@@ -1,3 +1,7 @@
+*** v0.1.19
+
+- [FIX] Do not ignore docker keys in git, that is needed
+
 *** v0.1.18
 
 - [NEW] Remove unused lang variables in dockerfile
