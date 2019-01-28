@@ -1,3 +1,8 @@
+*** v0.1.18
+
+- [NEW] Remove unused lang variables in dockerfile
+- [NEW] Avoid rebuilding image when keys change
+
 *** v0.1.17
 
 - [NEW] mix deli.version
