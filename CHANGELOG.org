@@ -1,3 +1,7 @@
+*** v0.1.21
+
+- [FIX] Fix edeliver tags in build command
+
 *** v0.1.20
 
 - [FIX] Move user creation lower in dockerfile to adapt to another change
