@@ -39,7 +39,7 @@ defmodule Mix.Tasks.Deli.Restart do
     controller = Config.controller()
     id = "#{app}@#{host}"
 
-    Check.run(host, false)
+    Check.run(host)
     IO.puts("restarting #{id}...")
     :ok = app |> controller.restart_host(host)
     IO.puts([IO.ANSI.green(), "restarted #{id}", IO.ANSI.reset()])
