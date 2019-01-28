@@ -8,12 +8,6 @@ ENV OTP_VERSION="21.2.2" \
     OTP_SUM="41b1c3a8343218157a683776e71d80a05ac4eb4019a90a760846608d78817690" \
     ELIXIR_SUM="fe896d8b2914f982d2e6fceeb585f59a8f92ad872653fc46c13df9ff86d69234"
 
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
-
-COPY authorized_keys /authorized_keys
-
 # Base dependencies
 RUN set -xe \
   && yum update -y \
@@ -93,6 +87,7 @@ RUN set -xe \
   && mix local.hex --force \
   && mix hex.info
 
+COPY authorized_keys /authorized_keys
 RUN ssh-keygen -q -t rsa -f /etc/ssh/ssh_host_rsa_key -C '' -N ''
 RUN ssh-keygen -q -t dsa -f /etc/ssh/ssh_host_dsa_key -C '' -N ''
 
@@ -103,8 +98,6 @@ RUN git config receive.denyCurrentBranch ignore
 RUN chown -R edeliver:edeliver /usr/local/builds
 
 RUN echo "export LANG=en_US.UTF-8" >> /home/edeliver/.profile
-RUN echo "LANG=en_US.utf-8" >> /etc/environment
-RUN echo "LC_ALL=en_US.utf-8" >> /etc/environment
 
 EXPOSE 22
 
