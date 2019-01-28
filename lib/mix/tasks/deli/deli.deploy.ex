@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Deli.Deploy do
     target = options |> Keyword.fetch!(:target)
     tag = options |> Versioning.fetch_version_tag()
 
-    if "deploy #{app}#{tag} to #{target}?" |> confirm?(options) do
+    if "deploy #{app} #{tag} to #{target}?" |> confirm?(options) do
       Deploy.run(target)
     else
       IO.puts([IO.ANSI.green(), "deploy cancelled by user", IO.ANSI.reset()])

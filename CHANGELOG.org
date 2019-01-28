@@ -1,3 +1,5 @@
+- [NEW] Better output when confirming deploy
+
 *** v0.1.21
 
 - [FIX] Fix edeliver tags in build command
