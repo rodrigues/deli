@@ -1,3 +1,7 @@
+*** v0.1.20
+
+- [FIX] Move user creation lower in dockerfile to adapt to another change
+
 *** v0.1.19
 
 - [FIX] Do not ignore docker keys in git, that is needed
