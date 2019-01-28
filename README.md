@@ -120,7 +120,6 @@ At the moment, this package exists for reusing among similarly configured apps. 
 ## Potential future work
 
 - Remove edeliver dependency, replacing its steps by local code
-- Provide default distillery config
 - Concurrent restarts / checks / ...
 - Accept regex pattern in the end of task(s) to filter hosts affected by command
 - Before confirmation, list all affected hosts
