@@ -56,7 +56,11 @@ defmodule Deli.Shell do
     exit({:shutdown, 1})
   end
 
-  def confirm?(message, options) do
+  def confirm?(operation, options) do
+    app = Config.app()
+    target = options |> Keyword.fetch!(:target)
+    message = "#{operation} #{app} at #{target}?"
+
     if options |> Keyword.get(:yes) do
       IO.puts("#{message} (Y/n) YES")
       true

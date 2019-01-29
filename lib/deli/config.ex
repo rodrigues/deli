@@ -8,8 +8,8 @@ defmodule Deli.Config do
     target: :staging,
     # in seconds, waits 1h to timeout
     port_forwarding_timeout: 3_600,
-    # in ms, waits 1s between open port and iex
-    port_forwarding_wait: 1_000
+    # in ms, waits 2s between open port and iex
+    port_forwarding_wait: 2_000
   }
 
   def app do

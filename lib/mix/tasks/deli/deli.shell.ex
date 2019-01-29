@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli.Shell do
   use Mix.Task
   import Deli.Shell
-  alias Deli.Config
+  alias Deli.{Config, HostFilter}
 
   @moduledoc """
   Returns the command you need to run to open a shell.
@@ -21,10 +21,10 @@ defmodule Mix.Tasks.Deli.Shell do
 
     Application.put_env(:deli, :verbose, true)
 
-    # TODO Build a host selector
-    host = env |> Config.hosts() |> Enum.at(0)
+    {:ok, host} = env |> HostFilter.host(args)
 
     spawn(fn -> port_forwarding(env, host) end)
+
     :timer.sleep(Config.port_forwarding_wait())
 
     command =
@@ -33,7 +33,8 @@ defmodule Mix.Tasks.Deli.Shell do
       |> command(env, host)
 
     print_command(command)
-    :timer.sleep(Config.port_forwarding_timeout())
+
+    :timer.sleep(Config.port_forwarding_wait())
   end
 
   defp port_forwarding(env, host) do

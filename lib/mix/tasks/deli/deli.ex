@@ -1,5 +1,7 @@
 defmodule Mix.Tasks.Deli do
   use Mix.Task
+  import Deli.Shell
+  alias Deli.HostFilter
   alias Mix.Tasks.Deli.{Deploy, Release}
 
   @moduledoc """
@@ -29,6 +31,13 @@ defmodule Mix.Tasks.Deli do
 
   def run(args) do
     _ = Application.ensure_all_started(:deli)
+    options = args |> parse_options
+    target = options |> Keyword.fetch!(:target)
+
+    # Although deploy is the one that needs hosts,
+    # calling this before so operation stops fast
+    # in case there are no valid hosts given filter
+    {:ok, _} = target |> HostFilter.hosts(args)
 
     with :ok <- args |> Release.run() do
       Deploy.run(args)

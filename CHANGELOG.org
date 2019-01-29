@@ -1,4 +1,9 @@
-*** v0.1.24
+*** v0.1.26
+
+- [NEW] Accept regex pattern in the end of task(s) to filter hosts affected by command
+- [NEW] Before confirmation, list all affected hosts
+
+*** v0.1.25 (v0.1.24 skipped)
 
 - [NEW] Provide `Config.yarn?/0` and install it on centos when needed
 - [NEW] Provide `Config.assets?/0`

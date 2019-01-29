@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli.Restart do
   use Mix.Task
   import Deli.Shell
-  alias Deli.{Check, Config}
+  alias Deli.{Check, Config, HostFilter}
 
   @moduledoc """
   To restart app in all staging hosts, do:
@@ -23,12 +23,12 @@ defmodule Mix.Tasks.Deli.Restart do
 
   def run(args) do
     _ = Application.ensure_all_started(:deli)
-    app = Config.app()
     options = args |> parse_options
     target = options |> Keyword.fetch!(:target)
+    {:ok, hosts} = target |> HostFilter.hosts(args)
 
-    if "restart #{app} at target #{target}?" |> confirm?(options) do
-      target |> Config.hosts() |> Enum.each(&restart_host(target, &1))
+    if :restart |> confirm?(options) do
+      hosts |> Enum.each(&restart_host(target, &1))
     else
       IO.puts([IO.ANSI.green(), "restart cancelled by user", IO.ANSI.reset()])
     end

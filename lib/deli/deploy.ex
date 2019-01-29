@@ -4,15 +4,10 @@ defmodule Deli.Deploy do
 
   @moduledoc false
 
-  def run(target) do
-    IO.puts("🤞")
+  def run(target, host) do
     edeliver_target = target |> Config.edeliver_target()
-    edeliver(:deploy, [:release, :to, edeliver_target])
-    restart_target(target)
-  end
-
-  defp restart_target(env) do
-    env |> Config.hosts() |> Enum.each(&restart_host(env, &1))
+    edeliver(:deploy, [:release, :to, edeliver_target, "--host=#{host}"])
+    restart_host(target, host)
   end
 
   defp restart_host(env, host) do
