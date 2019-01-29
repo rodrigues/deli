@@ -33,6 +33,10 @@ defmodule Deli.Config do
     end
   end
 
+  def assets? do
+    :assets |> get(false)
+  end
+
   def cookie do
     cookie = :cookie |> get()
     cookie || app()

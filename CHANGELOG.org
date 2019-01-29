@@ -1,3 +1,4 @@
+- [NEW] Provide `Config.assets?/0`
 - [NEW] Wait between port forwarding spawn and shell command is configurable
 
 *** v0.1.23

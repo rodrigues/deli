@@ -36,7 +36,7 @@ defmodule Mix.Tasks.Deli.Release do
     if options |> Keyword.get(:assets) do
       true
     else
-      :deli |> Application.get_env(:assets, false)
+      Config.assets?()
     end
   end
 end
