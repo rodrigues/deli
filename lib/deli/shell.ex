@@ -66,8 +66,19 @@ defmodule Deli.Shell do
   end
 
   def parse_options(args) do
-    options = [version: :string, target: :string, yes: :boolean, assets: :boolean]
-    aliases = [v: :version, t: :target, y: :yes, a: :assets]
+    options = [
+      version: :string,
+      target: :string,
+      yes: :boolean,
+      assets: :boolean
+    ]
+
+    aliases = [
+      v: :version,
+      t: :target,
+      y: :yes,
+      a: :assets
+    ]
 
     args
     |> OptionParser.parse(aliases: aliases, switches: options)

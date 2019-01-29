@@ -1,3 +1,4 @@
+- [NEW] Run observer to remote node with a simple call
 - [FIX] Restart expects node to be running
 
 *** v0.1.22

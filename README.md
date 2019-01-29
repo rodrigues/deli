@@ -93,8 +93,11 @@ $ mix deli.status -t prod
 # Checks version
 $ mix deli.version
 
-# Opens a IEx session to a host in target staging
+# Opens a IEx remote console from local machine
 $ eval $(mix deli.shell)
+
+# Opens a local observer connected to remote node
+$ eval $(mix deli.shell -o)
 ```
 
 ### Configuring controller

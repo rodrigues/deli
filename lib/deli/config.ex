@@ -5,17 +5,49 @@ defmodule Deli.Config do
     docker_build_target: :centos,
     docker_port: 4441,
     controller: Deli.Controller.Bin,
-    target: :staging
+    target: :staging,
+    port_forwarding_timeout: 3_600
   }
 
   def app do
-    :app |> get(Mix.Project.get().project[:app])
+    app = :app |> get()
+    app || Mix.Project.get().project[:app]
+  end
+
+  def app_user(env) do
+    app_user = :app_user |> get()
+
+    case app_user do
+      nil ->
+        app()
+
+      user when is_atom(user) or is_binary(user) ->
+        user
+
+      options when is_list(options) ->
+        user = options |> Keyword.get(env)
+        user || app()
+    end
+  end
+
+  def cookie do
+    cookie = :cookie |> get()
+    cookie || app()
+  end
+
+  def host_id(host) do
+    "#{app()}@#{host}"
   end
 
   def bin_path do
-    app = app()
-    path = "/opt/#{app}/bin/#{app}"
-    :bin_path |> get(path)
+    case :bin_path |> get() do
+      nil ->
+        app = app()
+        "/opt/#{app}/bin/#{app}"
+
+      path ->
+        path
+    end
   end
 
   def docker_build_target do
@@ -24,6 +56,10 @@ defmodule Deli.Config do
 
   def docker_port do
     :docker_port |> get(@defaults.docker_port)
+  end
+
+  def port_forwarding_timeout do
+    :port_forwarding_timeout |> get(@defaults.port_forwarding_timeout)
   end
 
   def hosts(env) do
@@ -38,7 +74,7 @@ defmodule Deli.Config do
     :verbose |> get(false)
   end
 
-  def get(key, default) do
+  def get(key, default \\ nil) do
     :deli |> Application.get_env(key, default)
   end
 

@@ -16,14 +16,154 @@ defmodule Mix.Tasks.Deli.Shell do
     _ = Application.ensure_all_started(:deli)
 
     options = args |> parse_options
+    extra_options = args |> parse_extra_options
     target = options |> Keyword.fetch!(:target)
 
     Application.put_env(:deli, :verbose, true)
-    app = Config.app()
 
-    # Build a host selector
+    # TODO Build a host selector
     host = target |> Config.hosts() |> Enum.at(0)
 
-    IO.write("ssh #{app}@#{host} #{Config.bin_path()} remote_console")
+    spawn(fn -> host |> port_forwarding end)
+
+    :timer.sleep(100)
+
+    command =
+      extra_options
+      |> determine_shell
+      |> command(host)
+
+    print_command(command)
+    :timer.sleep(Config.port_forwarding_timeout())
+  end
+
+  defp port_forwarding(host) do
+    {epmd_port, app_port} = host |> fetch_ports()
+
+    {:ok, processes} = :ps |> cmd_result([:aux])
+
+    args = [
+      Config.port_forwarding_timeout(),
+      :ssh,
+      Config.host_id(host),
+      "-L#{epmd_port}:localhost:#{epmd_port}",
+      "-L#{app_port}:localhost:#{app_port}"
+    ]
+
+    running? =
+      processes
+      |> String.split("\n", trim: true)
+      |> Enum.any?(&matching_ssh_command(&1, args))
+
+    unless running? do
+      :timeout |> cmd(args, [0], into: "", parallelism: true)
+    end
+  end
+
+  defp matching_ssh_command(command, [_timeout | args]) do
+    args = args |> Enum.join(" ")
+    command |> String.contains?(args)
+  end
+
+  defp command(:remote, _host) do
+    app = Config.app()
+    cookie = Config.cookie()
+
+    [
+      "iex",
+      "--name #{whoami()}@127.0.0.1",
+      "--cookie #{cookie}",
+      "--remsh #{app}@127.0.0.1"
+    ]
+  end
+
+  defp command(:observer, _host) do
+    app = Config.app()
+    cookie = Config.cookie()
+
+    [
+      "iex",
+      "--name #{whoami()}@127.0.0.1",
+      "--cookie #{cookie}",
+      "-e 'Node.connect(:\"#{app}@127.0.0.1\"); :observer.start()'"
+    ]
+  end
+
+  defp command(:bin, host) do
+    [
+      "ssh",
+      Config.host_id(host),
+      Config.bin_path(),
+      "remote_console"
+    ]
+  end
+
+  def print_command(command) do
+    IO.write(command |> Enum.join(" "))
+  end
+
+  defp whoami do
+    'whoami' |> :os.cmd() |> to_string |> String.trim()
+  end
+
+  defp fetch_ports(host) do
+    id = host |> Config.host_id()
+
+    {:ok, erts_result} = :ssh |> cmd_result([id, "ps ax | grep epmd | grep erts"])
+
+    epmd_path =
+      erts_result
+      |> String.split(" ", trim: true)
+      |> Enum.find(&String.ends_with?(&1, "/epmd"))
+
+    {:ok, epmd_names} = :ssh |> cmd_result([id, "#{epmd_path} -names"])
+
+    lines = epmd_names |> String.split("\n")
+    epmd = lines |> Enum.at(0) |> epmd_port
+    app = lines |> Enum.find_value(&app_port/1)
+
+    {epmd, app}
+  end
+
+  defp epmd_port(line) do
+    [[_, port]] = ~r/port\s(\d+)/ |> Regex.scan(line)
+    port
+  end
+
+  def app_port(line) do
+    app = Config.app()
+    prefix = "name #{app} at port "
+
+    if line |> String.starts_with?(prefix) do
+      line |> String.replace_prefix(prefix, "")
+    end
+  end
+
+  def determine_shell(extra_options) do
+    case extra_options |> Enum.at(0) do
+      {shell, true} ->
+        shell
+
+      _ ->
+        :remote
+    end
+  end
+
+  defp parse_extra_options(args) do
+    options = [
+      observer: :boolean,
+      bin: :boolean,
+      remote: :boolean
+    ]
+
+    aliases = [
+      o: :observer,
+      b: :bin,
+      r: :remote
+    ]
+
+    args
+    |> OptionParser.parse(aliases: aliases, switches: options)
+    |> elem(0)
   end
 end
