@@ -7,6 +7,13 @@ defmodule Deli.Templates.EdeliverConfig do
     :def,
     :build,
     Path.expand("lib/templates/.deliver/config.eex"),
-    [:app, :staging_hosts, :production_hosts, :docker_port]
+    ~w(
+      app
+      staging_hosts
+      production_hosts
+      staging_user
+      production_user
+      docker_port
+    )a
   )
 end

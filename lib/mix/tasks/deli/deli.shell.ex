@@ -17,35 +17,34 @@ defmodule Mix.Tasks.Deli.Shell do
 
     options = args |> parse_options
     extra_options = args |> parse_extra_options
-    target = options |> Keyword.fetch!(:target)
+    env = options |> Keyword.fetch!(:target)
 
     Application.put_env(:deli, :verbose, true)
 
     # TODO Build a host selector
-    host = target |> Config.hosts() |> Enum.at(0)
+    host = env |> Config.hosts() |> Enum.at(0)
 
-    spawn(fn -> host |> port_forwarding end)
-
+    spawn(fn -> port_forwarding(env, host) end)
     :timer.sleep(100)
 
     command =
       extra_options
       |> determine_shell
-      |> command(host)
+      |> command(env, host)
 
     print_command(command)
     :timer.sleep(Config.port_forwarding_timeout())
   end
 
-  defp port_forwarding(host) do
-    {epmd_port, app_port} = host |> fetch_ports()
+  defp port_forwarding(env, host) do
+    {epmd_port, app_port} = env |> fetch_ports(host)
 
     {:ok, processes} = :ps |> cmd_result([:aux])
 
     args = [
       Config.port_forwarding_timeout(),
       :ssh,
-      Config.host_id(host),
+      Config.host_id(env, host),
       "-L#{epmd_port}:localhost:#{epmd_port}",
       "-L#{app_port}:localhost:#{app_port}"
     ]
@@ -65,7 +64,7 @@ defmodule Mix.Tasks.Deli.Shell do
     command |> String.contains?(args)
   end
 
-  defp command(:remote, _host) do
+  defp command(:remote, _env, _host) do
     app = Config.app()
     cookie = Config.cookie()
 
@@ -77,7 +76,7 @@ defmodule Mix.Tasks.Deli.Shell do
     ]
   end
 
-  defp command(:observer, _host) do
+  defp command(:observer, _env, _host) do
     app = Config.app()
     cookie = Config.cookie()
 
@@ -89,10 +88,10 @@ defmodule Mix.Tasks.Deli.Shell do
     ]
   end
 
-  defp command(:bin, host) do
+  defp command(:bin, env, host) do
     [
       "ssh",
-      Config.host_id(host),
+      Config.host_id(env, host),
       Config.bin_path(),
       "remote_console"
     ]
@@ -106,8 +105,8 @@ defmodule Mix.Tasks.Deli.Shell do
     'whoami' |> :os.cmd() |> to_string |> String.trim()
   end
 
-  defp fetch_ports(host) do
-    id = host |> Config.host_id()
+  defp fetch_ports(env, host) do
+    id = env |> Config.host_id(host)
 
     {:ok, erts_result} = :ssh |> cmd_result([id, "ps ax | grep epmd | grep erts"])
 

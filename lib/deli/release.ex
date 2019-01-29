@@ -39,6 +39,8 @@ defmodule Deli.Release do
           Config.app(),
           Config.hosts(:staging),
           Config.hosts(:prod),
+          Config.app_user(:staging),
+          Config.app_user(:prod),
           Config.docker_port()
         )
 

@@ -28,23 +28,22 @@ defmodule Mix.Tasks.Deli.Restart do
     target = options |> Keyword.fetch!(:target)
 
     if "restart #{app} at target #{target}?" |> confirm?(options) do
-      target |> Config.hosts() |> Enum.each(&restart_host/1)
+      target |> Config.hosts() |> Enum.each(&restart_host(target, &1))
     else
       IO.puts([IO.ANSI.green(), "restart cancelled by user", IO.ANSI.reset()])
     end
   end
 
-  defp restart_host(host) do
-    app = Config.app()
+  defp restart_host(env, host) do
     controller = Config.controller()
-    id = "#{app}@#{host}"
+    id = env |> Config.host_id(host)
 
-    Check.run(host)
+    Check.run(env, host)
     IO.puts("restarting #{id}...")
-    :ok = app |> controller.restart_host(host)
+    :ok = env |> controller.restart_host(host)
     IO.puts([IO.ANSI.green(), "restarted #{id}", IO.ANSI.reset()])
 
     :timer.sleep(1_000)
-    Check.run(host)
+    Check.run(env, host)
   end
 end

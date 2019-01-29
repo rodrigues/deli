@@ -26,7 +26,7 @@ BUILD_AT="/usr/local/builds"
 DELIVER_TO="/opt"
 
 STAGING_HOSTS="<%= staging_hosts |> Enum.join(", ") %>"
-STAGING_USER="<%= app %>"
+STAGING_USER="<%= staging_user %>"
 
 PRODUCTION_HOSTS="<%= production_hosts |> Enum.join(", ") %>"
-PRODUCTION_USER="<%= app %>"
+PRODUCTION_USER="<%= production_user %>"

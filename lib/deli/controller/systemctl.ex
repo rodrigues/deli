@@ -1,45 +1,45 @@
 defmodule Deli.Controller.Systemctl do
   import Deli.Shell
+  alias Deli.Config
 
   @moduledoc "Provides support for systemd on deploy"
 
   @behaviour Deli.Controller
 
   @impl true
-  def start_host(app, host) do
-    sudo_systemctl(app, host, :start)
+  def start_host(env, host) do
+    sudo_systemctl(env, host, :start)
   end
 
   @impl true
-  def stop_host(app, host) do
-    sudo_systemctl(app, host, :stop)
+  def stop_host(env, host) do
+    sudo_systemctl(env, host, :stop)
   end
 
   @impl true
-  def restart_host(app, host) do
-    sudo_systemctl(app, host, :restart)
+  def restart_host(env, host) do
+    sudo_systemctl(env, host, :restart)
   end
 
   @impl true
-  def service_running?(app, host) do
-    status = app |> service_status(host)
-    status =~ ~r/Active\: active \(running\)/
+  def service_running?(env, host) do
+    service_status(env, host) =~ ~r/Active\: active \(running\)/
   end
 
   @impl true
-  def service_status(app, host) do
-    [command | args] = app |> systemctl(host, :status)
+  def service_status(env, host) do
+    [command | args] = env |> systemctl(host, :status)
     {:ok, result} = command |> cmd_result(args, [0, 3])
     result
   end
 
-  defp sudo_systemctl(app, host, op) do
-    [command | args] = app |> systemctl(host, op, true)
+  defp sudo_systemctl(env, host, op) do
+    [command | args] = env |> systemctl(host, op, true)
     cmd(command, args)
   end
 
-  defp systemctl(app, host, cmd, sudo \\ false) do
+  defp systemctl(env, host, cmd, sudo \\ false) do
     sudo = if sudo, do: :sudo
-    [:ssh, "#{app}@#{host}", sudo, :systemctl, cmd, app]
+    [:ssh, Config.host_id(env, host), sudo, :systemctl, cmd, Config.app()]
   end
 end

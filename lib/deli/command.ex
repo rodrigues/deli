@@ -57,7 +57,7 @@ defmodule Deli.Command do
     mod = mod |> to_string |> String.replace(~r/^Elixir\./, "")
     mfa = ~s("#{mod}.run/1")
     terms = args |> Enum.map(&to_string/1) |> Enum.join(" ")
-    env |> Config.hosts() |> Enum.each(&call_host(&1, mfa, terms))
+    env |> Config.hosts() |> Enum.each(&call_host(env, &1, mfa, terms))
   end
 
   @doc ~S"""
@@ -73,12 +73,9 @@ defmodule Deli.Command do
     |> call(command, args)
   end
 
-  defp call_host(host, mfa, terms) do
-    app = Config.app()
-    id = "#{app}@#{host}"
-
+  defp call_host(env, host, mfa, terms) do
     cmd_args = [
-      id,
+      Config.host_id(env, host),
       Config.bin_path(),
       :eval,
       "--mfa",

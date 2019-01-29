@@ -28,23 +28,22 @@ defmodule Mix.Tasks.Deli.Stop do
     target = options |> Keyword.fetch!(:target)
 
     if "stop #{app} at target #{target}?" |> confirm?(options) do
-      target |> Config.hosts() |> Enum.each(&stop_host/1)
+      target |> Config.hosts() |> Enum.each(&stop_host(target, &1))
     else
       IO.puts([IO.ANSI.green(), "stop cancelled by user", IO.ANSI.reset()])
     end
   end
 
-  defp stop_host(host) do
-    app = Config.app()
+  defp stop_host(env, host) do
     controller = Config.controller()
-    id = "#{app}@#{host}"
+    id = env |> Config.host_id(host)
 
-    Check.run(host)
+    Check.run(env, host)
     IO.puts("stopping #{id}...")
-    :ok = app |> controller.stop_host(host)
+    :ok = env |> controller.stop_host(host)
     IO.puts([IO.ANSI.green(), "stopped #{id}", IO.ANSI.reset()])
 
     :timer.sleep(1_000)
-    Check.run(host, false)
+    Check.run(env, host, false)
   end
 end

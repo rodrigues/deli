@@ -35,8 +35,8 @@ defmodule Deli.Config do
     cookie || app()
   end
 
-  def host_id(host) do
-    "#{app()}@#{host}"
+  def host_id(env, host) do
+    "#{app_user(env)}@#{host}"
   end
 
   def bin_path do

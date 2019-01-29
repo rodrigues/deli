@@ -11,20 +11,19 @@ defmodule Deli.Deploy do
     restart_target(target)
   end
 
-  defp restart_target(target) do
-    target |> Config.hosts() |> Enum.each(&restart_host/1)
+  defp restart_target(env) do
+    env |> Config.hosts() |> Enum.each(&restart_host(env, &1))
   end
 
-  defp restart_host(host) do
-    app = Config.app()
+  defp restart_host(env, host) do
     controller = Config.controller()
-    id = "#{app}@#{host}"
+    id = env |> Config.host_id(host)
 
     IO.puts("restarting #{id}...")
-    :ok = app |> controller.restart_host(host)
+    :ok = env |> controller.restart_host(host)
     IO.puts([IO.ANSI.green(), "restarted #{id}", IO.ANSI.reset()])
 
     :timer.sleep(1_000)
-    Check.run(host)
+    Check.run(env, host)
   end
 end

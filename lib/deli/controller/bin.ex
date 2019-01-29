@@ -7,39 +7,38 @@ defmodule Deli.Controller.Bin do
   @behaviour Deli.Controller
 
   @impl true
-  def start_host(app, host) do
-    bin_cmd(app, host, :start)
+  def start_host(env, host) do
+    bin_cmd(env, host, :start)
   end
 
   @impl true
-  def stop_host(app, host) do
-    bin_cmd(app, host, :stop)
+  def stop_host(env, host) do
+    bin_cmd(env, host, :stop)
   end
 
   @impl true
-  def restart_host(app, host) do
-    bin_cmd(app, host, :restart)
+  def restart_host(env, host) do
+    bin_cmd(env, host, :restart)
   end
 
   @impl true
-  def service_running?(app, host) do
-    status = app |> service_status(host)
-    status =~ ~r/pong/
+  def service_running?(env, host) do
+    service_status(env, host) =~ ~r/pong/
   end
 
   @impl true
-  def service_status(app, host) do
-    [command | args] = app |> bin(host, :ping)
+  def service_status(env, host) do
+    [command | args] = env |> bin(host, :ping)
     {:ok, content} = command |> cmd_result(args, [0, 1, 127])
     content
   end
 
-  defp bin_cmd(app, host, op) do
-    [command | args] = app |> bin(host, op)
+  defp bin_cmd(env, host, op) do
+    [command | args] = env |> bin(host, op)
     cmd(command, args)
   end
 
-  defp bin(app, host, cmd) do
-    [:ssh, "#{app}@#{host}", Config.bin_path(), cmd]
+  defp bin(env, host, cmd) do
+    [:ssh, Config.host_id(env, host), Config.bin_path(), cmd]
   end
 end

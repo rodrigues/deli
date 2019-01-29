@@ -1,3 +1,5 @@
+- [NEW] Allow name for remote user different than app name
+- [NEW] Output full status response when verbose
 - [NEW] Run observer to remote node with a simple call
 - [FIX] Restart expects node to be running
 

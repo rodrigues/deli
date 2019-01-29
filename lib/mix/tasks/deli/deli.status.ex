@@ -22,6 +22,6 @@ defmodule Mix.Tasks.Deli.Status do
     target = options |> Keyword.fetch!(:target)
 
     IO.puts("checking status of #{app} at target #{target}")
-    target |> Config.hosts() |> Enum.each(&Check.run/1)
+    target |> Config.hosts() |> Enum.each(&Check.run(target, &1))
   end
 end
