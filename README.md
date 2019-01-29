@@ -154,7 +154,6 @@ At the moment, this package exists for reusing among similarly configured apps. 
 - Provision/setup new target hosts (with hooks for custom setup)
 - mix deli.version handle dev target
 - mix deli.version have compare option
-- mix deli.status output whole status answer also when active, when verbose
 - mix deli.ping to run specifically bin ping command
 - mix deli.eval
 - Add more docs, tests and typespecs
