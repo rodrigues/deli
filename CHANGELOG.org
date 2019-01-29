@@ -1,3 +1,5 @@
+- [NEW] Wait between port forwarding spawn and shell command is configurable
+
 *** v0.1.23
 
 - [NEW] Allow name for remote user different than app name

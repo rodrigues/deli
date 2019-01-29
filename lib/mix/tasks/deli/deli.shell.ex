@@ -25,7 +25,7 @@ defmodule Mix.Tasks.Deli.Shell do
     host = env |> Config.hosts() |> Enum.at(0)
 
     spawn(fn -> port_forwarding(env, host) end)
-    :timer.sleep(100)
+    :timer.sleep(Config.port_forwarding_wait())
 
     command =
       extra_options

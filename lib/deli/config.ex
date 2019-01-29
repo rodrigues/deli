@@ -6,7 +6,10 @@ defmodule Deli.Config do
     docker_port: 4441,
     controller: Deli.Controller.Bin,
     target: :staging,
-    port_forwarding_timeout: 3_600
+    # in seconds, waits 1h to timeout
+    port_forwarding_timeout: 3_600,
+    # in ms, waits 1s between open port and iex
+    port_forwarding_wait: 1_000
   }
 
   def app do
@@ -60,6 +63,10 @@ defmodule Deli.Config do
 
   def port_forwarding_timeout do
     :port_forwarding_timeout |> get(@defaults.port_forwarding_timeout)
+  end
+
+  def port_forwarding_wait do
+    :port_forwarding_wait |> get(@defaults.port_forwarding_wait)
   end
 
   def hosts(env) do
