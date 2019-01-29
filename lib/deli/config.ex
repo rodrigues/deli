@@ -37,6 +37,10 @@ defmodule Deli.Config do
     :assets |> get(false)
   end
 
+  def yarn? do
+    :yarn |> get(false)
+  end
+
   def cookie do
     cookie = :cookie |> get()
     cookie || app()

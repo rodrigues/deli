@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli.Release do
   use Mix.Task
   import Deli.Shell
-  alias Deli.{Release, Versioning}
+  alias Deli.{Config, Release, Versioning}
 
   @moduledoc """
   To build a release of current master into staging, do:

@@ -57,7 +57,8 @@ defmodule Deli.Release do
       content =
         Dockerfile.build(
           Config.docker_build_target(),
-          Config.app()
+          Config.app(),
+          Config.yarn?()
         )
 
       write_file(path, content)

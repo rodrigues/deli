@@ -7,8 +7,10 @@ defmodule Deli.Templates.Dockerfile do
     :def,
     :build_centos,
     Path.expand("lib/templates/.deliver/Dockerfile/centos.eex"),
-    [:app]
+    ~w(app yarn?)a
   )
 
-  def build(:centos, app), do: build_centos(app)
+  def build(:centos, app, yarn?) do
+    app |> build_centos(yarn?)
+  end
 end

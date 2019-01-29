@@ -76,6 +76,16 @@ RUN set -xe \
   && mix local.hex --force \
   && mix hex.info
 
+<%= if yarn? do %>
+# Yarn
+RUN set -xe \
+  && yum -y install cairo-devel \
+  && curl --silent --location https://rpm.nodesource.com/setup_9.x | bash \
+  && yum -y install nodejs \
+  && npm -g up \
+  && curl -sL https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo \
+  && yum -y install yarn
+<% end %>
 COPY authorized_keys /authorized_keys
 RUN ssh-keygen -q -t rsa -f /etc/ssh/ssh_host_rsa_key -C '' -N ''
 RUN ssh-keygen -q -t dsa -f /etc/ssh/ssh_host_dsa_key -C '' -N ''
