@@ -1,5 +1,5 @@
 defmodule Deli.Config do
-  @moduledoc false
+  @moduledoc "Provides access to deli configuration"
 
   @defaults %{
     # in seconds, waits 1h to timeout

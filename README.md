@@ -43,6 +43,8 @@ config :deli,
   ]
 ```
 
+See [`lib/deli/config.ex`](https://github.com/rodrigues/deli/blob/master/lib/deli/config.ex) for all configuration options (and their defaults).
+
 ```bash
 $ mix deli
 ```
