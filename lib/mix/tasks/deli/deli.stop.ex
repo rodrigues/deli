@@ -30,7 +30,7 @@ defmodule Mix.Tasks.Deli.Stop do
     if :stop |> confirm?(options) do
       hosts |> Enum.each(&stop_host(target, &1))
     else
-      IO.puts([IO.ANSI.green(), "stop cancelled by user", IO.ANSI.reset()])
+      cancelled!(:stop)
     end
   end
 

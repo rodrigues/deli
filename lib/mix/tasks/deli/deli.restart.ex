@@ -30,7 +30,7 @@ defmodule Mix.Tasks.Deli.Restart do
     if :restart |> confirm?(options) do
       hosts |> Enum.each(&restart_host(target, &1))
     else
-      IO.puts([IO.ANSI.green(), "restart cancelled by user", IO.ANSI.reset()])
+      cancelled!(:restart)
     end
   end
 

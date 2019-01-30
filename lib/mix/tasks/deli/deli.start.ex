@@ -30,7 +30,7 @@ defmodule Mix.Tasks.Deli.Start do
     if :start |> confirm?(options) do
       hosts |> Enum.each(&start_host(target, &1))
     else
-      IO.puts([IO.ANSI.green(), "start cancelled by user", IO.ANSI.reset()])
+      cancelled!(:start)
     end
   end
 

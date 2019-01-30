@@ -39,7 +39,7 @@ defmodule Mix.Tasks.Deli.Deploy do
       IO.puts("🤞")
       hosts |> Enum.each(&Deploy.run(target, &1))
     else
-      IO.puts([IO.ANSI.green(), "deploy cancelled by user", IO.ANSI.reset()])
+      cancelled!(:deploy)
     end
   end
 end

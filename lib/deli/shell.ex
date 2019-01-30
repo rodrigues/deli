@@ -69,6 +69,15 @@ defmodule Deli.Shell do
     end
   end
 
+  def cancelled!(operation) do
+    IO.puts([
+      IO.ANSI.green(),
+      to_string(operation),
+      " cancelled by user",
+      IO.ANSI.reset()
+    ])
+  end
+
   def parse_options(args) do
     options = [
       version: :string,
