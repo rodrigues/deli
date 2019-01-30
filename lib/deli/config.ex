@@ -2,15 +2,19 @@ defmodule Deli.Config do
   @moduledoc "Provides access to deli configuration"
 
   @defaults %{
-    # in seconds, waits 1h to timeout
-    port_forwarding_timeout: 3_600,
-    # in ms, waits 2s between open port and iex
-    port_forwarding_wait: 2_000,
-    docker_build_target: :centos,
-    docker_port: 4441,
+    # chosen target env
     target: :staging,
+    # controls application, needs to implement `Deli.Controller`
     controller: Deli.Controller.Bin,
-    versioning: Deli.Versioning.Default
+    # ensures versioning policy, needs to implement `Deli.Versioning`
+    versioning: Deli.Versioning.Default,
+    # wait in seconds when running `mix deli.shell`
+    port_forwarding_timeout: 3_600,
+    # wait in ms between port forwarding and iex command
+    port_forwarding_wait: 2_000,
+    # image being used to build releases
+    docker_build_target: :centos,
+    docker_port: 4441
   }
 
   def app do
@@ -114,5 +118,5 @@ defmodule Deli.Config do
   def edeliver_target(env) when is_atom(env), do: env |> to_string
   def edeliver_target(target) when is_binary(target), do: target
 
-  def default_target, do: :staging
+  def default_target, do: @defaults.target
 end
