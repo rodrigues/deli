@@ -2,14 +2,15 @@ defmodule Deli.Config do
   @moduledoc false
 
   @defaults %{
-    docker_build_target: :centos,
-    docker_port: 4441,
-    controller: Deli.Controller.Bin,
-    target: :staging,
     # in seconds, waits 1h to timeout
     port_forwarding_timeout: 3_600,
     # in ms, waits 2s between open port and iex
-    port_forwarding_wait: 2_000
+    port_forwarding_wait: 2_000,
+    docker_build_target: :centos,
+    docker_port: 4441,
+    target: :staging,
+    controller: Deli.Controller.Bin,
+    versioning: Deli.Versioning.Default
   }
 
   def app do
@@ -83,6 +84,10 @@ defmodule Deli.Config do
 
   def controller do
     :controller |> get(@defaults.controller)
+  end
+
+  def versioning do
+    :versioning |> get(@defaults.versioning)
   end
 
   def verbose? do

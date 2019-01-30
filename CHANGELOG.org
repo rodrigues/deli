@@ -1,6 +1,10 @@
+*** v0.1.27
+
+- [NEW] Allow to configure a custom `versioning` behaviour
+
 *** v0.1.26
 
-- [NEW] Accept regex pattern in the end of task(s) to filter hosts affected by command
+- [NEW] Accept regex pattern to `-h` to filter hosts affected by command
 - [NEW] Before confirmation, list all affected hosts
 
 *** v0.1.25 (v0.1.24 skipped)

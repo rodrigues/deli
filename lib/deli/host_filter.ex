@@ -78,16 +78,13 @@ defmodule Deli.HostFilter do
   end
 
   defp host_filter(args) do
-    case args |> List.last() do
-      "-" <> _ ->
-        nil
+    filter =
+      args
+      |> OptionParser.parse(aliases: [h: :host], switches: [host: :string])
+      |> elem(0)
+      |> Keyword.get(:host)
 
-      nil ->
-        nil
-
-      filter ->
-        ~r/#{filter}/
-    end
+    if filter, do: ~r/#{filter}/
   end
 
   defp list_hosts(hosts) do
