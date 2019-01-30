@@ -2,19 +2,18 @@ defmodule Deli.Config do
   @moduledoc "Provides access to deli configuration"
 
   @defaults %{
-    # chosen target env
-    target: :staging,
-    # controls application, needs to implement `Deli.Controller`
+    assets?: false,
     controller: Deli.Controller.Bin,
-    # ensures versioning policy, needs to implement `Deli.Versioning`
-    versioning: Deli.Versioning.Default,
+    docker_build_target: :centos,
+    docker_port: 4441,
     # wait in seconds when running `mix deli.shell`
     port_forwarding_timeout: 3_600,
     # wait in ms between port forwarding and iex command
     port_forwarding_wait: 2_000,
-    # image being used to build releases
-    docker_build_target: :centos,
-    docker_port: 4441
+    target: :staging,
+    verbose?: true,
+    versioning: Deli.Versioning.Default,
+    yarn?: false
   }
 
   def app do
@@ -39,11 +38,11 @@ defmodule Deli.Config do
   end
 
   def assets? do
-    :assets |> get(false)
+    :assets |> get(@defaults.assets?)
   end
 
   def yarn? do
-    :yarn |> get(false)
+    :yarn |> get(@defaults.yarn?)
   end
 
   def cookie do
@@ -95,7 +94,11 @@ defmodule Deli.Config do
   end
 
   def verbose? do
-    :verbose |> get(false)
+    :verbose |> get(@defaults.verbose?)
+  end
+
+  def default_target do
+    :default_target |> get(@defaults.target)
   end
 
   def get(key, default \\ nil) do
@@ -117,6 +120,4 @@ defmodule Deli.Config do
   def edeliver_target(:prod), do: "production"
   def edeliver_target(env) when is_atom(env), do: env |> to_string
   def edeliver_target(target) when is_binary(target), do: target
-
-  def default_target, do: @defaults.target
 end
