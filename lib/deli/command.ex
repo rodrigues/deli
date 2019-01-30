@@ -35,6 +35,9 @@ defmodule Deli.Command do
 
       # runs command in all prod hosts
       $ mix my_app.xyz --arg_example=1 -t prod
+
+      # runs command in all prod hosts that match ~r/01/
+      $ mix my_app.xyz --arg_example=1 -t prod -h 01
   """
 
   @callback run([String.t()]) :: :ok
