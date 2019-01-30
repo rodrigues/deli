@@ -132,6 +132,21 @@ If you want to maintain a custom version, just remove from .gitignore, and also 
 
 At the moment, this package exists for reusing among similarly configured apps. It might not be flexible enough for your needs yet.
 
+### Run mix tasks (locally) in remote nodes
+
+By using [`Deli.Command`](https://hexdocs.pm/deli/Deli.Command.html), you can have this:
+
+```shell
+# runs locally
+$ mix my_app.xyz --arg_example=1
+
+# runs in all prod hosts
+$ mix my_app.xyz --arg_example=1 -t prod
+
+# runs in prod hosts matching ~r/03/
+$ mix my_app.xyz --arg_example=1 -t prod -h 03
+```
+
 ## Potential future work
 
 - Remove edeliver dependency, replacing its steps by local code
