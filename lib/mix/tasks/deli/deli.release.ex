@@ -23,6 +23,7 @@ defmodule Mix.Tasks.Deli.Release do
   def run(args) do
     _ = Application.ensure_all_started(:deli)
     options = args |> parse_options
+    target = options |> Keyword.fetch!(:target)
 
     if assets?(options), do: System.put_env("ASSETS", "1")
 
@@ -31,16 +32,10 @@ defmodule Mix.Tasks.Deli.Release do
       |> Keyword.get(:version)
       |> Config.versioning().version_tag()
 
-    target = options |> Keyword.fetch!(:target)
-
     Release.build(tag, target)
   end
 
   defp assets?(options) do
-    if options |> Keyword.get(:assets) do
-      true
-    else
-      Config.assets?()
-    end
+    Keyword.get(options, :assets) || Config.assets?()
   end
 end
