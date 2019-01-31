@@ -40,17 +40,13 @@ defmodule Deli.Command do
       $ mix my_app.xyz --arg_example=1 -t prod -h 01
   """
 
-  @callback run([String.t()]) :: :ok
+  @callback run(OptionParser.argv()) :: :ok
 
   @doc ~S"""
   Either runs a command locally (dev), or through a RPC call
   to the remote target env
   """
-  @spec call(
-          env :: atom,
-          module,
-          args :: [String.t()]
-        ) :: term
+  @spec call(Deli.env(), module, OptionParser.argv()) :: :ok
   def call(:dev, mod, args) do
     {:ok, _} = Config.app() |> Application.ensure_all_started()
     mod |> apply(:run, [args])
@@ -67,7 +63,7 @@ defmodule Deli.Command do
   @doc ~S"""
   Fetches env from target (specified or default), and runs `call/3`
   """
-  @spec run(module, [String.t()]) :: :ok
+  @spec run(module, OptionParser.argv()) :: :ok
   def run(command, args) do
     args
     |> OptionParser.parse(aliases: [t: :target], switches: [target: :string])
@@ -77,6 +73,7 @@ defmodule Deli.Command do
     |> call(command, args)
   end
 
+  @spec call_host(Deli.env(), Deli.host(), String.t(), String.t()) :: :ok
   defp call_host(env, host, mfa, terms) do
     cmd_args = [
       Config.host_id(env, host),

@@ -5,6 +5,8 @@ defmodule Deli.Release do
 
   @moduledoc false
 
+  @type docker_build_target :: :centos
+
   def build(tag, target) do
     target_mix_env = target |> Config.mix_env()
 

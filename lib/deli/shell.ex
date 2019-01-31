@@ -3,14 +3,27 @@ defmodule Deli.Shell do
 
   @moduledoc false
 
-  # When you want the output, use `cmd_result`
+  @type command :: atom | String.t()
+  @type args :: [String.Chars.t()]
+  @type exit_signal :: non_neg_integer
+  @type ok_signals :: [exit_signal]
+
+  @spec cmd(command, args, ok_signals, Keyword.t()) :: :ok
   def cmd(command, args \\ [], ok_signals \\ [0], opts \\ []) do
+    command |> do_cmd(args, ok_signals, opts)
+  end
+
+  @spec cmd_result(command, args, ok_signals, Keyword.t()) ::
+          {:ok, Collectable.t()}
+  def cmd_result(command, args \\ [], ok_signals \\ [0], opts \\ []) do
+    opts = [into: ""] ++ opts
+    command |> do_cmd(args, ok_signals, opts, true)
+  end
+
+  defp do_cmd(command, args, ok_signals, opts, result? \\ false) do
     command = command |> to_string
     args = args |> Enum.map(&to_string/1)
-    # verbose_inspect([command | args])
-
-    result? = opts |> Keyword.get(:result)
-    opts = opts |> Keyword.delete(:result)
+    verbose_inspect([command | args])
 
     {content, signal} = command |> System.cmd(args, verbose_opts(opts))
 
@@ -21,11 +34,7 @@ defmodule Deli.Shell do
     end
   end
 
-  def cmd_result(command, args \\ [], ok_signals \\ [0], opts \\ []) do
-    opts = [result: true, into: ""] ++ opts
-    cmd(command, args, ok_signals, opts)
-  end
-
+  @spec edeliver(command, args) :: :ok
   def edeliver(command, args \\ []) do
     verbose = if Config.verbose?(), do: ["--verbose"], else: []
     edeliver_args = ["edeliver", command] ++ args ++ verbose
@@ -104,6 +113,7 @@ defmodule Deli.Shell do
     opts |> Keyword.put(:target, target)
   end
 
+  @spec command_failed!(command, args, exit_signal, Collectable.t()) :: no_return
   defp command_failed!(command, args, signal, content)
        when is_binary(command) and is_list(args) and is_integer(signal) do
     details = "(#{signal})"
@@ -121,20 +131,22 @@ defmodule Deli.Shell do
     exit({:shutdown, signal})
   end
 
-  # defp verbose_inspect(command) do
-  #   if Config.verbose?() do
-  #     IO.puts([
-  #       IO.ANSI.bright(),
-  #       "$ ",
-  #       IO.ANSI.reset(),
-  #       IO.ANSI.underline(),
-  #       command_inspect(command),
-  #       IO.ANSI.reset()
-  #     ])
-  #   end
-  #   command
-  # end
+  defp verbose_inspect(command) do
+    if Config.output_commands?() do
+      IO.puts([
+        IO.ANSI.bright(),
+        "$ ",
+        IO.ANSI.reset(),
+        IO.ANSI.underline(),
+        command_inspect(command),
+        IO.ANSI.reset()
+      ])
+    end
 
+    :ok
+  end
+
+  @spec verbose_opts(Keyword.t()) :: Keyword.t()
   defp verbose_opts(opts) do
     if Config.verbose?() do
       [into: IO.stream(:stdio, :line), stderr_to_stdout: true] ++ opts
@@ -143,6 +155,6 @@ defmodule Deli.Shell do
     end
   end
 
-  defp command_inspect(command) when is_binary(command), do: command
+  @spec command_inspect([String.t()]) :: String.t()
   defp command_inspect(command) when is_list(command), do: command |> Enum.join(" ")
 end
