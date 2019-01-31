@@ -45,11 +45,13 @@ config :deli,
 
 See [`lib/deli/config.ex`](https://github.com/rodrigues/deli/blob/master/lib/deli/config.ex) for all configuration options (and their defaults).
 
+## Deploy
+
 ```bash
 $ mix deli
 ```
 
-The command above does full cycle deploy:
+The task above does full cycle deploy:
 
 - Create a local build env
 - Build release in this env
@@ -67,7 +69,7 @@ $ mix deli -t prod
 It will ask for confirmation after release is built, before deploy.
 If you don't want that extra step, pass `-y` when calling this task.
 
-Other convenience tasks provided by deli:
+### Other tasks provided by deli
 
 ```bash
 # Starts all hosts for target prod
