@@ -36,11 +36,16 @@ defmodule Deli.Release do
     path = ".deliver/config"
 
     unless path |> file_exists? do
+      host_provider = Config.host_provider()
+      hosts = fn env -> env |> host_provider.hosts() |> Enum.to_list() end
+      staging_hosts = hosts.(:staging)
+      prod_hosts = hosts.(:prod)
+
       content =
         EdeliverConfig.build(
           Config.app(),
-          Config.hosts(:staging),
-          Config.hosts(:prod),
+          staging_hosts,
+          prod_hosts,
           Config.app_user(:staging),
           Config.app_user(:prod),
           Config.docker_port()

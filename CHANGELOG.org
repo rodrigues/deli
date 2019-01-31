@@ -1,3 +1,7 @@
+- [NEW] Configurable host provider
+- [NEW] Add typespecs in core parts
+- [NEW] `Config.output_commands?/0`
+
 *** v0.1.27
 
 - [NEW] Allow to configure a custom `versioning` behaviour

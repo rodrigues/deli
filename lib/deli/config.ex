@@ -6,6 +6,7 @@ defmodule Deli.Config do
     controller: Deli.Controller.Bin,
     docker_build_target: :centos,
     docker_port: 4441,
+    host_provider: Deli.HostProvider.Config,
     # verbose won't output `Deli.Shell` cmd calls
     output_commands?: false,
     # wait in seconds when running `mix deli.shell`
@@ -94,9 +95,18 @@ defmodule Deli.Config do
     :port_forwarding_wait |> get(@defaults.port_forwarding_wait)
   end
 
+  @doc """
+  Returns hosts as configured through `:deli` application config.
+  If there is a custom host provider configured, it might not be correct.
+  """
   @spec hosts(Deli.env()) :: Enumerable.t()
   def hosts(env) do
     :hosts |> get([]) |> Keyword.get(mix_env(env), [])
+  end
+
+  @spec host_provider() :: module
+  def host_provider do
+    :host_provider |> get(@defaults.host_provider)
   end
 
   @spec controller() :: module

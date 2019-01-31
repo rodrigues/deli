@@ -4,8 +4,9 @@ defmodule Deli.HostFilter do
 
   @moduledoc false
 
+  @spec hosts(Deli.env(), OptionParser.argv(), boolean) :: {:ok, [Deli.host()]}
   def hosts(env, args, silent? \\ false) do
-    hosts = env |> Config.hosts()
+    hosts = env |> Config.host_provider().hosts() |> Enum.to_list()
 
     with %Regex{} = exp <- args |> host_filter do
       with [_ | _] = filtered_hosts <- hosts |> Enum.filter(&(&1 =~ exp)) do
@@ -31,6 +32,7 @@ defmodule Deli.HostFilter do
     end
   end
 
+  @spec host(Deli.env(), OptionParser.argv()) :: {:ok, Deli.host()} | {:error, term}
   def host(env, args) do
     {:ok, hosts} = env |> hosts(args, true)
     length = hosts |> Enum.count()
@@ -77,6 +79,7 @@ defmodule Deli.HostFilter do
     ])
   end
 
+  @spec host_filter(OptionParser.argv()) :: Regex.t() | nil
   defp host_filter(args) do
     filter =
       args
