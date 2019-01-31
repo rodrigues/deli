@@ -171,6 +171,7 @@ At the moment, this package exists for reusing among similarly configured apps. 
 - Provide common release service assets (nginx, systemd, logrotate etc)
 - Use a remote release store (allows CI to build releases for all build targets upfront)
 - Provision/setup new target hosts (with hooks for custom setup)
+- Integrate with a terminal-based observer
 - mix deli.version handle dev target
 - mix deli.version have compare option
 - mix deli.ping to run specifically bin ping command
