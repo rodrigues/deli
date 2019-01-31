@@ -163,7 +163,7 @@ At the moment, this package exists for reusing among similarly configured apps. 
 - Allow configuring docker build elixir / otp / rebar versions (mind the checksums)
 - Accept host labels in config, and filter by it in commands
 - Associate labels with different build targets (first label wins)
-- Configure a custom target host provider (default: config hosts behaviour)
+- Configure a custom target host provider, returning stream of hosts per env
 - Configure of a remote build host (docker as default behaviour)
 - Configure a custom deploy strategy
 - Plugin behaviour to allow custom hooks and integrations (e.g. slack notification)
