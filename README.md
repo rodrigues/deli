@@ -207,9 +207,9 @@ You can configure any module that implements the [`Deli.Controller` behaviour](h
 - Provision/setup new target hosts (with hooks for custom setup)
 - Integrate with a terminal-based observer
 - In docker build, allow skipping user creation step, by configuring `docker_build_user :: atom` (default: `:deli`)
-- Allow developers to create custom docker build hooks (`.deli/docker_hooks/{(before_|after)(build|setup|setup_(otp|elixir|rebar3))}/script.(sh|exs)`)
-- Do rebar3 checksum in docker images
-- Allow to pick one specific hex version
+- Allow developers to create custom docker build hooks, by checking paths: `.deli/docker_build_hooks/{(before_|after)(build|setup|setup_(otp|elixir|rebar3))}/script.(sh|exs)`
+- Do rebar3 checksum in docker build images
+- Allow to specify hex version in docker build images
 - Allow to change target path to something else than `/opt/APP`
 - Allow production to be default target if there is no staging
 - mix deli.version handle dev target
