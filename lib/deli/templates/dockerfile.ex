@@ -32,7 +32,6 @@ defmodule Deli.Templates.Dockerfile do
   EEx.function_from_file(:def, :build_custom, path.(:custom), @custom_bindings)
 
   @spec build(Docker.build_target(), Deli.app(), boolean) :: String.t()
-
   def build({:deli, {deli_image, tag}, beam_versions_opts}, app, yarn?)
       when deli_image in @deli_images and (is_atom(tag) or is_binary(tag)) and
              is_atom(app) and is_boolean(yarn?) and is_list(beam_versions_opts) do
