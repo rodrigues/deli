@@ -14,6 +14,7 @@ defmodule Deli.Config do
     port_forwarding_timeout: 3_600,
     # wait in ms between port forwarding and iex command
     port_forwarding_wait: 2_000,
+    release: Deli.Release.Docker,
     target: :staging,
     verbose?: true,
     versioning: Deli.Versioning.Default,
@@ -113,6 +114,11 @@ defmodule Deli.Config do
   @spec controller() :: module
   def controller do
     :controller |> get(@defaults.controller)
+  end
+
+  @spec release() :: module
+  def release do
+    :release |> get(@defaults.release)
   end
 
   @spec versioning() :: module

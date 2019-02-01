@@ -1,5 +1,6 @@
 defmodule Deli.Templates.Dockerfile do
   require EEx
+  alias Deli.BEAMVersions
 
   @moduledoc false
 
@@ -30,6 +31,19 @@ defmodule Deli.Templates.Dockerfile do
   EEx.function_from_file(:def, :build_custom, path.(:custom), @custom_bindings)
 
   @spec build(Docker.build_target(), Deli.app(), boolean) :: String.t()
+
+  def build(docker_image, app, yarn?)
+      when (is_atom(docker_image) or is_binary(docker_image)) and
+             is_atom(app) and is_boolean(yarn?) do
+    docker_image |> build_custom(app, yarn?)
+  end
+
+  def build({docker_image, tag}, app, yarn?)
+      when (is_atom(docker_image) or is_binary(docker_image)) and
+             is_atom(app) and is_boolean(yarn?) do
+    "#{docker_image}:#{tag}" |> build(app, yarn?)
+  end
+
   def build({:deli, deli_image}, app, yarn?) do
     {:deli, {deli_image, :latest}} |> build(app, yarn?)
   end
@@ -53,18 +67,5 @@ defmodule Deli.Templates.Dockerfile do
       end
 
     tag |> builder.(beam_versions, app, yarn?)
-  end
-
-  def build(docker_image, app, yarn?)
-      when (is_atom(docker_image) or is_binary(docker_image)) and
-             is_atom(app) and is_boolean(yarn?) do
-    docker_image |> build_custom(app, yarn?)
-  end
-
-  def build({docker_image, tag}, app, yarn?)
-      when (is_atom(docker_image) or is_binary(docker_image)) and
-             is_atom(app) and is_boolean(yarn?) do
-    {docker_image, tag} |> build(app, yarn?)
-    "#{docker_image}:#{tag}" |> build_custom(app, yarn?)
   end
 end
