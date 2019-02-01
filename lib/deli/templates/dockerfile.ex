@@ -46,10 +46,10 @@ defmodule Deli.Templates.Dockerfile do
     builder =
       case deli_image do
         :centos ->
-          &build_centos/3
+          &build_centos/4
 
         :debian ->
-          &build_debian/3
+          &build_debian/4
       end
 
     tag |> builder.(beam_versions, app, yarn?)
