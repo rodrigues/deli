@@ -70,7 +70,7 @@ defmodule Deli.Shell do
     target = options |> Keyword.fetch!(:target)
     message = "#{operation} #{app} at #{target}?"
 
-    if options |> Keyword.get(:yes) do
+    if options[:yes] do
       IO.puts("#{message} (Y/n) YES")
       true
     else

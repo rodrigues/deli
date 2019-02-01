@@ -28,14 +28,13 @@ defmodule Mix.Tasks.Deli.Release do
     if assets?(options), do: System.put_env("ASSETS", "1")
 
     {:ok, tag} =
-      options
-      |> Keyword.get(:version)
+      options[:version]
       |> Config.versioning().version_tag()
 
     Release.build(tag, target)
   end
 
   defp assets?(options) do
-    Keyword.get(options, :assets) || Config.assets?()
+    options[:assets] || Config.assets?()
   end
 end
