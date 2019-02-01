@@ -7,8 +7,19 @@ defmodule Deli.Release.Docker do
 
   @behaviour Deli.Release
 
-  @type build_target :: :centos
+  @type tag :: atom | String.t() | pos_integer
+  @type docker_image :: atom | String.t()
+  @type deli_image :: :centos | :debian
+  @type beam_versions :: Keyword.t()
 
+  @type build_target ::
+          {:deli, deli_image | {deli_image, tag}}
+          {:deli, deli_image | {deli_image, tag}, beam_versions},
+          | docker_image
+          | {docker_image, tag}
+          | {docker_image, tag, beam_versions}
+
+  @impl true
   def build(tag, target) do
     target_mix_env = target |> Config.mix_env()
 
