@@ -209,6 +209,7 @@ You can configure any module that implements the [`Deli.Controller` behaviour](h
 - Do rebar3 checksum in docker images
 - Allow to pick one specific hex version
 - Allow to change target path to something else than `/opt/APP`
+- Allow production to be default target if there is no staging
 - mix deli.version handle dev target
 - mix deli.version have compare option
 - mix deli.ping to run specifically bin ping command
