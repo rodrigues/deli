@@ -13,10 +13,12 @@ defmodule Deli.Release.Docker do
   @type beam_versions :: Keyword.t()
 
   @type build_target ::
-          {:deli, deli_image | {deli_image, tag}}
-          | {:deli, deli_image | {deli_image, tag}, beam_versions}
-          | docker_image
+          docker_image
           | {docker_image, tag}
+          | {:deli, deli_image}
+          | {:deli, {deli_image, tag}}
+          | {:deli, deli_image, beam_versions}
+          | {:deli, {deli_image, tag}, beam_versions}
 
   @impl true
   def build(tag, target) do

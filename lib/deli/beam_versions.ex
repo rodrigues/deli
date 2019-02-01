@@ -30,6 +30,7 @@ defmodule Deli.BEAMVersions do
   @spec update(dep) :: :ok
   def update(_dep) do
     # TODO fetch any new releases, download, gen checksums, and push a new PR
+    :ok
   end
 
   defp fetch_version({dep, nil}) when dep in @deps do
