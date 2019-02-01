@@ -165,7 +165,7 @@ config :deli, :docker_build_target, {:elixir, "1.8.0-alpine"}
 
 # deli images can also have beam dependencies configured
 #
-# if you don't set it, latest version available
+# if you don't set it, latest stable version available
 # when the package was generated will be used
 #
 beam_versions = [
