@@ -5,8 +5,8 @@ version: '3'
 services:
   deli:
     container_name: <%= app %>_deli
-    build: .deliver
+    build: .deli
     volumes:
-      - .deliver:/deliver
+      - .deli:/deli
     ports:
       - "<%= docker_port %>:22"
