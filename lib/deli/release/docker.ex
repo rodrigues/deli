@@ -45,7 +45,7 @@ defmodule Deli.Release.Docker do
   end
 
   defp ensure_edeliver_config do
-    path = ".deliver/config"
+    path = ".deli/edeliver_config"
 
     unless path |> file_exists? do
       host_provider = Config.host_provider()
@@ -65,12 +65,12 @@ defmodule Deli.Release.Docker do
 
       write_file(path, content)
       add_to_gitignore(path)
-      add_to_gitignore(".deliver/releases")
+      add_to_gitignore(".deli/releases")
     end
   end
 
   defp ensure_dockerfile do
-    path = ".deliver/Dockerfile"
+    path = ".deli/Dockerfile"
 
     unless path |> file_exists? do
       content =
@@ -82,12 +82,12 @@ defmodule Deli.Release.Docker do
 
       write_file(path, content)
       add_to_gitignore(path)
-      add_to_gitignore(".deliver/releases")
+      add_to_gitignore(".deli/releases")
     end
   end
 
   defp ensure_docker_compose do
-    path = ".deliver-docker-compose.yml"
+    path = ".deli-docker-compose.yml"
 
     unless path |> file_exists? do
       content =
@@ -103,11 +103,11 @@ defmodule Deli.Release.Docker do
 
   defp ensure_docker_authorized_keys do
     app = Config.app()
-    path = ".deliver/authorized_keys/#{app}_id_rsa"
+    path = ".deli/authorized_keys/#{app}_id_rsa"
 
     keygen_args = [
       "-f",
-      ".deliver/authorized_keys/#{app}_id_rsa",
+      ".deli/authorized_keys/#{app}_id_rsa",
       "-t",
       :rsa,
       "-b",
@@ -115,7 +115,7 @@ defmodule Deli.Release.Docker do
     ]
 
     unless path |> file_exists? do
-      cmd(:mkdir, ["-p", ".deliver/authorized_keys"])
+      cmd(:mkdir, ["-p", ".deli/authorized_keys"])
       cmd("ssh-keygen", keygen_args)
       error!("Commit authorized keys before proceeding")
     end
@@ -133,7 +133,7 @@ defmodule Deli.Release.Docker do
   end
 
   defp clear_previous_releases do
-    cmd(:rm, ["-rf", ".deliver/releases"], [0, 1])
+    cmd(:rm, ["-rf", ".deli/releases"], [0, 1])
   end
 
   defp clear_remote_releases do

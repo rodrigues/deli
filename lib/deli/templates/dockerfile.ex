@@ -3,7 +3,7 @@ defmodule Deli.Templates.Dockerfile do
 
   @moduledoc false
 
-  @base_path "lib/templates/.deliver/Dockerfile"
+  @base_path "lib/templates/.deli/Dockerfile"
 
   @deli_images ~w(
     centos
@@ -25,24 +25,9 @@ defmodule Deli.Templates.Dockerfile do
 
   path = &Path.expand("#{@base_path}/#{&1}.eex")
 
-  @centos %{
-    path: path.(:centos),
-    bindings: @deli_bindings
-  }
-
-  @debian %{
-    path: path.(:debian),
-    bindings: @deli_bindings
-  }
-
-  @custom %{
-    path: path.(:custom),
-    bindings: @custom_bindings
-  }
-
-  EEx.function_from_file(:def, :build_centos, @centos.path, @centos.bindings)
-  EEx.function_from_file(:def, :build_debian, @debian.path, @debian.bindings)
-  EEx.function_from_file(:def, :build_custom, @custom.path, @custom.bindings)
+  EEx.function_from_file(:def, :build_centos, path.(:centos), @deli_bindings)
+  EEx.function_from_file(:def, :build_debian, path.(:debian), @deli_bindings)
+  EEx.function_from_file(:def, :build_custom, path.(:custom), @custom_bindings)
 
   @spec build(Docker.build_target(), Deli.app(), boolean) :: String.t()
   def build({:deli, deli_image}, app, yarn?) do

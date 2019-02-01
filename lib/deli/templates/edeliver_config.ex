@@ -6,7 +6,7 @@ defmodule Deli.Templates.EdeliverConfig do
   EEx.function_from_file(
     :def,
     :build,
-    Path.expand("lib/templates/.deliver/config.eex"),
+    Path.expand("lib/templates/.deli/edeliver_config.eex"),
     ~w(
       app
       staging_hosts

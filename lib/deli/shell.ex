@@ -42,7 +42,7 @@ defmodule Deli.Shell do
   end
 
   def docker_compose(command, args \\ [], ok_signals \\ [0]) do
-    args = ["-f", ".deliver-docker-compose.yml"] ++ [command] ++ args
+    args = ["-f", ".deli-docker-compose.yml"] ++ [command] ++ args
     env = [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]
     "docker-compose" |> cmd(args, ok_signals, env: env)
   end

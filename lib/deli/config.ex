@@ -5,6 +5,7 @@ defmodule Deli.Config do
     assets?: false,
     controller: Deli.Controller.Bin,
     docker_build_target: {:deli, :centos},
+    docker_build_user: :deli,
     docker_port: 4441,
     host_provider: Deli.HostProvider.Config,
     # verbose won't output `Deli.Shell` cmd calls
