@@ -24,8 +24,9 @@ RUN git init
 RUN git config receive.denyCurrentBranch ignore
 RUN chown -R deli:deli /usr/local/builds
 
-<%= if yarn? %>
+<%= if yarn? do %>
 # TODO check if yarn is provided, otherwise ask a proper hook doing it, because we can't
+RUN echo 'ensure install yarn!'
 <% end %>
 
 RUN echo "export LANG=en_US.UTF-8" >> /home/deli/.profile
