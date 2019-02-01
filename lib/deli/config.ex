@@ -4,7 +4,7 @@ defmodule Deli.Config do
   @defaults %{
     assets?: false,
     controller: Deli.Controller.Bin,
-    docker_build_target: :centos,
+    docker_build_target: {:deli, :centos},
     docker_port: 4441,
     host_provider: Deli.HostProvider.Config,
     # verbose won't output `Deli.Shell` cmd calls
@@ -75,7 +75,7 @@ defmodule Deli.Config do
     end
   end
 
-  @spec docker_build_target() :: Deli.Release.docker_build_target()
+  @spec docker_build_target() :: Deli.Release.Docker.build_target()
   def docker_build_target do
     :docker_build_target |> get(@defaults.docker_build_target)
   end
