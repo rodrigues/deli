@@ -1,4 +1,6 @@
 defmodule Deli.BEAMVersions do
+  @moduledoc "Handles BEAM dependency version management"
+
   @deps ~w(otp elixir rebar3)a
 
   @type dep :: :otp | :elixir | :rebar3
