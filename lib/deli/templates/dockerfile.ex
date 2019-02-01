@@ -3,54 +3,61 @@ defmodule Deli.Templates.Dockerfile do
 
   @moduledoc false
 
+  @base_path "lib/templates/.deliver/Dockerfile"
+
   @deli_images ~w(
     centos
     debian
   )a
 
-  EEx.function_from_file(
-    :def,
-    :build_centos,
-    Path.expand("lib/templates/.deliver/Dockerfile/centos.eex"),
-    ~w(
-      tag,
-      app
-      yarn?
-    )a
-  )
+  @deli_bindings ~w(
+    tag
+    versions
+    app
+    yarn?
+  )a
 
-  EEx.function_from_file(
-    :def,
-    :build_debian,
-    Path.expand("lib/templates/.deliver/Dockerfile/debian.eex"),
-    ~w(
-      tag,
-      app
-      yarn?
-    )a
-  )
+  @custom_bindings ~w(
+    docker_image
+    app
+    yarn?
+  )a
 
-  EEx.function_from_file(
-    :def,
-    :build_custom,
-    Path.expand("lib/templates/.deliver/Dockerfile/custom.eex"),
-    ~w(
-      docker_image,
-      app
-      yarn?
-    )a
-  )
+  path = &Path.expand("#{@base_path}/#{&1}.eex")
+
+  @centos %{
+    path: path.(:centos),
+    bindings: @deli_bindings
+  }
+
+  @debian %{
+    path: path.(:debian),
+    bindings: @deli_bindings
+  }
+
+  @custom %{
+    path: path.(:custom),
+    bindings: @custom_bindings
+  }
+
+  EEx.function_from_file(:def, :build_centos, @centos.path, @centos.bindings)
+  EEx.function_from_file(:def, :build_debian, @debian.path, @debian.bindings)
+  EEx.function_from_file(:def, :build_custom, @custom.path, @custom.bindings)
 
   @spec build(Docker.build_target(), Deli.app(), boolean) :: String.t()
-  def build({:deli, deli_image}, app, yarn?)
-      when deli_image in @deli_images and
-             is_atom(app) and is_boolean(yarn?) do
+  def build({:deli, deli_image}, app, yarn?) do
     {:deli, {deli_image, :latest}} |> build(app, yarn?)
   end
 
-  def build({:deli, {deli_image, tag}, app, yarn?})
-      when deli_image in @deli_images and is_tag(tag) and
-             is_atom(app) and is_boolean(yarn?) do
+  def build({:deli, {deli_image, tag}, app, yarn?}) do
+    {:deli, {deli_image, tag, []}} |> build(app, yarn?)
+  end
+
+  def build({:deli, {deli_image, tag, beam_versions_opts}, app, yarn?})
+      when deli_image in @deli_images and (is_atom(tag) or is_binary(tag)) and
+             is_atom(app) and is_boolean(yarn?) and is_list(beam_versions_opts) do
+    beam_versions = beam_versions_opts |> BEAMVersions.fetch()
+
     builder =
       case deli_image do
         :centos ->
@@ -60,7 +67,7 @@ defmodule Deli.Templates.Dockerfile do
           &build_debian/3
       end
 
-    tag |> builder.(app, yarn?)
+    tag |> builder.(beam_versions, app, yarn?)
   end
 
   def build(docker_image, app, yarn?)
@@ -72,10 +79,7 @@ defmodule Deli.Templates.Dockerfile do
   def build({docker_image, tag}, app, yarn?)
       when (is_atom(docker_image) or is_binary(docker_image)) and
              is_atom(app) and is_boolean(yarn?) do
+    {docker_image, tag} |> build(app, yarn?)
     "#{docker_image}:#{tag}" |> build_custom(app, yarn?)
   end
-
-  defguardp is_tag(tag)
-            when is_atom(tag) or is_binary(tag) or
-                   (is_integer(tag) and tag > 0)
 end
