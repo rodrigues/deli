@@ -14,10 +14,9 @@ defmodule Deli.Release.Docker do
 
   @type build_target ::
           {:deli, deli_image | {deli_image, tag}}
-          {:deli, deli_image | {deli_image, tag}, beam_versions},
+          | {:deli, deli_image | {deli_image, tag}, beam_versions}
           | docker_image
           | {docker_image, tag}
-          | {docker_image, tag, beam_versions}
 
   @impl true
   def build(tag, target) do
