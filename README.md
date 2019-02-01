@@ -146,7 +146,7 @@ At the moment, this package exists for reusing among similarly configured apps. 
 
 ### Configuring docker image
 
-By default, if you don't configure an image, a `deli` [centos image](https://github.com/rodrigues/deli/blob/master/lib/templates/.deliver/Dockerfile/centos.eex) version is chosen.
+By default, if you don't configure an image, a `deli` [centos image](https://github.com/rodrigues/deli/blob/master/lib/templates/.deli/Dockerfile/centos.eex) version is chosen.
 
 You can also configure an image:
 
@@ -157,15 +157,19 @@ config :deli, :docker_build_target, {:deli, :debian}
 # use deli's centos image, based on this tag
 config :deli, :docker_build_target, {:deli, {:centos, "7.6.1810"}}
 
-# deli generates an image based on elixir official docker image (debian), latest
+# deli generates an image based on elixir official docker image
 config :deli, :docker_build_target, :elixir
 
 # deli generates an image based on elixir official docker image with this tag
 config :deli, :docker_build_target, {:elixir, "1.8.0-alpine"}
 
-# deli images can also have versions configured
+# deli images can also have beam dependencies configured
+#
+# if you don't set it, latest version available
+# when the package was generated will be used
+#
 beam_versions = [
-  otp: "21.2.2",
+  otp: "21.2.4",
   elixir: "1.8.0",
   rebar3: "3.6.1"
 ]
@@ -200,6 +204,11 @@ You can configure any module that implements the [`Deli.Controller` behaviour](h
 - Use a remote release store (allows CI to build releases for all build targets upfront)
 - Provision/setup new target hosts (with hooks for custom setup)
 - Integrate with a terminal-based observer
+- In docker build, allow skipping user creation step, by configuring `docker_build_user :: atom` (default: `:deli`)
+- Allow developers to create custom docker build hooks (`.deli/docker_hooks/{(before_|after)(build|setup|setup_(otp|elixir|rebar3))}/script.(sh|exs)`)
+- Do rebar3 checksum in docker images
+- Allow to pick one specific hex version
+- Allow to change target path to something else than `/opt/APP`
 - mix deli.version handle dev target
 - mix deli.version have compare option
 - mix deli.ping to run specifically bin ping command
