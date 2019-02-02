@@ -9,4 +9,4 @@ services:
     volumes:
       - .deli:/deli
     ports:
-      - "<%= docker_port %>:22"
+      - "<%= docker_build_port %>:22"

@@ -13,7 +13,8 @@ defmodule Deli.Templates.EdeliverConfig do
       production_hosts
       staging_user
       production_user
-      docker_port
+      docker_build_port
+      local?
     )a
   )
 end

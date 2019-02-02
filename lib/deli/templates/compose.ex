@@ -7,6 +7,6 @@ defmodule Deli.Templates.Compose do
     :def,
     :build,
     Path.expand("lib/templates/.deli/docker-compose.yml.eex"),
-    [:app, :docker_port]
+    [:app, :docker_build_port]
   )
 end

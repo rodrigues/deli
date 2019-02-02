@@ -1,7 +1,16 @@
 defmodule Deli.Release.Docker do
   import Deli.Shell
+
+  import Deli.Release.Local,
+    only: [
+      add_to_gitignore: 1,
+      clear_previous_releases: 0,
+      edeliver_build: 2,
+      ensure_edeliver_config: 1
+    ]
+
   alias Deli.Config
-  alias Deli.Templates.{Compose, Dockerfile, EdeliverConfig}
+  alias Deli.Templates.{Compose, Dockerfile}
 
   @moduledoc false
 
@@ -22,18 +31,15 @@ defmodule Deli.Release.Docker do
 
   @impl true
   def build(tag, target) do
-    target_mix_env = target |> Config.mix_env()
-
-    ensure_edeliver_config()
+    ensure_edeliver_config(false)
     clear_previous_releases()
     boot_docker()
     clear_remote_releases()
-
-    edeliver(:build, [:release, "--tag=#{tag}", "--mix-env=#{target_mix_env}"])
+    edeliver_build(tag, target)
   end
 
   defp boot_docker do
-    docker_port = Config.docker_port()
+    docker_build_port = Config.docker_build_port()
     ensure_dockerfile()
     ensure_docker_compose()
     ensure_docker_authorized_keys()
@@ -41,34 +47,9 @@ defmodule Deli.Release.Docker do
     docker_compose(:build, [:deli])
     docker_compose(:up, ["-d", :deli])
     :timer.sleep(1_000)
-    cmd("ssh-keygen", ["-R", "\[0.0.0.0\]:#{docker_port}"])
-    {:ok, scan} = "ssh-keyscan" |> cmd_result(["-p", docker_port, "0.0.0.0"])
+    cmd("ssh-keygen", ["-R", "\[0.0.0.0\]:#{docker_build_port}"])
+    {:ok, scan} = "ssh-keyscan" |> cmd_result(["-p", docker_build_port, "0.0.0.0"])
     write_file("~/.ssh/known_hosts", "\n#{scan}\n", [:append])
-  end
-
-  defp ensure_edeliver_config do
-    path = ".deli/edeliver_config"
-
-    unless path |> file_exists? do
-      host_provider = Config.host_provider()
-      hosts = fn env -> env |> host_provider.hosts() |> Enum.to_list() end
-      staging_hosts = hosts.(:staging)
-      prod_hosts = hosts.(:prod)
-
-      content =
-        EdeliverConfig.build(
-          Config.app(),
-          staging_hosts,
-          prod_hosts,
-          Config.app_user(:staging),
-          Config.app_user(:prod),
-          Config.docker_port()
-        )
-
-      write_file(path, content)
-      add_to_gitignore(path)
-      add_to_gitignore(".deli/releases")
-    end
   end
 
   defp ensure_dockerfile do
@@ -77,9 +58,9 @@ defmodule Deli.Release.Docker do
     unless path |> file_exists? do
       content =
         Dockerfile.build(
-          Config.docker_build_target(),
+          Config.docker_build_image(),
           Config.app(),
-          Config.yarn?()
+          Config.docker_build_yarn?()
         )
 
       write_file(path, content)
@@ -95,7 +76,7 @@ defmodule Deli.Release.Docker do
       content =
         Compose.build(
           Config.app(),
-          Config.docker_port()
+          Config.docker_build_port()
         )
 
       write_file(path, content)
@@ -123,19 +104,6 @@ defmodule Deli.Release.Docker do
     end
 
     cmd(:chmod, [400, path])
-  end
-
-  defp add_to_gitignore(path) do
-    gitignore = ".gitignore"
-    content = gitignore |> expand_path |> File.read!()
-
-    unless content |> String.contains?(path) do
-      write_file(gitignore, "#{path}\n", [:append])
-    end
-  end
-
-  defp clear_previous_releases do
-    cmd(:rm, ["-rf", ".deli/releases"], [0, 1])
   end
 
   defp clear_remote_releases do

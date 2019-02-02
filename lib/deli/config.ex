@@ -3,22 +3,35 @@ defmodule Deli.Config do
 
   @defaults %{
     assets?: false,
+    # use release binary by default
     controller: Deli.Controller.Bin,
-    docker_build_target: {:deli, :centos},
-    docker_build_user: :deli,
-    docker_port: 4441,
+    # used when `release` is configured as `Deli.Release.Docker`
+    docker_build: [
+      # check `Deli.Release.Docker.build_target()` type for all options
+      image: {:deli, :centos},
+      # in deli images, this user is automatically generated
+      # in other docker images, you need to ensure it is created
+      user: :deli,
+      port: 4441,
+      # when app has web assets
+      yarn?: false
+    ],
+    # by default use hosts configured in mix config
     host_provider: Deli.HostProvider.Config,
-    # verbose won't output `Deli.Shell` cmd calls
+    # verbose won't output `Deli.Shell` cmd calls, meant for debugging
     output_commands?: false,
     # wait in seconds when running `mix deli.shell`
     port_forwarding_timeout: 3_600,
     # wait in ms between port forwarding and iex command
     port_forwarding_wait: 2_000,
+    # use local docker as default release strategy
     release: Deli.Release.Docker,
+    # default commands to staging environment
     target: :staging,
+    # show processes output
     verbose?: true,
-    versioning: Deli.Versioning.Default,
-    yarn?: false
+    # git tags like mixfile by default
+    versioning: Deli.Versioning.Default
   }
 
   @spec app() :: Deli.app()
@@ -49,11 +62,6 @@ defmodule Deli.Config do
     :assets |> get(@defaults.assets?)
   end
 
-  @spec yarn?() :: boolean
-  def yarn? do
-    :yarn |> get(@defaults.yarn?)
-  end
-
   @spec cookie() :: atom
   def cookie do
     cookie = :cookie |> get()
@@ -77,14 +85,19 @@ defmodule Deli.Config do
     end
   end
 
-  @spec docker_build_target() :: Deli.Release.Docker.build_target()
-  def docker_build_target do
-    :docker_build_target |> get(@defaults.docker_build_target)
+  @spec docker_build_image() :: Deli.Release.Docker.build_target()
+  def docker_build_image do
+    :docker_build |> get([]) |> Keyword.get(:port, @defaults.docker_build[:image])
   end
 
-  @spec docker_port() :: :inet.port_number()
-  def docker_port do
-    :docker_port |> get(@defaults.docker_port)
+  @spec docker_build_port() :: :inet.port_number()
+  def docker_build_port do
+    :docker_build |> get([]) |> Keyword.get(:port, @defaults.docker_build[:port])
+  end
+
+  @spec docker_build_yarn?() :: boolean
+  def docker_build_yarn? do
+    :docker_build |> get([]) |> Keyword.get(:yarn?, @defaults.docker_build[:yarn?])
   end
 
   @spec port_forwarding_timeout() :: pos_integer

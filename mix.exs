@@ -51,7 +51,7 @@ defmodule Deli.MixProject do
   end
 
   defp docs do
-    [main: "readme", extras: ["README.md"]]
+    [main: "readme", extras: ["README.md", "docs/release_config.md"]]
   end
 
   defp package do
