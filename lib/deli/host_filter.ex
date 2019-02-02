@@ -6,7 +6,7 @@ defmodule Deli.HostFilter do
 
   @spec hosts(Deli.env(), OptionParser.argv(), boolean) :: {:ok, [Deli.host()]}
   def hosts(env, args, silent? \\ false) do
-    hosts = env |> Config.host_provider().hosts() |> Enum.to_list()
+    hosts = env |> Config.host_provider().hosts()
 
     with %Regex{} = exp <- args |> host_filter do
       with [_ | _] = filtered_hosts <- hosts |> Enum.filter(&(&1 =~ exp)) do

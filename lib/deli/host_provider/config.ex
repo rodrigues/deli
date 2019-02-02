@@ -3,7 +3,7 @@ defmodule Deli.HostProvider.Config do
 
   @moduledoc """
   Host provider that will return hosts based in
-  `config `:deli`, `hosts: [env: [...]]`
+  `config :deli, hosts: [env: [...]]`
   """
 
   @behaviour Deli.HostProvider
