@@ -6,11 +6,8 @@ COPY authorized_keys /authorized_keys
 RUN ssh-keygen -q -t rsa -f /etc/ssh/ssh_host_rsa_key -C '' -N ''
 RUN ssh-keygen -q -t dsa -f /etc/ssh/ssh_host_dsa_key -C '' -N ''
 
-# TODO make this step optional
-# Create deli user and make it a sudoer
+# Copy keys to build user, and make it a sudoer
 RUN set -xe \
-  && useradd -s /bin/bash -c "deli" deli \
-  && mkhomedir_helper deli \
   && mkdir -p /home/deli/.ssh \
   && cp /authorized_keys/<%= app %>_id_rsa.pub /home/deli/.ssh/authorized_keys \
   && chown -R deli:deli /home/deli/.ssh \
