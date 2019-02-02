@@ -1,7 +1,7 @@
 defmodule Deli.Release.Docker do
   import Deli.Shell
 
-  import Deli.Release.Local,
+  import Deli.Release.Remote,
     only: [
       add_to_gitignore: 1,
       clear_previous_releases: 0,

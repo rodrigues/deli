@@ -1,4 +1,4 @@
-defmodule Deli.Release.Local do
+defmodule Deli.Release.Remote do
   import Deli.Shell
   alias Deli.Config
   alias Deli.Templates.EdeliverConfig
@@ -19,7 +19,7 @@ defmodule Deli.Release.Local do
     edeliver(:build, [:release, "--tag=#{tag}", "--mix-env=#{target_mix_env}"])
   end
 
-  def ensure_edeliver_config(local? \\ true) do
+  def ensure_edeliver_config(remote? \\ true) do
     path = ".deli/edeliver_config"
 
     unless path |> file_exists? do
@@ -36,9 +36,11 @@ defmodule Deli.Release.Local do
           Config.app_user(:staging),
           Config.app_user(:prod),
           Config.docker_build_port(),
-          local?
+          remote?
         )
 
+      dir = path |> Path.dirname()
+      File.mkdir_p(dir)
       write_file(path, content)
       add_to_gitignore(path)
       add_to_gitignore(".deli/releases")

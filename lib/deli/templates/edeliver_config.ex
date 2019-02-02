@@ -14,7 +14,7 @@ defmodule Deli.Templates.EdeliverConfig do
       staging_user
       production_user
       docker_build_port
-      local?
+      remote?
     )a
   )
 end

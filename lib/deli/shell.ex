@@ -117,7 +117,7 @@ defmodule Deli.Shell do
   defp command_failed!(command, args, signal, content)
        when is_binary(command) and is_list(args) and is_integer(signal) do
     details = "(#{signal})"
-    details = if content, do: "\n#{details} #{content}", else: details
+    details = if content, do: "\n#{details} #{inspect(content)}", else: details
 
     IO.puts([
       IO.ANSI.reset(),
