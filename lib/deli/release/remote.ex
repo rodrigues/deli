@@ -40,7 +40,7 @@ defmodule Deli.Release.Remote do
         )
 
       dir = path |> Path.dirname()
-      File.mkdir_p(dir)
+      :ok = File.mkdir_p(dir)
       write_file(path, content)
       add_to_gitignore(path)
       add_to_gitignore(".deli/releases")
