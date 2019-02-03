@@ -1,17 +1,19 @@
 defmodule Deli.HostFilter do
   import Deli.Shell
+  import Deli.Config.Ensure
   alias Deli.Config
 
   @moduledoc false
 
   @spec hosts(Deli.env(), OptionParser.argv(), boolean) :: {:ok, [Deli.host()]}
-  def hosts(env, args, silent? \\ false) do
+  def hosts(env, args, silent? \\ false)
+      when is_atom(env) and is_list(args) and is_boolean(silent?) do
     hosts = env |> Config.host_provider().hosts()
 
     with %Regex{} = exp <- args |> host_filter do
       with [_ | _] = filtered_hosts <- hosts |> Enum.filter(&(&1 =~ exp)) do
         unless silent?, do: list_hosts(filtered_hosts)
-        {:ok, filtered_hosts}
+        {:ok, filtered_hosts |> Enum.map(&ensure_binary/1)}
       else
         [] ->
           error!("""
@@ -27,13 +29,13 @@ defmodule Deli.HostFilter do
 
           _ ->
             unless silent?, do: list_hosts(hosts)
-            {:ok, hosts}
+            {:ok, hosts |> Enum.map(&ensure_binary/1)}
         end
     end
   end
 
   @spec host(Deli.env(), OptionParser.argv()) :: {:ok, Deli.host()} | {:error, term}
-  def host(env, args) do
+  def host(env, args) when is_atom(env) and is_list(args) do
     {:ok, hosts} = env |> hosts(args, true)
     length = hosts |> Enum.count()
 
@@ -42,7 +44,7 @@ defmodule Deli.HostFilter do
         {:error, :no_host_found}
 
       1 ->
-        host = hosts |> Enum.at(0)
+        host = hosts |> Enum.at(0) |> ensure_binary
         {:ok, host}
 
       _ ->
@@ -61,7 +63,7 @@ defmodule Deli.HostFilter do
       |> Integer.parse()
 
     if number < count do
-      host = hosts |> Enum.at(number)
+      host = hosts |> Enum.at(number) |> ensure_binary
       {:ok, host}
     else
       select_host(hosts)

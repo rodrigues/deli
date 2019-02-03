@@ -38,7 +38,8 @@ defmodule Deli.Shell do
   end
 
   @spec edeliver(command, args) :: :ok
-  def edeliver(command, args \\ []) when (is_atom(command) or is_binary(command)) and is_list(args) do
+  def edeliver(command, args \\ [])
+      when (is_atom(command) or is_binary(command)) and is_list(args) do
     verbose = if Config.verbose?(), do: ["--verbose"], else: []
     edeliver_args = ["edeliver", command] ++ args ++ verbose
     "mix" |> cmd(edeliver_args)

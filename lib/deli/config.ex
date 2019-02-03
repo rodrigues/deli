@@ -1,4 +1,6 @@
 defmodule Deli.Config do
+  import Deli.Config.Ensure
+
   @moduledoc "Provides access to deli configuration"
 
   @defaults %{
@@ -130,7 +132,7 @@ defmodule Deli.Config do
   If there is a custom host provider configured, it might not be correct.
   """
   @spec hosts(Deli.env()) :: [Deli.host()]
-  def hosts(env) do
+  def hosts(env) when is_atom(env) do
     :hosts
     |> get([])
     |> Keyword.get(mix_env(env), [])
@@ -209,19 +211,4 @@ defmodule Deli.Config do
   def edeliver_target(:prod), do: "production"
   def edeliver_target(env) when is_atom(env), do: env |> Atom.to_string()
   def edeliver_target(target) when is_binary(target), do: target
-
-  defp ensure_boolean(b) when b in [true, false], do: b
-  defp ensure_boolean(x), do: raise("Only boolean accepted, got: #{inspect(x)}")
-
-  defp ensure_atom(a) when is_atom(a), do: a
-  defp ensure_atom(x), do: raise("Only atom accepted, got: #{inspect(x)}")
-
-  defp ensure_port_number(i) when i in 0..65535, do: i
-  defp ensure_port_number(x), do: raise("Only port number accepted, got: #{inspect(x)}")
-
-  defp ensure_pos_integer(i) when is_integer(i) and i > 0, do: i
-  defp ensure_pos_integer(x), do: raise("Only positive integer accepted, got: #{inspect(x)}")
-
-  defp ensure_binary(s) when is_binary(s), do: s
-  defp ensure_binary(x), do: raise("Only string accepted, got: #{inspect(x)}")
 end
