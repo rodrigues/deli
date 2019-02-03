@@ -30,7 +30,8 @@ defmodule Deli.MixProject do
       {:distillery, "~> 2.0.10", runtime: false},
       {:ex_doc, "~> 0.19.1", only: :dev, runtime: false},
       {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
+      {:stream_data, "~> 0.4.2", only: :test}
     ]
   end
 

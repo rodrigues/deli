@@ -60,7 +60,7 @@ defmodule Deli.Config do
           user || app()
       end
 
-    app_user |> ensure_atom
+    app_user |> ensure_atom_or_binary
   end
 
   @spec assets?() :: boolean
