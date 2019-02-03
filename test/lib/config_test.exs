@@ -69,5 +69,30 @@ defmodule Deli.ConfigTest do
         assert Config.app_user(:prod) == p
       end
     end
+
+    test "fails when app_user is configured as something else" do
+      call = fn -> Config.app_user(:staging) end
+      put_config(:app_user, 123)
+      assert_raise CaseClauseError, call
+    end
+  end
+
+  describe "assets?/0" do
+    test "returns false when not configured" do
+      delete_config(:assets)
+      assert Config.assets?() == false
+    end
+
+    test "returns boolean when configured as boolean" do
+      check all a <- StreamData.boolean() do
+        put_config(:assets, a)
+        assert Config.assets?() == a
+      end
+    end
+
+    test "fails when configured as something else" do
+      put_config(:assets, :not_a_boolean)
+      assert_raise RuntimeError, &Config.assets?/0
+    end
   end
 end
