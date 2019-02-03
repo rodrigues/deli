@@ -58,12 +58,12 @@ defmodule Deli.MixProject do
         guides/Release.md
       ),
       groups_for_modules: [
-        "Controller": [
+        Controller: [
           Deli.Controller,
           Deli.Controller.Bin,
           Deli.Controller.Systemctl
         ],
-        "Release": [
+        Release: [
           Deli.Release,
           Deli.Release.Remote,
           Deli.Release.Docker
@@ -72,7 +72,7 @@ defmodule Deli.MixProject do
           Deli.HostProvider,
           Deli.HostProvider.Config
         ],
-        "Versioning": [
+        Versioning: [
           Deli.Versioning,
           Deli.Versioning.Default
         ]
