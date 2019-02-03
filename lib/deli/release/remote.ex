@@ -3,7 +3,7 @@ defmodule Deli.Release.Remote do
   alias Deli.Config
   alias Deli.Templates.EdeliverConfig
 
-  @moduledoc false
+  @moduledoc "Release strategy that relies on a remote build host"
 
   @behaviour Deli.Release
 

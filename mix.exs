@@ -56,7 +56,27 @@ defmodule Deli.MixProject do
       extras: ~w(
         README.md
         guides/Release.md
-      )
+      ),
+      groups_for_modules: [
+        "Controller": [
+          Deli.Controller,
+          Deli.Controller.Bin,
+          Deli.Controller.Systemctl
+        ],
+        "Release": [
+          Deli.Release,
+          Deli.Release.Remote,
+          Deli.Release.Docker
+        ],
+        "Host provider": [
+          Deli.HostProvider,
+          Deli.HostProvider.Config
+        ],
+        "Versioning": [
+          Deli.Versioning,
+          Deli.Versioning.Default
+        ]
+      ]
     ]
   end
 

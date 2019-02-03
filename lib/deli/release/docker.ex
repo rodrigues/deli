@@ -12,7 +12,7 @@ defmodule Deli.Release.Docker do
   alias Deli.Config
   alias Deli.Templates.{Compose, Dockerfile}
 
-  @moduledoc false
+  @moduledoc "Release strategy that creates a local docker to build"
 
   @behaviour Deli.Release
 
