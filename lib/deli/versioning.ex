@@ -9,5 +9,5 @@ defmodule Deli.Versioning do
   returns an ok tuple with the version tag to be used during deploy,
   or raises in case there is no version tag resolved.
   """
-  @callback version_tag(user_provided_tag :: String.t() | nil) :: {:ok, tag} | no_return
+  @callback version_tag(version :: String.t() | nil) :: {:ok, tag} | no_return
 end
