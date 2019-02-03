@@ -15,4 +15,7 @@ defmodule Deli.Config.Ensure do
 
   def ensure_binary(s) when is_binary(s), do: s
   def ensure_binary(x), do: raise("Only string accepted, got: #{inspect(x)}")
+
+  def ensure_atom_or_binary(x) when is_atom(x) or is_binary(x), do: x
+  def ensure_atom_or_binary(x), do: raise("Only string or atom accepted, got: #{inspect(x)}")
 end

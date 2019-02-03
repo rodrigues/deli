@@ -24,10 +24,46 @@ defmodule Deli.ConfigTest do
       put_config(:app, "not_an_atom")
       assert_raise RuntimeError, &Config.app/0
     end
+  end
 
-    test "uses mix project app when app not configured" do
-      put_config(:app, nil)
-      assert Config.app() == :deli
+  describe "app_user/1" do
+    test "fails if `env` is not an atom" do
+      call = fn -> Config.app_user("staging") end
+      assert_raise FunctionClauseError, call
+    end
+
+    test "returns app when not configured" do
+      check all a <- :alphanumeric |> StreamData.atom() do
+        put_config(:app, a)
+        put_config(:app_user, nil)
+        assert Config.app_user(:staging) == a
+        assert Config.app_user(:prod) == a
+      end
+    end
+
+    test "returns app_user configured when atom" do
+      check all a <- :alphanumeric |> StreamData.atom() do
+        put_config(:app_user, a)
+        assert Config.app_user(:staging) == a
+        assert Config.app_user(:prod) == a
+      end
+    end
+
+    test "returns app_user configured when binary" do
+      check all a <- StreamData.binary() do
+        put_config(:app_user, a)
+        assert Config.app_user(:staging) == a
+        assert Config.app_user(:prod) == a
+      end
+    end
+
+    test "returns env specific user when configured as such" do
+      check all s <- :alphanumeric |> StreamData.atom(),
+                p <- :alphanumeric |> StreamData.atom() do
+        put_config(:app_user, staging: s, prod: p)
+        assert Config.app_user(:staging) == s
+        assert Config.app_user(:prod) == p
+      end
     end
   end
 end
