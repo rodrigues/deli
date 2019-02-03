@@ -4,5 +4,5 @@ defmodule Deli.Release do
   @moduledoc "Defines a behaviour for releases"
 
   @doc "Creates a release targeting `target` env on `tag`"
-  @callback build(Versioning.tag(), Deli.env()) :: :ok
+  @callback build(tag :: Versioning.tag(), target :: Deli.env()) :: :ok
 end

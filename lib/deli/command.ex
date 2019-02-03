@@ -40,7 +40,7 @@ defmodule Deli.Command do
       $ mix my_app.xyz --arg_example=1 -t prod -h 01
   """
 
-  @callback run(OptionParser.argv()) :: :ok
+  @callback run(args :: OptionParser.argv()) :: :ok
 
   @doc ~S"""
   Either runs a command locally (dev), or through a RPC call
