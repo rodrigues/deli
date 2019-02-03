@@ -31,14 +31,14 @@ defmodule Deli.Shell do
     {content, signal} = command |> System.cmd(args, verbose_opts(opts))
 
     if ok_signals |> Enum.member?(signal) do
-      {:ok, content}
+      {:ok, content |> to_string}
     else
       command_failed!(command, args, signal, content)
     end
   end
 
   @spec edeliver(command, args) :: :ok
-  def edeliver(command, args \\ []) do
+  def edeliver(command, args \\ []) when (is_atom(command) or is_binary(command)) and is_list(args) do
     verbose = if Config.verbose?(), do: ["--verbose"], else: []
     edeliver_args = ["edeliver", command] ++ args ++ verbose
     "mix" |> cmd(edeliver_args)

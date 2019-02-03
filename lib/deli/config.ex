@@ -42,7 +42,7 @@ defmodule Deli.Config do
   end
 
   @spec app_user(Deli.env()) :: atom
-  def app_user(env) do
+  def app_user(env) when is_atom(env) do
     app_user = :app_user |> get()
 
     app_user =
@@ -74,7 +74,7 @@ defmodule Deli.Config do
   end
 
   @spec host_id(Deli.env(), Deli.host()) :: String.t()
-  def host_id(env, host) do
+  def host_id(env, host) when is_atom(env) and is_binary(host) do
     "#{app_user(env)}@#{host}"
   end
 
