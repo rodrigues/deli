@@ -37,35 +37,40 @@ defmodule Deli.Config do
   @spec app() :: Deli.app()
   def app do
     app = :app |> get()
-    app || Mix.Project.get().project[:app]
+    app = app || Mix.Project.get().project[:app]
+    app |> ensure_atom
   end
 
   @spec app_user(Deli.env()) :: atom
   def app_user(env) do
     app_user = :app_user |> get()
 
-    case app_user do
-      nil ->
-        app()
+    app_user =
+      case app_user do
+        nil ->
+          app()
 
-      user when is_atom(user) or is_binary(user) ->
-        user
+        user when is_atom(user) or is_binary(user) ->
+          user
 
-      options when is_list(options) ->
-        user = options |> Keyword.get(env)
-        user || app()
-    end
+        options when is_list(options) ->
+          user = options |> Keyword.get(env)
+          user || app()
+      end
+
+    app_user |> ensure_atom
   end
 
   @spec assets?() :: boolean
   def assets? do
-    :assets |> get(@defaults.assets?)
+    :assets |> get(@defaults.assets?) |> ensure_boolean
   end
 
   @spec cookie() :: atom
   def cookie do
     cookie = :cookie |> get()
-    cookie || app()
+    cookie = cookie || app()
+    cookie |> ensure_atom
   end
 
   @spec host_id(Deli.env(), Deli.host()) :: String.t()
@@ -80,7 +85,7 @@ defmodule Deli.Config do
         app = app()
         "/opt/#{app}/bin/#{app}"
 
-      path ->
+      path when is_binary(path) ->
         path
     end
   end
@@ -92,66 +97,93 @@ defmodule Deli.Config do
 
   @spec docker_build_port() :: :inet.port_number()
   def docker_build_port do
-    :docker_build |> get([]) |> Keyword.get(:port, @defaults.docker_build[:port])
+    :docker_build
+    |> get([])
+    |> Keyword.get(:port, @defaults.docker_build[:port])
+    |> ensure_port_number
   end
 
   @spec docker_build_yarn?() :: boolean
   def docker_build_yarn? do
-    :docker_build |> get([]) |> Keyword.get(:yarn?, @defaults.docker_build[:yarn?])
+    :docker_build
+    |> get([])
+    |> Keyword.get(:yarn?, @defaults.docker_build[:yarn?])
+    |> ensure_boolean
   end
 
   @spec port_forwarding_timeout() :: pos_integer
   def port_forwarding_timeout do
-    :port_forwarding_timeout |> get(@defaults.port_forwarding_timeout)
+    :port_forwarding_timeout
+    |> get(@defaults.port_forwarding_timeout)
+    |> ensure_pos_integer
   end
 
-  @spec port_forwarding_wait() :: non_neg_integer
+  @spec port_forwarding_wait() :: pos_integer
   def port_forwarding_wait do
-    :port_forwarding_wait |> get(@defaults.port_forwarding_wait)
+    :port_forwarding_wait
+    |> get(@defaults.port_forwarding_wait)
+    |> ensure_pos_integer
   end
 
   @doc """
   Returns hosts as configured through `:deli` application config.
   If there is a custom host provider configured, it might not be correct.
   """
-  @spec hosts(Deli.env()) :: Enumerable.t()
+  @spec hosts(Deli.env()) :: [Deli.host()]
   def hosts(env) do
-    :hosts |> get([]) |> Keyword.get(mix_env(env), [])
+    :hosts
+    |> get([])
+    |> Keyword.get(mix_env(env), [])
+    |> Enum.map(&ensure_binary/1)
   end
 
   @spec host_provider() :: module
   def host_provider do
-    :host_provider |> get(@defaults.host_provider)
+    :host_provider
+    |> get(@defaults.host_provider)
+    |> ensure_atom
   end
 
   @spec controller() :: module
   def controller do
-    :controller |> get(@defaults.controller)
+    :controller
+    |> get(@defaults.controller)
+    |> ensure_atom
   end
 
   @spec release() :: module
   def release do
-    :release |> get(@defaults.release)
+    :release
+    |> get(@defaults.release)
+    |> ensure_atom
   end
 
   @spec versioning() :: module
   def versioning do
-    :versioning |> get(@defaults.versioning)
+    :versioning
+    |> get(@defaults.versioning)
+    |> ensure_atom
   end
 
   @spec verbose?() :: boolean
   def verbose? do
-    :verbose |> get(@defaults.verbose?)
+    :verbose
+    |> get(@defaults.verbose?)
+    |> ensure_boolean
   end
 
   @spec output_commands?() :: boolean
   def output_commands? do
-    :output_commands |> get(@defaults.output_commands?)
+    :output_commands
+    |> get(@defaults.output_commands?)
+    |> ensure_boolean
   end
 
   @spec default_target() :: Deli.env()
   def default_target do
-    :default_target |> get(@defaults.target)
+    :default_target
+    |> get(@defaults.target)
+    |> ensure_atom
   end
 
   @spec get(Application.key(), Application.value()) :: Application.value()
@@ -177,4 +209,19 @@ defmodule Deli.Config do
   def edeliver_target(:prod), do: "production"
   def edeliver_target(env) when is_atom(env), do: env |> to_string
   def edeliver_target(target) when is_binary(target), do: target
+
+  defp ensure_boolean(b) when b in [true, false], do: b
+  defp ensure_boolean(x), do: raise("Only boolean accepted, got: #{inspect(x)}")
+
+  defp ensure_atom(a) when is_atom(a), do: a
+  defp ensure_atom(x), do: raise("Only atom accepted, got: #{inspect(x)}")
+
+  defp ensure_port_number(i) when i in 0..65535, do: i
+  defp ensure_port_number(x), do: raise("Only port number accepted, got: #{inspect(x)}")
+
+  defp ensure_pos_integer(i) when is_integer(i) and i > 0, do: i
+  defp ensure_pos_integer(x), do: raise("Only positive integer accepted, got: #{inspect(x)}")
+
+  defp ensure_binary(s) when is_binary(s), do: s
+  defp ensure_binary(x), do: raise("Only string accepted, got: #{inspect(x)}")
 end
