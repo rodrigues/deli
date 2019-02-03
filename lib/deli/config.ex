@@ -75,11 +75,6 @@ defmodule Deli.Config do
     cookie |> ensure_atom
   end
 
-  @spec host_id(Deli.env(), Deli.host()) :: String.t()
-  def host_id(env, host) when is_atom(env) and is_binary(host) do
-    "#{app_user(env)}@#{host}"
-  end
-
   @spec bin_path :: String.t()
   def bin_path do
     case :bin_path |> get() do
@@ -90,6 +85,20 @@ defmodule Deli.Config do
       path when is_binary(path) ->
         path
     end
+  end
+
+  @spec controller() :: module
+  def controller do
+    :controller
+    |> get(@defaults.controller)
+    |> ensure_atom
+  end
+
+  @spec default_target() :: Deli.env()
+  def default_target do
+    :default_target
+    |> get(@defaults.target)
+    |> ensure_atom
   end
 
   @spec docker_build_image() :: Deli.Release.Docker.build_target()
@@ -113,20 +122,6 @@ defmodule Deli.Config do
     |> ensure_boolean
   end
 
-  @spec port_forwarding_timeout() :: pos_integer
-  def port_forwarding_timeout do
-    :port_forwarding_timeout
-    |> get(@defaults.port_forwarding_timeout)
-    |> ensure_pos_integer
-  end
-
-  @spec port_forwarding_wait() :: pos_integer
-  def port_forwarding_wait do
-    :port_forwarding_wait
-    |> get(@defaults.port_forwarding_wait)
-    |> ensure_pos_integer
-  end
-
   @doc """
   Returns hosts as configured through `:deli` application config.
   If there is a custom host provider configured, it might not be correct.
@@ -139,6 +134,11 @@ defmodule Deli.Config do
     |> Enum.map(&ensure_binary/1)
   end
 
+  @spec host_id(Deli.env(), Deli.host()) :: String.t()
+  def host_id(env, host) when is_atom(env) and is_binary(host) do
+    "#{app_user(env)}@#{host}"
+  end
+
   @spec host_provider() :: module
   def host_provider do
     :host_provider
@@ -146,11 +146,25 @@ defmodule Deli.Config do
     |> ensure_atom
   end
 
-  @spec controller() :: module
-  def controller do
-    :controller
-    |> get(@defaults.controller)
-    |> ensure_atom
+  @spec output_commands?() :: boolean
+  def output_commands? do
+    :output_commands
+    |> get(@defaults.output_commands?)
+    |> ensure_boolean
+  end
+
+  @spec port_forwarding_timeout() :: pos_integer
+  def port_forwarding_timeout do
+    :port_forwarding_timeout
+    |> get(@defaults.port_forwarding_timeout)
+    |> ensure_pos_integer
+  end
+
+  @spec port_forwarding_wait() :: pos_integer
+  def port_forwarding_wait do
+    :port_forwarding_wait
+    |> get(@defaults.port_forwarding_wait)
+    |> ensure_pos_integer
   end
 
   @spec release() :: module
@@ -172,20 +186,6 @@ defmodule Deli.Config do
     :verbose
     |> get(@defaults.verbose?)
     |> ensure_boolean
-  end
-
-  @spec output_commands?() :: boolean
-  def output_commands? do
-    :output_commands
-    |> get(@defaults.output_commands?)
-    |> ensure_boolean
-  end
-
-  @spec default_target() :: Deli.env()
-  def default_target do
-    :default_target
-    |> get(@defaults.target)
-    |> ensure_atom
   end
 
   @spec get(Application.key(), Application.value()) :: Application.value()
