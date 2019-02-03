@@ -53,7 +53,10 @@ defmodule Deli.MixProject do
   defp docs do
     [
       main: "readme",
-      extras: ["README.md", "guides/release.md"]
+      extras: ~w(
+        README.md
+        guides/Release.md
+      )
     ]
   end
 
