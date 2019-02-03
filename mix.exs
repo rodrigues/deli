@@ -45,6 +45,7 @@ defmodule Deli.MixProject do
         error_handling
         race_conditions
         unmatched_returns
+        underspecs
       )a,
       ignore_warnings: ".dialyzer_ignore.exs"
     ]
