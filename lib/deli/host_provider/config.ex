@@ -12,9 +12,4 @@ defmodule Deli.HostProvider.Config do
   def hosts(env) do
     env |> Config.hosts()
   end
-
-  @impl true
-  def count(env) do
-    env |> hosts |> Enum.count()
-  end
 end
