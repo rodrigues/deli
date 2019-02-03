@@ -207,7 +207,7 @@ defmodule Deli.Config do
   @spec edeliver_target(atom | String.t()) :: String.t()
   def edeliver_target("prod"), do: "production"
   def edeliver_target(:prod), do: "production"
-  def edeliver_target(env) when is_atom(env), do: env |> to_string
+  def edeliver_target(env) when is_atom(env), do: env |> Atom.to_string()
   def edeliver_target(target) when is_binary(target), do: target
 
   defp ensure_boolean(b) when b in [true, false], do: b

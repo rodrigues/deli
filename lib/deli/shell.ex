@@ -10,17 +10,20 @@ defmodule Deli.Shell do
 
   @spec cmd(command, args, ok_signals, Keyword.t()) :: :ok
   def cmd(command, args \\ [], ok_signals \\ [0], opts \\ []) do
-    command |> do_cmd(args, ok_signals, opts)
+    {:ok, _} = command |> do_cmd(args, ok_signals, opts)
+    :ok
   end
 
   @spec cmd_result(command, args, ok_signals, Keyword.t()) ::
           {:ok, Collectable.t()}
   def cmd_result(command, args \\ [], ok_signals \\ [0], opts \\ []) do
     opts = [into: ""] ++ opts
-    command |> do_cmd(args, ok_signals, opts, true)
+    command |> do_cmd(args, ok_signals, opts)
   end
 
-  defp do_cmd(command, args, ok_signals, opts, result? \\ false) do
+  defp do_cmd(command, args, ok_signals, opts)
+       when (is_atom(command) or is_binary(command)) and
+              is_list(args) and is_list(ok_signals) and is_list(opts) do
     command = command |> to_string
     args = args |> Enum.map(&to_string/1)
     verbose_inspect([command | args])
@@ -28,7 +31,7 @@ defmodule Deli.Shell do
     {content, signal} = command |> System.cmd(args, verbose_opts(opts))
 
     if ok_signals |> Enum.member?(signal) do
-      if result?, do: {:ok, content}, else: :ok
+      {:ok, content}
     else
       command_failed!(command, args, signal, content)
     end
