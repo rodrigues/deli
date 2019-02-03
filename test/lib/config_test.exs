@@ -7,9 +7,13 @@ defmodule Deli.ConfigTest do
     :ok = :deli |> Application.put_env(key, value)
   end
 
+  def delete_config(key) do
+    :ok = :deli |> Application.delete_env(key)
+  end
+
   describe "app/0" do
     test "uses mix project app when app not configured" do
-      put_config(:app, nil)
+      delete_config(:app)
       assert Config.app() == :deli
     end
 
@@ -35,7 +39,7 @@ defmodule Deli.ConfigTest do
     test "returns app when not configured" do
       check all a <- :alphanumeric |> StreamData.atom() do
         put_config(:app, a)
-        put_config(:app_user, nil)
+        delete_config(:app_user)
         assert Config.app_user(:staging) == a
         assert Config.app_user(:prod) == a
       end
