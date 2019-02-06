@@ -1,3 +1,6 @@
+*** v0.1.28
+
+- [NEW] CentOS build image updated OTP to 21.2.4 and Elixir to 1.8.1
 - [NEW] Configurable host provider
 - [NEW] Add typespecs in core parts
 - [NEW] `Config.output_commands?/0`
