@@ -85,7 +85,7 @@ defmodule Deli.ConfigTest do
       assert Config.assets?() == false
     end
 
-    test "returns boolean when configured as boolean" do
+    test "returns assets? when configured as boolean" do
       check all a <- StreamData.boolean() do
         put_config(:assets, a)
         assert Config.assets?() == a
