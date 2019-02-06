@@ -3,6 +3,8 @@ defmodule Deli.ConfigTest do
   import ExUnitProperties
   alias Deli.Config
 
+  @default_app :deli
+
   def put_config(key, value) do
     :ok = :deli |> Application.put_env(key, value)
   end
@@ -14,7 +16,7 @@ defmodule Deli.ConfigTest do
   describe "app/0" do
     test "uses mix project app when app not configured" do
       delete_config(:app)
-      assert Config.app() == :deli
+      assert Config.app() == @default_app
     end
 
     test "returns app configured when atom" do
