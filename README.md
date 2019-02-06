@@ -14,7 +14,7 @@ Add `deli` to your deps:
 def deps do
   [
     # ...
-    {:deli, "~> 0.1.27", runtime: false}
+    {:deli, "~> 0.1.28", runtime: false}
   ]
 end
 ```
