@@ -95,4 +95,28 @@ defmodule Deli.ConfigTest do
       assert_raise RuntimeError, &Config.assets?/0
     end
   end
+
+  describe "cookie/0" do
+    test "returns app when not configured" do
+      delete_config(:app)
+      delete_config(:cookie)
+      assert Config.cookie() == @default_app
+    end
+
+    test "returns cookie when configured as atom" do
+      check all a <- :alphanumeric |> StreamData.atom() do
+        put_config(:cookie, a)
+        assert Config.cookie() == a
+      end
+    end
+
+    test "fails when configured as something else" do
+      not_an_atom = StreamData.term() |> Stream.filter(&(not is_atom(&1)))
+
+      check all a <- not_an_atom do
+        put_config(:cookie, a)
+        assert_raise RuntimeError, &Config.cookie/0
+      end
+    end
+  end
 end
