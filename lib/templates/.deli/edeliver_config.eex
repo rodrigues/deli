@@ -22,6 +22,7 @@ MIX_CMD="ASSETS=1 mix"
 fi
 
 <%= if remote? do %>
+# TODO change localhost by remote_build_host
 BUILD_HOST="localhost"
 BUILD_USER="deli"
 BUILD_AT=".deli/releases"

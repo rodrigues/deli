@@ -1,4 +1,4 @@
-defmodule Deli.BEAMVersions do
+defmodule Deli.BeamVersions do
   @moduledoc false
 
   @deps ~w(otp elixir rebar3)a
@@ -17,20 +17,15 @@ defmodule Deli.BEAMVersions do
     elixir: []
   }
 
+  @spec deps() :: [dep]
+  def deps, do: @deps
+
+  @spec versions() :: %{required(dep) => [{version(), checksum()}]}
+  def versions, do: @versions
+
   @spec fetch([opt]) :: [beam_version]
   def fetch(opts \\ []) do
     @deps |> Enum.map(&fetch_version({&1, opts[&1]}))
-  end
-
-  @spec update() :: :ok
-  def update do
-    @deps |> Enum.each(&update/1)
-  end
-
-  @spec update(dep) :: :ok
-  def update(_dep) do
-    # TODO fetch any new releases, download, gen checksums, and push a new PR
-    :ok
   end
 
   defp fetch_version({dep, nil}) when dep in @deps do
@@ -38,7 +33,10 @@ defmodule Deli.BEAMVersions do
   end
 
   defp fetch_version({dep, :latest}) when dep in @deps do
-    {version, _} = @versions[dep] |> Enum.at(0)
+    {version, _} =
+      @versions[dep]
+      |> Enum.find(fn {v, _} -> not String.contains?(v, "rc") end)
+
     {dep, version} |> fetch_version
   end
 

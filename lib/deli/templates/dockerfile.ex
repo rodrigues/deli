@@ -1,6 +1,6 @@
 defmodule Deli.Templates.Dockerfile do
   require EEx
-  alias Deli.BEAMVersions
+  alias Deli.BeamVersions
   alias Deli.Release.Docker
 
   @moduledoc false
@@ -35,7 +35,7 @@ defmodule Deli.Templates.Dockerfile do
   def build({:deli, {deli_image, tag}, beam_versions_opts}, app, yarn?)
       when deli_image in @deli_images and (is_atom(tag) or is_binary(tag)) and
              is_atom(app) and is_boolean(yarn?) and is_list(beam_versions_opts) do
-    beam_versions = beam_versions_opts |> BEAMVersions.fetch()
+    beam_versions = beam_versions_opts |> BeamVersions.fetch()
 
     builder =
       case deli_image do
