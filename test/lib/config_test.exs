@@ -298,4 +298,46 @@ defmodule Deli.ConfigTest do
       end
     end
   end
+
+  describe "host_provider/0" do
+    test "returns default host provider when not configured" do
+      delete_config(:host_provider)
+      assert Config.host_provider() == Deli.HostProvider.Config
+    end
+
+    property "returns host provider when configured as atom" do
+      check all a <- :alphanumeric |> atom() do
+        put_config(:host_provider, a)
+        assert Config.host_provider() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:host_provider, a)
+        assert_raise RuntimeError, &Config.host_provider/0
+      end
+    end
+  end
+
+  describe "output_commands?/0" do
+    test "returns false when not configured" do
+      delete_config(:output_commands)
+      refute Config.output_commands?()
+    end
+
+    property "returns value when configured as boolean" do
+      check all a <- boolean() do
+        put_config(:output_commands, a)
+        assert Config.output_commands?() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_boolean/1) do
+        put_config(:output_commands, a)
+        assert_raise RuntimeError, &Config.output_commands?/0
+      end
+    end
+  end
 end
