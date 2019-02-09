@@ -130,6 +130,27 @@ defmodule Deli.ConfigTest do
     end
   end
 
+  describe "controller/0" do
+    test "returns default controller when not configured" do
+      delete_config(:controller)
+      assert Config.controller() == Deli.Controller.Bin
+    end
+
+    property "returns controller when configured as atom" do
+      check all a <- :alphanumeric |> atom() do
+        put_config(:controller, a)
+        assert Config.controller() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:controller, a)
+        assert_raise RuntimeError, &Config.controller/0
+      end
+    end
+  end
+
   describe "cookie/0" do
     test "returns app when not configured" do
       delete_config(:app)
