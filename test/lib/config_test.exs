@@ -517,4 +517,23 @@ defmodule Deli.ConfigTest do
       end
     end
   end
+
+  describe "edeliver_target/1" do
+    test "makes prod be production" do
+      assert Config.edeliver_target(:prod) == "production"
+      assert Config.edeliver_target("prod") == "production"
+    end
+
+    property "binary when configured as a binary" do
+      check all a <- binary() do
+        assert Config.edeliver_target(a) == a
+      end
+    end
+
+    property "to_string when configured as atom" do
+      check all a <- :alphanumeric |> atom() do
+        assert Config.edeliver_target(a) == to_string(a)
+      end
+    end
+  end
 end
