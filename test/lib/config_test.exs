@@ -20,7 +20,7 @@ defmodule Deli.ConfigTest do
       assert Config.app() == @default_app
     end
 
-    property "returns app configured when atom" do
+    property "app configured when atom" do
       check all a <- :alphanumeric |> atom() do
         put_config(:app, a)
         assert Config.app() == a
@@ -43,7 +43,7 @@ defmodule Deli.ConfigTest do
       end
     end
 
-    property "returns app when not configured" do
+    property "app when not configured" do
       check all a <- :alphanumeric |> atom() do
         put_config(:app, a)
         delete_config(:app_user)
@@ -52,7 +52,7 @@ defmodule Deli.ConfigTest do
       end
     end
 
-    property "returns app_user configured when atom" do
+    property "app_user configured when atom" do
       check all a <- :alphanumeric |> atom() do
         put_config(:app_user, a)
         assert Config.app_user(:staging) == a
@@ -60,7 +60,7 @@ defmodule Deli.ConfigTest do
       end
     end
 
-    property "returns app_user configured when binary" do
+    property "app_user configured when binary" do
       check all a <- binary() do
         put_config(:app_user, a)
         assert Config.app_user(:staging) == a
@@ -68,7 +68,7 @@ defmodule Deli.ConfigTest do
       end
     end
 
-    property "returns env specific user when configured as such" do
+    property "env specific user when configured as such" do
       check all s <- :alphanumeric |> atom(),
                 p <- :alphanumeric |> atom() do
         put_config(:app_user, staging: s, prod: p)
@@ -77,7 +77,7 @@ defmodule Deli.ConfigTest do
       end
     end
 
-    property "returns app if app_user is configured as something else" do
+    property "app if app_user is configured as something else" do
       check all a <- :alphanumeric |> atom(),
                 b <- term_except(&(is_atom(&1) or is_binary(&1))) do
         put_config(:app, a)
@@ -88,7 +88,7 @@ defmodule Deli.ConfigTest do
   end
 
   describe "assets?/0" do
-    test "returns false when not configured" do
+    test "false when not configured" do
       delete_config(:assets)
       assert Config.assets?() == false
     end
@@ -109,13 +109,13 @@ defmodule Deli.ConfigTest do
   end
 
   describe "bin_path/0" do
-    test "returns default bin path when not configured" do
+    test "default bin path when not configured" do
       put_config(:app, :fish)
       delete_config(:bin_path)
       assert Config.bin_path() == "/opt/fish/bin/fish"
     end
 
-    property "returns path when binary" do
+    property "path when binary" do
       check all a <- binary() do
         put_config(:bin_path, a)
         assert Config.bin_path() == a
@@ -131,12 +131,12 @@ defmodule Deli.ConfigTest do
   end
 
   describe "controller/0" do
-    test "returns default controller when not configured" do
+    test "default controller when not configured" do
       delete_config(:controller)
       assert Config.controller() == Deli.Controller.Bin
     end
 
-    property "returns controller when configured as atom" do
+    property "controller when configured as atom" do
       check all a <- :alphanumeric |> atom() do
         put_config(:controller, a)
         assert Config.controller() == a
@@ -152,13 +152,13 @@ defmodule Deli.ConfigTest do
   end
 
   describe "cookie/0" do
-    test "returns app when not configured" do
+    test "app when not configured" do
       delete_config(:app)
       delete_config(:cookie)
       assert Config.cookie() == @default_app
     end
 
-    property "returns cookie when configured as atom" do
+    property "cookie when configured as atom" do
       check all a <- :alphanumeric |> atom() do
         put_config(:cookie, a)
         assert Config.cookie() == a
@@ -174,12 +174,12 @@ defmodule Deli.ConfigTest do
   end
 
   describe "default_target/0" do
-    test "returns staging when not configured" do
+    test "staging when not configured" do
       delete_config(:default_target)
       assert Config.default_target() == :staging
     end
 
-    property "returns default_target when configured as atom" do
+    property "default_target when configured as atom" do
       check all a <- :alphanumeric |> atom() do
         put_config(:default_target, a)
         assert Config.default_target() == a
@@ -195,12 +195,12 @@ defmodule Deli.ConfigTest do
   end
 
   describe "docker_build_image/0" do
-    test "returns default image when not configured" do
+    test "default image when not configured" do
       delete_config(:docker_build)
       assert Config.docker_build_image() == {:deli, :centos}
     end
 
-    property "returns docker build image when configured" do
+    property "docker build image when configured" do
       check all a <- term() do
         put_config(:docker_build, image: a)
         assert Config.docker_build_image() == a
@@ -209,12 +209,12 @@ defmodule Deli.ConfigTest do
   end
 
   describe "docker_build_port/0" do
-    test "returns default port when not configured" do
+    test "default port when not configured" do
       delete_config(:docker_build)
       assert Config.docker_build_port() == 4441
     end
 
-    property "returns docker build port when configured" do
+    property "docker build port when configured" do
       check all a <- integer(0..65_535) do
         put_config(:docker_build, port: a)
         assert Config.docker_build_port() == a
@@ -223,12 +223,12 @@ defmodule Deli.ConfigTest do
   end
 
   describe "docker_build_yarn?/0" do
-    test "returns false when not configured" do
+    test "false when not configured" do
       delete_config(:docker_build)
       refute Config.docker_build_yarn?()
     end
 
-    property "returns value when configured as boolean" do
+    property "value when configured as boolean" do
       check all a <- boolean() do
         put_config(:docker_build, yarn?: a)
         assert Config.docker_build_yarn?() == a
@@ -244,14 +244,14 @@ defmodule Deli.ConfigTest do
   end
 
   describe "hosts/1" do
-    test "returns empty if not configured" do
+    test "empty if not configured" do
       check all a <- :alphanumeric |> atom() do
         delete_config(:hosts)
         assert Config.hosts(a) == []
       end
     end
 
-    property "returns value when configured as binary list" do
+    property "value when configured as binary list" do
       check all env <- :alphanumeric |> atom(),
                 hosts <- list_of(binary()) do
         put_config(:hosts, [{env, hosts}])
@@ -275,7 +275,7 @@ defmodule Deli.ConfigTest do
   end
 
   describe "host_id/2" do
-    test "returns ssh user@host identifier" do
+    test "ssh user@host identifier" do
       check all env <- :alphanumeric |> atom(),
                 app_user <- :alphanumeric |> atom(),
                 host <- binary() do
@@ -300,12 +300,12 @@ defmodule Deli.ConfigTest do
   end
 
   describe "host_provider/0" do
-    test "returns default host provider when not configured" do
+    test "default host provider when not configured" do
       delete_config(:host_provider)
       assert Config.host_provider() == Deli.HostProvider.Config
     end
 
-    property "returns host provider when configured as atom" do
+    property "host provider when configured as atom" do
       check all a <- :alphanumeric |> atom() do
         put_config(:host_provider, a)
         assert Config.host_provider() == a
@@ -321,12 +321,12 @@ defmodule Deli.ConfigTest do
   end
 
   describe "output_commands?/0" do
-    test "returns false when not configured" do
+    test "false when not configured" do
       delete_config(:output_commands)
       refute Config.output_commands?()
     end
 
-    property "returns value when configured as boolean" do
+    property "value when configured as boolean" do
       check all a <- boolean() do
         put_config(:output_commands, a)
         assert Config.output_commands?() == a
@@ -342,12 +342,12 @@ defmodule Deli.ConfigTest do
   end
 
   describe "port_forwarding_timeout/0" do
-    test "returns default timeout when not configured" do
+    test "default timeout when not configured" do
       delete_config(:port_forwarding_timeout)
       assert Config.port_forwarding_timeout() == 3600
     end
 
-    property "returns port forwarding timeout when configured" do
+    property "port forwarding timeout when configured" do
       check all a <- positive_integer() do
         put_config(:port_forwarding_timeout, a)
         assert Config.port_forwarding_timeout() == a
@@ -358,6 +358,143 @@ defmodule Deli.ConfigTest do
       check all a <- term_except(&(is_integer(&1) and &1 > 0)) do
         put_config(:port_forwarding_timeout, a)
         assert catch_error(Config.port_forwarding_timeout())
+      end
+    end
+  end
+
+  describe "port_forwarding_wait/0" do
+    test "default wait when not configured" do
+      delete_config(:port_forwarding_wait)
+      assert Config.port_forwarding_wait() == 2000
+    end
+
+    property "port forwarding wait when configured" do
+      check all a <- positive_integer() do
+        put_config(:port_forwarding_wait, a)
+        assert Config.port_forwarding_wait() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&(is_integer(&1) and &1 > 0)) do
+        put_config(:port_forwarding_wait, a)
+        assert catch_error(Config.port_forwarding_wait())
+      end
+    end
+  end
+
+  describe "release/0" do
+    test "default release strategy when not configured" do
+      delete_config(:release)
+      assert Config.release() == Deli.Release.Docker
+    end
+
+    property "release strategy when configured as atom" do
+      check all a <- :alphanumeric |> atom() do
+        put_config(:release, a)
+        assert Config.release() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:release, a)
+        assert_raise RuntimeError, &Config.release/0
+      end
+    end
+  end
+
+  describe "versioning/0" do
+    test "default versioning strategy when not configured" do
+      delete_config(:versioning)
+      assert Config.versioning() == Deli.Versioning.Default
+    end
+
+    property "versioning strategy when configured as atom" do
+      check all a <- :alphanumeric |> atom() do
+        put_config(:versioning, a)
+        assert Config.versioning() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:versioning, a)
+        assert_raise RuntimeError, &Config.versioning/0
+      end
+    end
+  end
+
+  describe "verbose?/0" do
+    test "true when not configured" do
+      delete_config(:verbose)
+      assert Config.verbose?()
+    end
+
+    property "value when configured as boolean" do
+      check all a <- boolean() do
+        put_config(:verbose, a)
+        assert Config.verbose?() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_boolean/1) do
+        put_config(:verbose, a)
+        assert_raise RuntimeError, &Config.verbose?/0
+      end
+    end
+  end
+
+  describe "get/1" do
+    property "deli application value for key when set" do
+      check all key <- :alphanumeric |> atom(),
+                value <- term() do
+        put_config(key, value)
+        assert Config.get(key) == value
+      end
+    end
+
+    property "nil when there's no value set" do
+      check all key <- :alphanumeric |> atom() do
+        delete_config(key)
+        assert Config.get(key) == nil
+      end
+    end
+  end
+
+  describe "get/2" do
+    property "deli application value for key when set" do
+      check all key <- :alphanumeric |> atom(),
+                value <- term(),
+                default <- term() do
+        put_config(key, value)
+        assert Config.get(key, default) == value
+      end
+    end
+
+    property "nil when there's no value set" do
+      check all key <- :alphanumeric |> atom(),
+                default <- term() do
+        delete_config(key)
+        assert Config.get(key, default) == default
+      end
+    end
+  end
+
+  describe "fetch!/1" do
+    property "deli application value for key when set" do
+      check all key <- :alphanumeric |> atom(),
+                value <- term() do
+        put_config(key, value)
+        assert Config.fetch!(key) == value
+      end
+    end
+
+    property "fails when there's no value set" do
+      check all key <- :alphanumeric |> atom() do
+        delete_config(key)
+        assert_raise ArgumentError, fn -> Config.fetch!(key) end
       end
     end
   end
