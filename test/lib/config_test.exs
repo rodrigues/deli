@@ -172,4 +172,25 @@ defmodule Deli.ConfigTest do
       end
     end
   end
+
+  describe "default_target/0" do
+    test "returns staging when not configured" do
+      delete_config(:default_target)
+      assert Config.default_target() == :staging
+    end
+
+    property "returns default_target when configured as atom" do
+      check all a <- :alphanumeric |> atom() do
+        put_config(:default_target, a)
+        assert Config.default_target() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:default_target, a)
+        assert_raise RuntimeError, &Config.default_target/0
+      end
+    end
+  end
 end
