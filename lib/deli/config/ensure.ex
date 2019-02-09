@@ -7,7 +7,7 @@ defmodule Deli.Config.Ensure do
   def ensure_atom(a) when is_atom(a), do: a
   def ensure_atom(x), do: raise("Only atom accepted, got: #{inspect(x)}")
 
-  def ensure_port_number(i) when i in 0..65535, do: i
+  def ensure_port_number(i) when i in 0..65_535, do: i
   def ensure_port_number(x), do: raise("Only port number accepted, got: #{inspect(x)}")
 
   def ensure_pos_integer(i) when is_integer(i) and i > 0, do: i
