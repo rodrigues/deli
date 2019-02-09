@@ -146,7 +146,7 @@ At the moment, this package exists for reusing among similarly configured apps. 
 
 ### Advanced configuration
 
-Check [[doc/ReleaseConfiguration.md]] for more options.
+Checkout [Release configuration](https://hexdocs.pm/deli/release.html) for more options.
 
 ## Potential future work
 
