@@ -103,7 +103,7 @@ defmodule Deli.Config do
 
   @spec docker_build_image() :: Deli.Release.Docker.build_target()
   def docker_build_image do
-    :docker_build |> get([]) |> Keyword.get(:port, @defaults.docker_build[:image])
+    :docker_build |> get([]) |> Keyword.get(:image, @defaults.docker_build[:image])
   end
 
   @spec docker_build_port() :: :inet.port_number()

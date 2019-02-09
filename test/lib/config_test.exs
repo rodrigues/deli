@@ -193,4 +193,18 @@ defmodule Deli.ConfigTest do
       end
     end
   end
+
+  describe "docker_build_image/0" do
+    test "returns default image when not configured" do
+      delete_config(:docker_build)
+      assert Config.docker_build_image() == {:deli, :centos}
+    end
+
+    property "returns docker build image when configured" do
+      check all a <- term() do
+        put_config(:docker_build, image: a)
+        assert Config.docker_build_image() == a
+      end
+    end
+  end
 end
