@@ -207,4 +207,18 @@ defmodule Deli.ConfigTest do
       end
     end
   end
+
+  describe "docker_build_port/0" do
+    test "returns default port when not configured" do
+      delete_config(:docker_build)
+      assert Config.docker_build_port() == 4441
+    end
+
+    property "returns docker build port when configured" do
+      check all a <- integer(0..65_535) do
+        put_config(:docker_build, port: a)
+        assert Config.docker_build_port() == a
+      end
+    end
+  end
 end
