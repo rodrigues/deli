@@ -200,6 +200,7 @@ defmodule Deli.Config do
 
   @spec mix_env(atom | String.t()) :: Deli.env()
   def mix_env("production"), do: :prod
+  def mix_env(:production), do: :prod
   def mix_env(env) when is_atom(env), do: env
 
   def mix_env(env) when is_binary(env) do

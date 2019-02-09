@@ -498,4 +498,23 @@ defmodule Deli.ConfigTest do
       end
     end
   end
+
+  describe "mix_env/1" do
+    test "makes production be prod" do
+      assert Config.mix_env(:production) == :prod
+      assert Config.mix_env("production") == :prod
+    end
+
+    property "atom when configured as atom" do
+      check all a <- :alphanumeric |> atom() do
+        assert Config.mix_env(a) == a
+      end
+    end
+
+    property "to_atom when configured as a binary" do
+      check all a <- :alphanumeric |> atom() do
+        assert Config.mix_env(to_string(a)) == a
+      end
+    end
+  end
 end
