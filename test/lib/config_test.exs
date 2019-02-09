@@ -242,4 +242,60 @@ defmodule Deli.ConfigTest do
       end
     end
   end
+
+  describe "hosts/1" do
+    test "returns empty if not configured" do
+      check all a <- :alphanumeric |> atom() do
+        delete_config(:hosts)
+        assert Config.hosts(a) == []
+      end
+    end
+
+    property "returns value when configured as binary list" do
+      check all env <- :alphanumeric |> atom(),
+                hosts <- list_of(binary()) do
+        put_config(:hosts, [{env, hosts}])
+        assert Config.hosts(env) == hosts
+      end
+    end
+
+    property "fails when configured not as a list" do
+      check all env <- :alphanumeric |> atom(),
+                hosts <- term_except(&(is_list(&1) or &1 == %{})) do
+        put_config(:hosts, [{env, hosts}])
+        assert catch_error(Config.hosts(env))
+      end
+    end
+
+    property "fails when env is not an atom" do
+      check all env <- term_except(&is_atom/1) do
+        assert_raise FunctionClauseError, fn -> Config.hosts(env) end
+      end
+    end
+  end
+
+  describe "host_id/2" do
+    test "returns ssh user@host identifier" do
+      check all env <- :alphanumeric |> atom(),
+                app_user <- :alphanumeric |> atom(),
+                host <- binary() do
+        put_config(:app_user, [{env, app_user}])
+        assert Config.host_id(env, host) == "#{app_user}@#{host}"
+      end
+    end
+
+    property "fails if env not an atom" do
+      check all env <- term_except(&is_atom/1),
+                host <- binary() do
+        assert_raise FunctionClauseError, fn -> Config.host_id(env, host) end
+      end
+    end
+
+    property "fails if host not a binary" do
+      check all env <- :alphanumeric |> atom(),
+                host <- term_except(&is_binary/1) do
+        assert_raise FunctionClauseError, fn -> Config.host_id(env, host) end
+      end
+    end
+  end
 end
