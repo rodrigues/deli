@@ -49,15 +49,15 @@ defmodule Deli.Config do
 
     app_user =
       case app_user do
-        nil ->
-          app()
-
         user when is_atom(user) or is_binary(user) ->
-          user
+          user || app()
 
         options when is_list(options) ->
           user = options |> Keyword.get(env)
           user || app()
+
+        _ ->
+          app()
       end
 
     app_user |> ensure_atom_or_binary
@@ -66,13 +66,6 @@ defmodule Deli.Config do
   @spec assets?() :: boolean
   def assets? do
     :assets |> get(@defaults.assets?) |> ensure_boolean
-  end
-
-  @spec cookie() :: atom
-  def cookie do
-    cookie = :cookie |> get()
-    cookie = cookie || app()
-    cookie |> ensure_atom
   end
 
   @spec bin_path :: String.t()
@@ -92,6 +85,13 @@ defmodule Deli.Config do
     :controller
     |> get(@defaults.controller)
     |> ensure_atom
+  end
+
+  @spec cookie() :: atom
+  def cookie do
+    cookie = :cookie |> get()
+    cookie = cookie || app()
+    cookie |> ensure_atom
   end
 
   @spec default_target() :: Deli.env()

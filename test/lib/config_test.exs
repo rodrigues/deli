@@ -1,6 +1,7 @@
 defmodule Deli.ConfigTest do
   use ExUnit.Case
-  import ExUnitProperties
+  use ExUnitProperties
+  import StreamDataExclude
   alias Deli.Config
 
   @default_app :deli
@@ -19,27 +20,31 @@ defmodule Deli.ConfigTest do
       assert Config.app() == @default_app
     end
 
-    test "returns app configured when atom" do
-      check all a <- :alphanumeric |> StreamData.atom() do
+    property "returns app configured when atom" do
+      check all a <- :alphanumeric |> atom() do
         put_config(:app, a)
         assert Config.app() == a
       end
     end
 
-    test "fails when app configured but not an atom" do
-      put_config(:app, "not_an_atom")
-      assert_raise RuntimeError, &Config.app/0
+    property "fails when app configured but not an atom" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:app, a)
+        assert_raise RuntimeError, &Config.app/0
+      end
     end
   end
 
   describe "app_user/1" do
-    test "fails if `env` is not an atom" do
-      call = fn -> Config.app_user("staging") end
-      assert_raise FunctionClauseError, call
+    property "fails if `env` is not an atom" do
+      check all a <- term_except(&is_atom/1) do
+        call = fn -> Config.app_user(a) end
+        assert_raise FunctionClauseError, call
+      end
     end
 
-    test "returns app when not configured" do
-      check all a <- :alphanumeric |> StreamData.atom() do
+    property "returns app when not configured" do
+      check all a <- :alphanumeric |> atom() do
         put_config(:app, a)
         delete_config(:app_user)
         assert Config.app_user(:staging) == a
@@ -47,35 +52,38 @@ defmodule Deli.ConfigTest do
       end
     end
 
-    test "returns app_user configured when atom" do
-      check all a <- :alphanumeric |> StreamData.atom() do
+    property "returns app_user configured when atom" do
+      check all a <- :alphanumeric |> atom() do
         put_config(:app_user, a)
         assert Config.app_user(:staging) == a
         assert Config.app_user(:prod) == a
       end
     end
 
-    test "returns app_user configured when binary" do
-      check all a <- StreamData.binary() do
+    property "returns app_user configured when binary" do
+      check all a <- binary() do
         put_config(:app_user, a)
         assert Config.app_user(:staging) == a
         assert Config.app_user(:prod) == a
       end
     end
 
-    test "returns env specific user when configured as such" do
-      check all s <- :alphanumeric |> StreamData.atom(),
-                p <- :alphanumeric |> StreamData.atom() do
+    property "returns env specific user when configured as such" do
+      check all s <- :alphanumeric |> atom(),
+                p <- :alphanumeric |> atom() do
         put_config(:app_user, staging: s, prod: p)
         assert Config.app_user(:staging) == s
         assert Config.app_user(:prod) == p
       end
     end
 
-    test "fails when app_user is configured as something else" do
-      call = fn -> Config.app_user(:staging) end
-      put_config(:app_user, 123)
-      assert_raise CaseClauseError, call
+    property "returns app if app_user is configured as something else" do
+      check all a <- :alphanumeric |> atom(),
+                b <- term_except(&(is_atom(&1) or is_binary(&1))) do
+        put_config(:app, a)
+        put_config(:app_user, b)
+        assert Config.app_user(:staging) == a
+      end
     end
   end
 
@@ -85,16 +93,40 @@ defmodule Deli.ConfigTest do
       assert Config.assets?() == false
     end
 
-    test "returns assets? when configured as boolean" do
-      check all a <- StreamData.boolean() do
+    property "returns assets? when configured as boolean" do
+      check all a <- boolean() do
         put_config(:assets, a)
         assert Config.assets?() == a
       end
     end
 
-    test "fails when configured as something else" do
-      put_config(:assets, :not_a_boolean)
-      assert_raise RuntimeError, &Config.assets?/0
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_boolean/1) do
+        put_config(:assets, a)
+        assert_raise RuntimeError, &Config.assets?/0
+      end
+    end
+  end
+
+  describe "bin_path/0" do
+    test "returns default bin path when not configured" do
+      put_config(:app, :fish)
+      delete_config(:bin_path)
+      assert Config.bin_path() == "/opt/fish/bin/fish"
+    end
+
+    property "returns path when binary" do
+      check all a <- binary() do
+        put_config(:bin_path, a)
+        assert Config.bin_path() == a
+      end
+    end
+
+    property "fails when path is configured as something other than a binary" do
+      check all a <- term_except(&is_binary/1) do
+        put_config(:bin_path, a)
+        assert_raise CaseClauseError, &Config.bin_path/0
+      end
     end
   end
 
@@ -105,17 +137,15 @@ defmodule Deli.ConfigTest do
       assert Config.cookie() == @default_app
     end
 
-    test "returns cookie when configured as atom" do
-      check all a <- :alphanumeric |> StreamData.atom() do
+    property "returns cookie when configured as atom" do
+      check all a <- :alphanumeric |> atom() do
         put_config(:cookie, a)
         assert Config.cookie() == a
       end
     end
 
-    test "fails when configured as something else" do
-      not_an_atom = StreamData.term() |> Stream.filter(&(not is_atom(&1)))
-
-      check all a <- not_an_atom do
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
         put_config(:cookie, a)
         assert_raise RuntimeError, &Config.cookie/0
       end

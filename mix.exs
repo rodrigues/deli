@@ -6,6 +6,7 @@ defmodule Deli.MixProject do
       app: :deli,
       version: "0.1.28",
       elixir: "~> 1.8",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       application: application(),
       deps: deps(),
@@ -23,6 +24,9 @@ defmodule Deli.MixProject do
       extra_applications: [:mix, :logger]
     ]
   end
+
+  defp elixirc_paths(:test), do: ~w(lib test/support)
+  defp elixirc_paths(_), do: ~w(lib)
 
   defp deps do
     [
