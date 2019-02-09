@@ -230,14 +230,14 @@ defmodule Deli.ConfigTest do
 
     property "value when configured as boolean" do
       check all a <- boolean() do
-        put_config(:docker_build, yarn?: a)
+        put_config(:docker_build, yarn: a)
         assert Config.docker_build_yarn?() == a
       end
     end
 
     property "fails when configured as something else" do
       check all a <- term_except(&is_boolean/1) do
-        put_config(:docker_build, yarn?: a)
+        put_config(:docker_build, yarn: a)
         assert_raise RuntimeError, &Config.docker_build_yarn?/0
       end
     end

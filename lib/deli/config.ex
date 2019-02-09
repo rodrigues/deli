@@ -118,7 +118,7 @@ defmodule Deli.Config do
   def docker_build_yarn? do
     :docker_build
     |> get([])
-    |> Keyword.get(:yarn?, @defaults.docker_build[:yarn?])
+    |> Keyword.get(:yarn, @defaults.docker_build[:yarn?])
     |> ensure_boolean
   end
 
