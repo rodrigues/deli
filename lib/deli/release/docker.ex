@@ -60,6 +60,7 @@ defmodule Deli.Release.Docker do
         Dockerfile.build(
           Config.docker_build_image(),
           Config.app(),
+          Config.docker_build_user(),
           Config.docker_build_yarn?()
         )
 

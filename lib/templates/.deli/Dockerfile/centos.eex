@@ -9,7 +9,6 @@ ENV OTP_VERSION="<%= versions[:otp][:version] %>" \
     ELIXIR_SUM="<%= versions[:elixir][:checksum] %>" \
     REBAR3_SUM="<%= versions[:rebar3][:checksum] %>"
 
-
 # Base dependencies
 RUN set -xe \
   && yum update -y \
@@ -92,24 +91,23 @@ COPY authorized_keys /authorized_keys
 RUN ssh-keygen -q -t rsa -f /etc/ssh/ssh_host_rsa_key -C '' -N ''
 RUN ssh-keygen -q -t dsa -f /etc/ssh/ssh_host_dsa_key -C '' -N ''
 
-# Create deli user and make it a sudoer
+# Create <%= user %> user and make it a sudoer
 RUN set -xe \
-  && useradd -s /bin/bash -c "deli" deli \
-  && mkhomedir_helper deli \
-  && mkdir -p /home/deli/.ssh \
-  && cp /authorized_keys/<%= app %>_id_rsa.pub /home/deli/.ssh/authorized_keys \
-  && chown -R deli:deli /home/deli/.ssh \
+  && useradd -s /bin/bash -c "<%= user %>" <%= user %> \
+  && mkhomedir_helper <%= user %> \
+  && mkdir -p /home/<%= user %>/.ssh \
+  && cp /authorized_keys/<%= app %>_id_rsa.pub /home/<%= user %>/.ssh/authorized_keys \
+  && chown -R <%= user %>:<%= user %> /home/<%= user %>/.ssh \
   && mkdir -p /etc/sudoers.d \
-  && touch /etc/sudoers.d/deli \
-  && echo "deli ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/deli
+  && touch /etc/sudoers.d/<%= user %> \
+  && echo "<%= user %> ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/<%= user %>
 
 WORKDIR /usr/local/builds
 
 RUN git init
 RUN git config receive.denyCurrentBranch ignore
-RUN chown -R deli:deli /usr/local/builds
-
-RUN echo "export LANG=en_US.UTF-8" >> /home/deli/.profile
+RUN chown -R <%= user %>:<%= user %> /usr/local/builds
+RUN echo "export LANG=en_US.UTF-8" >> /home/<%= user %>/.profile
 
 EXPOSE 22
 
