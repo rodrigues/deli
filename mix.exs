@@ -44,6 +44,8 @@ defmodule Deli.MixProject do
       plt_add_deps: :apps_direct,
       plt_add_apps: ~w(
         ex_unit
+        inets
+        jason
         mix
       )a,
       flags: ~w(
