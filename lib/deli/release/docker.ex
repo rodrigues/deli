@@ -39,7 +39,7 @@ defmodule Deli.Release.Docker do
   end
 
   defp boot_docker do
-    docker_build_port = Config.docker_build_port()
+    port = Config.docker_build_port()
     ensure_dockerfile()
     ensure_docker_compose()
     ensure_docker_authorized_keys()
@@ -47,8 +47,8 @@ defmodule Deli.Release.Docker do
     docker_compose(:build, [:deli])
     docker_compose(:up, ["-d", :deli])
     :timer.sleep(1_000)
-    cmd("ssh-keygen", ["-R", "\[0.0.0.0\]:#{docker_build_port}"])
-    {:ok, scan} = "ssh-keyscan" |> cmd_result(["-p", docker_build_port, "0.0.0.0"])
+    cmd("ssh-keygen", ["-R", "\[0.0.0.0\]:#{port}"])
+    {:ok, scan} = "ssh-keyscan" |> cmd_result(["-p", port, "0.0.0.0"])
     write_file("~/.ssh/known_hosts", "\n#{scan}\n", [:append])
   end
 
