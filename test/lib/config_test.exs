@@ -1,23 +1,10 @@
 defmodule Deli.ConfigTest do
-  use ExUnit.Case
-  use ExUnitProperties
-  import StreamDataExclude
-  alias Deli.Config
-
-  @default_app :deli
-
-  def put_config(key, value) do
-    :ok = :deli |> Application.put_env(key, value)
-  end
-
-  def delete_config(key) do
-    :ok = :deli |> Application.delete_env(key)
-  end
+  use DeliCase
 
   describe "app/0" do
     test "uses mix project app when app not configured" do
       delete_config(:app)
-      assert Config.app() == @default_app
+      assert Config.app() == :deli
     end
 
     property "app configured when atom" do
@@ -153,9 +140,11 @@ defmodule Deli.ConfigTest do
 
   describe "cookie/0" do
     test "app when not configured" do
-      delete_config(:app)
-      delete_config(:cookie)
-      assert Config.cookie() == @default_app
+      check all a <- :alphanumeric |> atom() do
+        put_config(:app, a)
+        delete_config(:cookie)
+        assert Config.cookie() == a
+      end
     end
 
     property "cookie when configured as atom" do
