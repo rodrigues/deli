@@ -31,7 +31,16 @@ defmodule Deli.Shell do
     {content, signal} = command |> System.cmd(args, verbose_opts(opts))
 
     if ok_signals |> Enum.member?(signal) do
-      {:ok, content |> to_string}
+      content =
+        case content do
+          %IO.Stream{} = stream ->
+            stream
+
+          other ->
+            other |> to_string
+        end
+
+      {:ok, content}
     else
       command_failed!(command, args, signal, content)
     end
