@@ -28,6 +28,11 @@ defmodule Deli.Config do
     port_forwarding_wait: 2_000,
     # use local docker as default release strategy
     release: Deli.Release.Docker,
+    # used when `release` is configured as `Deli.Release.Remote`
+    remote_build: [
+      user: :deli,
+      host: "localhost"
+    ],
     # default commands to staging environment
     target: :staging,
     # show processes output
@@ -171,6 +176,22 @@ defmodule Deli.Config do
   def release do
     :release
     |> get(@defaults.release)
+    |> ensure_atom
+  end
+
+  @spec remote_build_host() :: Deli.host()
+  def remote_build_host do
+    :remote_build
+    |> get([])
+    |> Keyword.get(:host, @defaults.remote_build[:host])
+    |> ensure_binary
+  end
+
+  @spec remote_build_user() :: atom()
+  def remote_build_user do
+    :remote_build
+    |> get([])
+    |> Keyword.get(:user, @defaults.remote_build[:user])
     |> ensure_atom
   end
 

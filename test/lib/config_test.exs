@@ -404,6 +404,48 @@ defmodule Deli.ConfigTest do
     end
   end
 
+  describe "remote_build_host/0" do
+    test "localhost when not configured" do
+      delete_config(:remote_build)
+      assert Config.remote_build_host() == "localhost"
+    end
+
+    property "host when configured as a binary" do
+      check all a <- binary() do
+        put_config(:remote_build, host: a)
+        assert Config.remote_build_host() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_binary/1) do
+        put_config(:remote_build, host: a)
+        assert_raise RuntimeError, &Config.remote_build_host/0
+      end
+    end
+  end
+
+  describe "remote_build_user/0" do
+    test "deli when not configured" do
+      delete_config(:remote_build)
+      assert Config.remote_build_user() == :deli
+    end
+
+    property "user when configured as an atom" do
+      check all a <- :alphanumeric |> atom() do
+        put_config(:remote_build, user: a)
+        assert Config.remote_build_user() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:remote_build, user: a)
+        assert_raise RuntimeError, &Config.remote_build_user/0
+      end
+    end
+  end
+
   describe "versioning/0" do
     test "default versioning strategy when not configured" do
       delete_config(:versioning)
