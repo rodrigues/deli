@@ -119,6 +119,14 @@ defmodule Deli.Config do
     |> ensure_port_number
   end
 
+  @spec docker_build_user() :: atom()
+  def docker_build_user do
+    :docker_build
+    |> get([])
+    |> Keyword.get(:user, @defaults.docker_build[:user])
+    |> ensure_atom
+  end
+
   @spec docker_build_yarn?() :: boolean
   def docker_build_yarn? do
     :docker_build

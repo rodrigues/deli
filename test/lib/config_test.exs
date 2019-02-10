@@ -222,6 +222,27 @@ defmodule Deli.ConfigTest do
     end
   end
 
+  describe "docker_build_user/0" do
+    test "deli when not configured" do
+      delete_config(:docker_build)
+      assert Config.docker_build_user() == :deli
+    end
+
+    property "docker build user when configured as an atom" do
+      check all a <- :alphanumeric |> atom() do
+        put_config(:docker_build, user: a)
+        assert Config.docker_build_user() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:docker_build, user: a)
+        assert_raise RuntimeError, &Config.docker_build_user/0
+      end
+    end
+  end
+
   describe "docker_build_yarn?/0" do
     test "false when not configured" do
       delete_config(:docker_build)

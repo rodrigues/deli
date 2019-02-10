@@ -35,8 +35,11 @@ defmodule Deli.Release.Remote do
           prod_hosts,
           Config.app_user(:staging),
           Config.app_user(:prod),
+          Config.docker_build_user(),
           Config.docker_build_port(),
-          remote?
+          remote?,
+          Config.remote_build_host(),
+          Config.remote_build_user()
         )
 
       dir = path |> Path.dirname()
