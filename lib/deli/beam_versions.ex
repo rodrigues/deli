@@ -13,7 +13,7 @@ defmodule Deli.BeamVersions do
 
   @versions @deps |> File.versions_from_file()
 
-  @spec deps() :: [dep]
+  @spec deps() :: [dep, ...]
   def deps, do: @deps
 
   @spec versions() :: %{required(dep) => [{version(), checksum()}]}

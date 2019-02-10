@@ -56,14 +56,14 @@ defmodule Deli.BeamVersions.Updater do
   end
 
   defp add_version(dep, version) do
-    download_version(dep, version)
-    append_version(dep, version, checksum())
+    {_, 0} = dep |> download_version(version)
+    :ok = dep |> append_version(version, checksum())
   end
 
   defp download_version(dep, version) do
     file = @archives[dep] |> String.replace("%v", version)
     uri = "#{@base_uri}/#{@repos[dep]}/archive/#{file}"
-    {_, 0} = "curl" |> System.cmd(["-fSL#", uri, "-o", @archive_path])
+    "curl" |> System.cmd(["-fSL#", uri, "-o", @archive_path])
   end
 
   defp checksum do
