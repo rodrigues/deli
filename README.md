@@ -12,6 +12,8 @@ You can configure a different release / versioning strategy if you need to.
 
 ## Basic configuration
 
+Minimal versions required: Elixir 1.8+, OTP 20+.
+
 Add `deli` to your deps:
 
 ```elixir
