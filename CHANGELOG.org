@@ -3,8 +3,8 @@
 - [NEW] Property test =Deli.Config=
 - [NEW] Simplify host provider behaviour (=Stream= -> =List=)
 - [NEW] Support configuring beam versions (Elixir =1.8+=, OTP =20+=, Rebar3 =3.6.1+=)
-- [NEW] Allow a different build user
 - [NEW] Allow a different release build strategy: =Deli.Release.Remote=
+- [NEW] Allow a different build user (either docker or remote)
 - [NEW] Debian managed docker build image
 - [NEW] Allow use a non-deli-managed docker image to build
 
