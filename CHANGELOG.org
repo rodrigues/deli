@@ -1,3 +1,12 @@
+- [NEW] Ensure user configuration obeys to typespecs when fetching
+- [NEW] Property test =Deli.Config=
+- [NEW] Simplify host provider behaviour (=Stream= -> =List=)
+- [NEW] Support configuring beam versions (Elixir 1.8+, OTP 20+, Rebar3 3.6.1+)
+- [NEW] Allow a different build user
+- [NEW] Allow a different release build strategy: Deli.Release.Remote
+- [NEW] Debian managed docker build image
+- [NEW] Allow use a non-deli-managed docker image to build
+
 *** v0.1.28
 
 - [NEW] CentOS build image updated OTP to 21.2.4 and Elixir to 1.8.1
