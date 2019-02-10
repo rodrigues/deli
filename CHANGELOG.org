@@ -13,21 +13,21 @@
 - [NEW] CentOS build image updated OTP to 21.2.4 and Elixir to 1.8.1
 - [NEW] Configurable host provider
 - [NEW] Add typespecs in core parts
-- [NEW] `Config.output_commands?/0`
+- [NEW] =Config.output_commands?/0=
 
 *** v0.1.27
 
-- [NEW] Allow to configure a custom `versioning` behaviour
+- [NEW] Allow to configure a custom =versioning= behaviour
 
 *** v0.1.26
 
-- [NEW] Accept regex pattern to `-h` to filter hosts affected by command
+- [NEW] Accept regex pattern to =-h= to filter hosts affected by command
 - [NEW] Before confirmation, list all affected hosts
 
-*** v0.1.25 (v0.1.24 skipped)
+*** v0.1.25
 
-- [NEW] Provide `Config.yarn?/0` and install it on centos when needed
-- [NEW] Provide `Config.assets?/0`
+- [NEW] Provide =Config.yarn?/0= and install it on centos when needed
+- [NEW] Provide =Config.assets?/0=
 - [NEW] Wait between port forwarding spawn and shell command is configurable
 
 *** v0.1.23
@@ -40,7 +40,7 @@
 *** v0.1.22
 
 - [NEW] Better failure details output
-- [NEW] `Deli.Command` for env-agnostic mix tasks
+- [NEW] =Deli.Command= for env-agnostic mix tasks
 - [NEW] Better output when confirming deploy
 
 *** v0.1.21
@@ -65,13 +65,13 @@
 - [NEW] mix deli.version
 - [NEW] mix deli.status
 - [NEW] mix deli.shell
-- [NEW] Enable customization of bin_path (default to `/opt/APP/bin/APP`)
+- [NEW] Enable customization of bin_path (default to =/opt/APP/bin/APP=)
 - [NEW] mix deli.restart
 - [NEW] Quiet(er) mode without verbose
 - [NEW] Generate ssh keys transparently to interface local with release builder (docker)
 - [NEW] Replace :os.cmd calls for System.cmd, now with better output management
 - [NEW] Organize shell commands
-- [NEW] `@moduledoc false` on internal modules
+- [NEW] =@moduledoc false= on internal modules
 
 *** v0.1.16
 
