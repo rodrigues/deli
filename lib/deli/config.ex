@@ -242,13 +242,14 @@ defmodule Deli.Config do
   def edeliver_target(env) when is_atom(env), do: env |> Atom.to_string()
   def edeliver_target(target) when is_binary(target), do: target
 
-  @spec project() :: Keyword.t()
-  def project do
-    Mix.Project.get().project
+  @spec project(module | nil) :: Keyword.t()
+  def project(mix_project \\ nil) do
+    mix_project = mix_project || Mix.Project.get()
+    mix_project.project
   end
 
-  @spec version() :: Version.t()
-  def version do
-    project()[:version] |> Version.parse!()
+  @spec version(module | nil) :: Version.t()
+  def version(mix_project \\ nil) do
+    project(mix_project)[:version] |> Version.parse!()
   end
 end

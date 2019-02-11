@@ -588,4 +588,36 @@ defmodule Deli.ConfigTest do
       end
     end
   end
+
+  describe "project/0..1" do
+    test "uses mix project by default" do
+      assert Config.project()[:app] == :deli
+      assert Config.project(nil)[:app] == :deli
+    end
+
+    property "accepts mix_project as argument" do
+      check all k <- term(),
+                m = %{project: k} do
+        assert Config.project(m) == k
+      end
+    end
+  end
+
+  describe "version/0..1" do
+    test "uses mix project's version by default" do
+      check = &String.starts_with?(to_string(&1), "0.1")
+      assert check.(Config.version())
+      assert check.(Config.version(nil))
+    end
+
+    property "accepts mix_project as argument" do
+      check all major <- 0..21 |> integer(),
+                minor <- 0..256 |> integer(),
+                patch <- 0..512 |> integer(),
+                version = "#{major}.#{minor}.#{patch}",
+                m = %{project: [version: version]} do
+        assert to_string(Config.version(m)) == version
+      end
+    end
+  end
 end
