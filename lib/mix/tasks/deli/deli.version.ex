@@ -17,12 +17,25 @@ defmodule Mix.Tasks.Deli.Version do
 
   def run(args) do
     _ = Application.ensure_all_started(:deli)
-    app = Config.app()
-    options = args |> parse_options
-    target = options |> Keyword.fetch!(:target)
-    {:ok, hosts} = target |> HostFilter.hosts(args)
 
-    IO.puts("checking version of #{app} at target #{target}")
+    args
+    |> parse_options
+    |> Keyword.fetch!(:target)
+    |> check_version(args)
+  end
+
+  defp check_version(:dev, _args) do
+    app = Config.app()
+    IO.puts("checking version of #{app} at dev environment")
+    version = Config.version()
+    IO.puts([IO.ANSI.green(), to_string(version), IO.ANSI.reset()])
+  end
+
+  defp check_version(env, args) do
+    {:ok, hosts} = env |> HostFilter.hosts(args)
+    app = Config.app()
+
+    IO.puts("checking version of #{app} at target #{env}")
     hosts |> Enum.each(&host_version/1)
   end
 

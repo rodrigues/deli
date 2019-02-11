@@ -20,7 +20,7 @@ defmodule Deli.Release.Remote do
   end
 
   def ensure_edeliver_config(remote? \\ true) do
-    path = ".deli/edeliver_config"
+    path = ".deliver/config"
 
     unless path |> file_exists? do
       host_provider = Config.host_provider()

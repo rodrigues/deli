@@ -44,7 +44,7 @@ defmodule Deli.Config do
   @spec app() :: Deli.app()
   def app do
     app = :app |> get()
-    app = app || Mix.Project.get().project[:app]
+    app = app || project()[:app]
     app |> ensure_atom
   end
 
@@ -241,4 +241,14 @@ defmodule Deli.Config do
   def edeliver_target(:prod), do: "production"
   def edeliver_target(env) when is_atom(env), do: env |> Atom.to_string()
   def edeliver_target(target) when is_binary(target), do: target
+
+  @spec project() :: Keyword.t()
+  def project do
+    Mix.Project.get().project
+  end
+
+  @spec version() :: Version.t()
+  def version do
+    project()[:version] |> Version.parse!()
+  end
 end

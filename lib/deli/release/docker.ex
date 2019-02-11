@@ -71,7 +71,7 @@ defmodule Deli.Release.Docker do
   end
 
   defp ensure_docker_compose do
-    path = ".deli-docker-compose.yml"
+    path = ".deli/docker-compose.yml"
 
     unless path |> file_exists? do
       content =

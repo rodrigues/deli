@@ -1,12 +1,13 @@
 defmodule Deli.Versioning.Default do
   import Deli.Shell
+  alias Deli.Config
 
   @moduledoc "Provides version git tag enforcing"
 
   @behaviour Deli.Versioning
 
   def version_tag(nil) do
-    version = Mix.Project.get().project[:version] |> Version.parse!()
+    version = Config.version()
     tag = git_tags() |> List.last()
     if tag, do: version |> compare(tag), else: version |> create
   end
