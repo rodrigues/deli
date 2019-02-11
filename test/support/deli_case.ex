@@ -9,8 +9,6 @@ defmodule DeliCase do
       import unquote(__MODULE__)
       import ExUnit.CaptureIO
       alias Deli.Config
-
-      def atom, do: :alphanumeric |> atom
     end
   end
 
@@ -22,8 +20,19 @@ defmodule DeliCase do
     :ok = :deli |> Application.delete_env(key)
   end
 
+  def atom do
+    :alphanumeric |> StreamData.atom()
+  end
+
+  def string do
+    :alphanumeric |> StreamData.string()
+  end
+
   def term_except(predicate) do
-    StreamData.term()
-    |> StreamData.filter(fn a -> not predicate.(a) end, 100_000)
+    StreamData.term() |> except(predicate)
+  end
+
+  def except(data, predicate) do
+    data |> StreamData.filter(fn a -> not predicate.(a) end, 100_000)
   end
 end
