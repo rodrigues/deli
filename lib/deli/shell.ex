@@ -54,20 +54,24 @@ defmodule Deli.Shell do
     "mix" |> cmd(edeliver_args)
   end
 
+  @spec docker_compose(command, args, ok_signals) :: :ok
   def docker_compose(command, args \\ [], ok_signals \\ [0]) do
     args = ["-f", ".deli-docker-compose.yml"] ++ [command] ++ args
     env = [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]
     "docker-compose" |> cmd(args, ok_signals, env: env)
   end
 
+  @spec file_exists?(Path.t()) :: boolean
   def file_exists?(path) do
     path |> expand_path |> File.exists?()
   end
 
+  @spec write_file(Path.t(), binary(), [mode :: atom]) :: :ok
   def write_file(path, content, options \\ []) do
     path |> expand_path |> File.write!(content, options)
   end
 
+  @spec expand_path(Path.t()) :: Path.t()
   def expand_path(path) do
     path |> Path.expand(File.cwd!())
   end
@@ -78,7 +82,8 @@ defmodule Deli.Shell do
     exit({:shutdown, 1})
   end
 
-  def confirm?(operation, options) do
+  @spec confirm?(atom, Keyword.t()) :: boolean
+  def confirm?(operation, options) when is_atom(operation) and is_list(options) do
     app = Config.app()
     target = options |> Keyword.fetch!(:target)
     message = "#{operation} #{app} at #{target}?"
@@ -91,6 +96,7 @@ defmodule Deli.Shell do
     end
   end
 
+  @spec cancelled!(atom) :: :ok
   def cancelled!(operation) when is_atom(operation) do
     IO.puts([
       IO.ANSI.green(),
@@ -100,6 +106,7 @@ defmodule Deli.Shell do
     ])
   end
 
+  @spec parse_options(OptionParser.argv()) :: Keyword.t()
   def parse_options(args) do
     options = [
       version: :string,
@@ -159,7 +166,6 @@ defmodule Deli.Shell do
     :ok
   end
 
-  @spec verbose_opts(Keyword.t()) :: Keyword.t()
   defp verbose_opts(opts) do
     if Config.verbose?() do
       [into: IO.stream(:stdio, :line), stderr_to_stdout: true] ++ opts
@@ -168,6 +174,5 @@ defmodule Deli.Shell do
     end
   end
 
-  @spec command_inspect([String.t()]) :: String.t()
   defp command_inspect(command) when is_list(command), do: command |> Enum.join(" ")
 end
