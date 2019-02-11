@@ -177,3 +177,6 @@ Checkout [Release configuration](https://hexdocs.pm/deli/release.html) for more 
 - mix deli.ping to run specifically bin ping command
 - mix deli.eval
 - Add more docs, tests, guards and typespecs
+- Allow production to be default target if there's no staging
+- Allow developers to create custom docker build hooks, by checking paths: `.deli/docker_build_hooks/{(before_|after)(build|setup|setup_(otp|elixir|rebar3))}/script.(sh|exs)`
+- Do rebar3 checksum in docker build images
