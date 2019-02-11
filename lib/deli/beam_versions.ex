@@ -10,13 +10,14 @@ defmodule Deli.BeamVersions do
   @type checksum :: String.t()
   @type opt :: {dep, version} | {dep, version, checksum}
   @type beam_version :: {dep, [{:version, version} | {:checksum, checksum}]}
+  @type versions :: %{required(dep) => [{version(), checksum()}]}
 
   @versions @deps |> File.versions_from_file()
 
   @spec deps() :: [dep, ...]
   def deps, do: @deps
 
-  @spec versions() :: %{required(dep) => [{version(), checksum()}]}
+  @spec versions() :: versions
   def versions, do: @versions
 
   @spec fetch([opt]) :: [beam_version]
