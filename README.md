@@ -99,6 +99,9 @@ $ mix deli.deploy
 # Checks status in all prod hosts
 $ mix deli.status -t prod
 
+# Pings all staging hosts (bin ping)
+$ mix deli.ping
+
 # Checks version in all staging hosts that match ~r/01/
 $ mix deli.version -h 01
 
