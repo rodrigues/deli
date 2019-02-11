@@ -91,7 +91,7 @@ defmodule Deli.Shell do
     end
   end
 
-  def cancelled!(operation) do
+  def cancelled!(operation) when is_atom(operation) do
     IO.puts([
       IO.ANSI.green(),
       to_string(operation),

@@ -6,9 +6,11 @@ defmodule DeliCase do
   using do
     quote do
       use ExUnitProperties
-      import StreamDataExclude
       import unquote(__MODULE__)
+      import ExUnit.CaptureIO
       alias Deli.Config
+
+      def atom, do: :alphanumeric |> atom
     end
   end
 
@@ -18,5 +20,10 @@ defmodule DeliCase do
 
   def delete_config(key) do
     :ok = :deli |> Application.delete_env(key)
+  end
+
+  def term_except(predicate) do
+    StreamData.term()
+    |> StreamData.filter(fn a -> not predicate.(a) end, 100_000)
   end
 end
