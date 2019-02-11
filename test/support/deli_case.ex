@@ -5,6 +5,30 @@ defmodule DeliCase do
 
   @limit_mismatches 100_000
 
+  @keys ~w(
+    app
+    app_user
+    assets
+    bin_path
+    controller
+    cookie
+    default_target
+    docker_build
+    hosts
+    host_provider
+    output_commands
+    port_forwarding_timeout
+    port_forwarding_wait
+    release
+    remote_build
+    target
+    verbose
+    versioning
+    __system__
+    __file_handler__
+    __code_handler__
+  )a
+
   using do
     quote do
       use ExUnitProperties
@@ -15,10 +39,7 @@ defmodule DeliCase do
   end
 
   setup do
-    put_config(:__system__, System)
-    put_config(:__file_handler__, File)
-    put_config(:__code_handler__, Code)
-    put_config(:host_provider, Deli.HostProvider.Config)
+    @keys |> Enum.each(&delete_config/1)
   end
 
   def put_config(key, value) do
