@@ -7,8 +7,8 @@ defmodule Deli.HostFilterTest do
       empty? = &(&1 == "")
 
       check all e <- atom(),
-                h1 <- string(?a..?k) |> except(empty?),
-                h2 <- string(?l..?z) |> except(empty?),
+                h1 <- ?a..?k |> string() |> except(empty?),
+                h2 <- ?l..?z |> string() |> except(empty?),
                 term_size <- integer(1..5) do
         put_config(:hosts, [{e, [h1, h2]}])
 

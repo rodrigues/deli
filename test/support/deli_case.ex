@@ -12,6 +12,10 @@ defmodule DeliCase do
     end
   end
 
+  setup do
+    put_config(:host_provider, Deli.HostProvider.Config)
+  end
+
   def put_config(key, value) do
     :ok = :deli |> Application.put_env(key, value)
   end
