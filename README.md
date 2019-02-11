@@ -172,7 +172,6 @@ Checkout [Release configuration](https://hexdocs.pm/deli/release.html) for more 
 - Integrate with a terminal-based observer
 - Allow to specify hex version in docker build images
 - Allow to change target path to something else than `/opt/APP`
-- mix deli.version have compare option
 - mix deli.eval
 - Add more docs, tests, guards and typespecs
 - Allow production to be default target if there's no staging
