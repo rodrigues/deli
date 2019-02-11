@@ -203,18 +203,18 @@ defmodule Deli.Config do
     |> ensure_atom
   end
 
-  @spec versioning() :: module
-  def versioning do
-    :versioning
-    |> get(@defaults.versioning)
-    |> ensure_atom
-  end
-
   @spec verbose?() :: boolean
   def verbose? do
     :verbose
     |> get(@defaults.verbose?)
     |> ensure_boolean
+  end
+
+  @spec versioning() :: module
+  def versioning do
+    :versioning
+    |> get(@defaults.versioning)
+    |> ensure_atom
   end
 
   @spec __system__() :: module
