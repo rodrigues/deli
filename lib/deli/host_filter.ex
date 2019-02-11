@@ -81,7 +81,6 @@ defmodule Deli.HostFilter do
     ])
   end
 
-  @spec host_filter(OptionParser.argv()) :: Regex.t() | nil
   defp host_filter(args) do
     filter =
       args
