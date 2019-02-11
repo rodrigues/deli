@@ -24,11 +24,12 @@ defmodule Deli.Shell do
   defp do_cmd(command, args, ok_signals, opts)
        when (is_atom(command) or is_binary(command)) and
               is_list(args) and is_list(ok_signals) and is_list(opts) do
+    system = Config.__system__()
     command = command |> to_string
     args = args |> Enum.map(&to_string/1)
     verbose_inspect([command | args])
 
-    {content, signal} = command |> System.cmd(args, verbose_opts(opts))
+    {content, signal} = command |> system.cmd(args, verbose_opts(opts))
 
     if ok_signals |> Enum.member?(signal) do
       content =
@@ -63,17 +64,17 @@ defmodule Deli.Shell do
 
   @spec file_exists?(Path.t()) :: boolean
   def file_exists?(path) do
-    path |> expand_path |> File.exists?()
+    path |> expand_path |> file_handler().exists?()
   end
 
   @spec write_file(Path.t(), binary(), [mode :: atom]) :: :ok
   def write_file(path, content, options \\ []) do
-    path |> expand_path |> File.write!(content, options)
+    path |> expand_path |> file_handler().write!(content, options)
   end
 
   @spec expand_path(Path.t()) :: Path.t()
   def expand_path(path) do
-    path |> Path.expand(File.cwd!())
+    path |> Path.expand(file_handler().cwd!())
   end
 
   @spec error!(String.t()) :: no_return
@@ -175,4 +176,6 @@ defmodule Deli.Shell do
   end
 
   defp command_inspect(command) when is_list(command), do: command |> Enum.join(" ")
+
+  defp file_handler, do: Config.__file_handler__()
 end

@@ -1,6 +1,7 @@
 defmodule Deli.BeamVersions.Updater do
   alias Deli.BeamVersions
   alias Deli.BeamVersions.File
+  alias Deli.Config
 
   @moduledoc false
 
@@ -63,11 +64,11 @@ defmodule Deli.BeamVersions.Updater do
   defp download_version(dep, version) do
     file = @archives[dep] |> String.replace("%v", version)
     uri = "#{@base_uri}/#{@repos[dep]}/archive/#{file}"
-    "curl" |> System.cmd(["-fSL#", uri, "-o", @archive_path])
+    "curl" |> system().cmd(["-fSL#", uri, "-o", @archive_path])
   end
 
   defp checksum do
-    {result, 0} = "shasum" |> System.cmd(["-a", "256", @archive_path])
+    {result, 0} = "shasum" |> system().cmd(["-a", "256", @archive_path])
     result |> String.split(" ") |> Enum.at(0)
   end
 
@@ -165,4 +166,6 @@ defmodule Deli.BeamVersions.Updater do
 
   defp generic_version_compare([v1 | _r1], [v2 | _r2]) when v1 > v2, do: :gt
   defp generic_version_compare([v1 | _r1], [v2 | _r2]) when v1 < v2, do: :lt
+
+  defp system, do: Config.__system__()
 end

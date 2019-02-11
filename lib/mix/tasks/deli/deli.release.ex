@@ -22,10 +22,11 @@ defmodule Mix.Tasks.Deli.Release do
 
   def run(args) do
     _ = Application.ensure_all_started(:deli)
+    system = Config.__system__()
     options = args |> parse_options
     target = options |> Keyword.fetch!(:target)
 
-    if assets?(options), do: System.put_env("ASSETS", "1")
+    if assets?(options), do: system.put_env("ASSETS", "1")
 
     {:ok, tag} =
       options[:version]

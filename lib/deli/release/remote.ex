@@ -43,7 +43,7 @@ defmodule Deli.Release.Remote do
         )
 
       dir = path |> Path.dirname()
-      :ok = File.mkdir_p(dir)
+      :ok = file_handler().mkdir_p(dir)
       write_file(path, content)
       add_to_gitignore(path)
       add_to_gitignore(".deli/releases")
@@ -56,10 +56,12 @@ defmodule Deli.Release.Remote do
 
   def add_to_gitignore(path) do
     gitignore = ".gitignore"
-    content = gitignore |> expand_path |> File.read!()
+    content = gitignore |> expand_path |> file_handler().read!()
 
     unless content |> String.contains?(path) do
       write_file(gitignore, "#{path}\n", [:append])
     end
   end
+
+  defp file_handler, do: Config.__file_handler__()
 end

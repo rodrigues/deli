@@ -217,6 +217,27 @@ defmodule Deli.Config do
     |> ensure_boolean
   end
 
+  @spec __system__() :: module
+  def __system__ do
+    :__system__
+    |> get(System)
+    |> ensure_atom
+  end
+
+  @spec __file_handler__() :: module
+  def __file_handler__ do
+    :__file_handler__
+    |> get(File)
+    |> ensure_atom
+  end
+
+  @spec __code_handler__() :: module
+  def __code_handler__ do
+    :__code_handler__
+    |> get(Code)
+    |> ensure_atom
+  end
+
   @spec get(Application.key(), Application.value()) :: Application.value()
   def get(key, default \\ nil) do
     :deli |> Application.get_env(key, default)

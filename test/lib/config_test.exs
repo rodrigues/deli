@@ -498,6 +498,69 @@ defmodule Deli.ConfigTest do
     end
   end
 
+  describe "__system__/0" do
+    test "System when not configured" do
+      delete_config(:__system__)
+      assert Config.__system__() == System
+    end
+
+    property "value when configured as an atom" do
+      check all a <- atom() do
+        put_config(:__system__, a)
+        assert Config.__system__() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:__system__, a)
+        assert_raise RuntimeError, &Config.__system__/0
+      end
+    end
+  end
+
+  describe "__file_handler__/0" do
+    test "File when not configured" do
+      delete_config(:__file_handler__)
+      assert Config.__file_handler__() == File
+    end
+
+    property "value when configured as an atom" do
+      check all a <- atom() do
+        put_config(:__file_handler__, a)
+        assert Config.__file_handler__() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:__file_handler__, a)
+        assert_raise RuntimeError, &Config.__file_handler__/0
+      end
+    end
+  end
+
+  describe "__code_handler__/0" do
+    test "Code when not configured" do
+      delete_config(:__code_handler__)
+      assert Config.__code_handler__() == Code
+    end
+
+    property "value when configured as an atom" do
+      check all a <- atom() do
+        put_config(:__code_handler__, a)
+        assert Config.__code_handler__() == a
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all a <- term_except(&is_atom/1) do
+        put_config(:__code_handler__, a)
+        assert_raise RuntimeError, &Config.__code_handler__/0
+      end
+    end
+  end
+
   describe "get/1" do
     property "deli application value for key when set" do
       check all key <- :alphanumeric |> atom(),
