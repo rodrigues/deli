@@ -6,12 +6,14 @@ defmodule SystemStub do
   def cmd(command, args, opts) do
     call = {:__system__, :cmd, command, args, opts}
     send(get(:pid), call)
-    {get(:content, ""), get(:signal, 0)}
+    default = fn _, _, _ -> {"", 0} end
+    get(:cmd, default).(command, args, opts)
   end
 
   def put_env(varname, value) do
     call = {:__system__, :put_env, varname, value}
     send(get(:pid), call)
-    :ok
+    default = fn _, _ -> :ok end
+    get(:put_env, default).(varname, value)
   end
 end

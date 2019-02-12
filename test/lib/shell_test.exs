@@ -80,7 +80,7 @@ defmodule Deli.ShellTest do
                 args <- non_empty_string() |> list_of(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 [signal] = ok_signals |> Enum.take_random(1) do
-        :ok = :signal |> TestAgent.set(signal)
+        stub_cmd({"", signal})
         assert :ok == Shell.cmd(command, args, ok_signals)
       end
     end
@@ -91,7 +91,7 @@ defmodule Deli.ShellTest do
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 signal <- 0..999 |> integer(),
                 not Enum.member?(ok_signals, signal) do
-        :ok = :signal |> TestAgent.set(signal)
+        stub_cmd({"", signal})
 
         call = fn ->
           capture_io(fn ->
@@ -109,7 +109,7 @@ defmodule Deli.ShellTest do
                 opts <- term() |> keyword_of(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 [signal] = ok_signals |> Enum.take_random(1) do
-        :ok = :signal |> TestAgent.set(signal)
+        stub_cmd({"", signal})
         :ok = command |> Shell.cmd(args, ok_signals, opts)
         expected_opts = opts ++ [into: ""]
         assert_received {:__system__, :cmd, ^command, ^args, ^expected_opts}

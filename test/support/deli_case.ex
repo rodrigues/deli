@@ -80,4 +80,8 @@ defmodule DeliCase do
 
   def empty_string?(""), do: true
   def empty_string?(_), do: false
+
+  def stub_cmd(result) do
+    :ok = :cmd |> TestAgent.set(fn _, _, _ -> result end)
+  end
 end
