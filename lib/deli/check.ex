@@ -23,5 +23,7 @@ defmodule Deli.Check do
         IO.puts(env |> controller.service_status(host))
       end
     end
+
+    :ok
   end
 end
