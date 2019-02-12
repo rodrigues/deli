@@ -102,6 +102,19 @@ defmodule Deli.ShellTest do
         assert catch_exit(call.()) == {:shutdown, signal}
       end
     end
+
+    property "propagates opts downstream" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of(),
+                opts <- term() |> keyword_of(),
+                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                [signal] = ok_signals |> Enum.take_random(1) do
+        :ok = :signal |> TestAgent.set(signal)
+        :ok = command |> Shell.cmd(args, ok_signals, opts)
+        expected_opts = opts ++ [into: ""]
+        assert_received {:__system__, :cmd, ^command, ^args, ^expected_opts}
+      end
+    end
   end
 
   describe "cancelled!/1" do
