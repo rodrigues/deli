@@ -74,7 +74,8 @@ defmodule Deli.Shell do
 
   @spec expand_path(Path.t()) :: Path.t()
   def expand_path(path) do
-    path |> Path.expand(file_handler().cwd!())
+    cwd = file_handler().cwd!()
+    path |> Path.expand(cwd)
   end
 
   @spec error!(String.t()) :: no_return
