@@ -85,7 +85,7 @@ defmodule Deli.ShellTest do
       end
     end
 
-    property "Fails when signal not in ok_signals" do
+    property "fails when signal not in ok_signals" do
       check all command <- non_empty_string(),
                 args <- non_empty_string() |> list_of(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
