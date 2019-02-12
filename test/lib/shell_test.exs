@@ -11,14 +11,14 @@ defmodule Deli.ShellTest do
       check all a <- atom() do
         :ok = a |> Shell.cmd()
         command = a |> to_string
-        assert_received {:__system__, ^command, [], _}
+        assert_received {:__system__, :cmd, ^command, [], _}
       end
     end
 
     property "runs shell command without args as binary" do
       check all a <- string() do
         :ok = a |> Shell.cmd()
-        assert_received {:__system__, ^a, [], _}
+        assert_received {:__system__, :cmd, ^a, [], _}
       end
     end
 
@@ -27,7 +27,7 @@ defmodule Deli.ShellTest do
                 args <- non_empty_string() |> list_of() do
         command = a |> to_string
         :ok = a |> Shell.cmd(args)
-        assert_received {:__system__, ^command, ^args, _}
+        assert_received {:__system__, :cmd, ^command, ^args, _}
       end
     end
 
@@ -44,7 +44,7 @@ defmodule Deli.ShellTest do
         argv = args |> Enum.join(" ")
 
         assert output == "\e[1m$ \e[0m\e[4m#{command} #{argv}\e[0m\n"
-        assert_received {:__system__, ^command, ^args, _}
+        assert_received {:__system__, :cmd, ^command, ^args, _}
       end
     end
 
@@ -57,6 +57,7 @@ defmodule Deli.ShellTest do
 
         assert_received {
           :__system__,
+          :cmd,
           ^command,
           ^args,
           into: %IO.Stream{device: :standard_io, line_or_bytes: :line, raw: false},
@@ -70,7 +71,7 @@ defmodule Deli.ShellTest do
                 args <- non_empty_string() |> non_empty_list_of() do
         :ok = command |> Shell.cmd(args)
 
-        assert_received {:__system__, ^command, ^args, into: ""}
+        assert_received {:__system__, :cmd, ^command, ^args, into: ""}
       end
     end
   end
