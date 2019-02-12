@@ -11,7 +11,7 @@ defmodule FileStub do
   end
 
   def write!(path, content) do
-    call = {:__system__, :_write!, path, content}
+    call = {:__file_handler__, :write!, path, content}
     send(get(:pid), call)
     default = fn _, _ -> :ok end
     get(:write!, default).(path, content)
