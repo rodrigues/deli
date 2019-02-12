@@ -1,3 +1,4 @@
+- [NEW] Added Travis CI build matrix: ex_unit, format, credo, dialyzer
 - [NEW] =mix deli.version --compare= for comparing local version with target
 - [NEW] =mix deli.version= handle dev target
 - [NEW] =mix deli.ping= to call release bin ping specifically, no matter controller
