@@ -52,7 +52,7 @@ defmodule Deli.ShellTest do
       put_config(:verbose, true)
 
       check all command <- non_empty_string(),
-                args <- non_empty_string() |> non_empty_list_of() do
+                args <- non_empty_string() |> list_of() do
         :ok = command |> Shell.cmd(args)
 
         assert_received {
