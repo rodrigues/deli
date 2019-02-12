@@ -68,10 +68,38 @@ defmodule Deli.ShellTest do
 
     property "does not output command output when not verbose" do
       check all command <- non_empty_string(),
-                args <- non_empty_string() |> non_empty_list_of() do
+                args <- non_empty_string() |> list_of() do
         :ok = command |> Shell.cmd(args)
 
         assert_received {:__system__, :cmd, ^command, ^args, into: ""}
+      end
+    end
+
+    property "ok when signal is in ok_signals" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of(),
+                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                [signal] = ok_signals |> Enum.take_random(1) do
+        :ok = :signal |> TestAgent.set(signal)
+        assert :ok == Shell.cmd(command, args, ok_signals)
+      end
+    end
+
+    property "Fails when signal not in ok_signals" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of(),
+                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                signal <- 0..999 |> integer(),
+                not Enum.member?(ok_signals, signal) do
+        :ok = :signal |> TestAgent.set(signal)
+
+        call = fn ->
+          capture_io(fn ->
+            Shell.cmd(command, args, ok_signals)
+          end)
+        end
+
+        assert catch_exit(call.()) == {:shutdown, signal}
       end
     end
   end
