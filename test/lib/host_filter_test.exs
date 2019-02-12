@@ -4,12 +4,10 @@ defmodule Deli.HostFilterTest do
 
   describe "hosts/0" do
     property "filters hosts" do
-      empty? = &(&1 == "")
-
       check all e <- atom(),
-                h1 <- ?a..?k |> string() |> except(empty?),
-                h2 <- ?l..?z |> string() |> except(empty?),
-                term_size <- integer(1..5) do
+                h1 <- ?a..?k |> non_empty_string(),
+                h2 <- ?l..?z |> non_empty_string(),
+                term_size <- 1..5 |> integer() do
         h3 = h1 <> h2
         put_config(:hosts, [{e, [h1, h2, h3]}])
 

@@ -18,7 +18,7 @@ defmodule Deli.Config.EnsureTest do
 
   describe "ensure_atom/0" do
     property "atom when receives atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         assert Ensure.ensure_atom(a) == a
       end
     end
@@ -32,7 +32,7 @@ defmodule Deli.Config.EnsureTest do
 
   describe "ensure_port_number/0" do
     property "port number when receives port number" do
-      check all a <- integer(0..65_535) do
+      check all a <- 0..65_535 |> integer() do
         assert Ensure.ensure_port_number(a) == a
       end
     end
@@ -52,7 +52,7 @@ defmodule Deli.Config.EnsureTest do
     end
 
     property "fails otherwise" do
-      check all a <- term_except(&(&1 > 0)) do
+      check all a <- term_except(&(is_integer(&1) and &1 > 0)) do
         assert_raise RuntimeError, fn -> Ensure.ensure_pos_integer(a) end
       end
     end
@@ -74,7 +74,7 @@ defmodule Deli.Config.EnsureTest do
 
   describe "ensure_atom_or_binary/0" do
     property "atom when receives atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         assert Ensure.ensure_atom_or_binary(a) == a
       end
     end

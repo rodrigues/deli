@@ -35,11 +35,15 @@ defmodule DeliCase do
       import unquote(__MODULE__)
       import ExUnit.CaptureIO
       alias Deli.Config
+      alias TestAgent
     end
   end
 
   setup do
     @keys |> Enum.each(&delete_config/1)
+    put_config(:verbose, false)
+    :ok = TestAgent.clear()
+    :ok = :pid |> TestAgent.set(self())
   end
 
   def put_config(key, value) do
@@ -58,6 +62,14 @@ defmodule DeliCase do
     :alphanumeric |> StreamData.string()
   end
 
+  def non_empty_string(type \\ :alphanumeric) do
+    type |> StreamData.string() |> except(&empty_string?/1)
+  end
+
+  def non_empty_list_of(data) do
+    data |> StreamData.list_of() |> except(&Enum.empty?/1)
+  end
+
   def term_except(predicate) do
     StreamData.term() |> except(predicate)
   end
@@ -65,4 +77,7 @@ defmodule DeliCase do
   def except(data, predicate) do
     data |> StreamData.filter(&(not predicate.(&1)), @limit_mismatches)
   end
+
+  def empty_string?(""), do: true
+  def empty_string?(_), do: false
 end

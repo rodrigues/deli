@@ -8,7 +8,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "app configured when atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:app, a)
         assert Config.app() == a
       end
@@ -31,7 +31,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "app when not configured" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:app, a)
         delete_config(:app_user)
         assert Config.app_user(:staging) == a
@@ -40,7 +40,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "app_user configured when atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:app_user, a)
         assert Config.app_user(:staging) == a
         assert Config.app_user(:prod) == a
@@ -56,8 +56,8 @@ defmodule Deli.ConfigTest do
     end
 
     property "env specific user when configured as such" do
-      check all s <- :alphanumeric |> atom(),
-                p <- :alphanumeric |> atom() do
+      check all s <- atom(),
+                p <- atom() do
         put_config(:app_user, staging: s, prod: p)
         assert Config.app_user(:staging) == s
         assert Config.app_user(:prod) == p
@@ -65,7 +65,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "app if app_user is configured as something else" do
-      check all a <- :alphanumeric |> atom(),
+      check all a <- atom(),
                 b <- term_except(&(is_atom(&1) or is_binary(&1))) do
         put_config(:app, a)
         put_config(:app_user, b)
@@ -124,7 +124,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "controller when configured as atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:controller, a)
         assert Config.controller() == a
       end
@@ -140,7 +140,7 @@ defmodule Deli.ConfigTest do
 
   describe "cookie/0" do
     test "app when not configured" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:app, a)
         delete_config(:cookie)
         assert Config.cookie() == a
@@ -148,7 +148,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "cookie when configured as atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:cookie, a)
         assert Config.cookie() == a
       end
@@ -169,7 +169,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "default_target when configured as atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:default_target, a)
         assert Config.default_target() == a
       end
@@ -204,7 +204,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "docker build port when configured" do
-      check all a <- integer(0..65_535) do
+      check all a <- 0..65_535 |> integer() do
         put_config(:docker_build, port: a)
         assert Config.docker_build_port() == a
       end
@@ -218,7 +218,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "docker build user when configured as an atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:docker_build, user: a)
         assert Config.docker_build_user() == a
       end
@@ -255,22 +255,22 @@ defmodule Deli.ConfigTest do
 
   describe "hosts/1" do
     test "empty if not configured" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         delete_config(:hosts)
         assert Config.hosts(a) == []
       end
     end
 
     property "value when configured as binary list" do
-      check all env <- :alphanumeric |> atom(),
-                hosts <- list_of(binary()) do
+      check all env <- atom(),
+                hosts <- non_empty_string() |> list_of() do
         put_config(:hosts, [{env, hosts}])
         assert Config.hosts(env) == hosts
       end
     end
 
     property "fails when configured not as a list" do
-      check all env <- :alphanumeric |> atom(),
+      check all env <- atom(),
                 hosts <- term_except(&(is_list(&1) or &1 == %{})) do
         put_config(:hosts, [{env, hosts}])
         assert catch_error(Config.hosts(env))
@@ -286,8 +286,8 @@ defmodule Deli.ConfigTest do
 
   describe "host_id/2" do
     test "ssh user@host identifier" do
-      check all env <- :alphanumeric |> atom(),
-                app_user <- :alphanumeric |> atom(),
+      check all env <- atom(),
+                app_user <- atom(),
                 host <- binary() do
         put_config(:app_user, [{env, app_user}])
         assert Config.host_id(env, host) == "#{app_user}@#{host}"
@@ -302,7 +302,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "fails if host not a binary" do
-      check all env <- :alphanumeric |> atom(),
+      check all env <- atom(),
                 host <- term_except(&is_binary/1) do
         assert_raise FunctionClauseError, fn -> Config.host_id(env, host) end
       end
@@ -316,7 +316,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "host provider when configured as atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:host_provider, a)
         assert Config.host_provider() == a
       end
@@ -400,7 +400,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "release strategy when configured as atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:release, a)
         assert Config.release() == a
       end
@@ -442,7 +442,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "user when configured as an atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:remote_build, user: a)
         assert Config.remote_build_user() == a
       end
@@ -463,7 +463,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "versioning strategy when configured as atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         put_config(:versioning, a)
         assert Config.versioning() == a
       end
@@ -563,7 +563,7 @@ defmodule Deli.ConfigTest do
 
   describe "get/1" do
     property "deli application value for key when set" do
-      check all key <- :alphanumeric |> atom(),
+      check all key <- atom(),
                 value <- term() do
         put_config(key, value)
         assert Config.get(key) == value
@@ -571,7 +571,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "nil when there's no value set" do
-      check all key <- :alphanumeric |> atom() do
+      check all key <- atom() do
         delete_config(key)
         assert Config.get(key) == nil
       end
@@ -580,7 +580,7 @@ defmodule Deli.ConfigTest do
 
   describe "get/2" do
     property "deli application value for key when set" do
-      check all key <- :alphanumeric |> atom(),
+      check all key <- atom(),
                 value <- term(),
                 default <- term() do
         put_config(key, value)
@@ -589,7 +589,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "nil when there's no value set" do
-      check all key <- :alphanumeric |> atom(),
+      check all key <- atom(),
                 default <- term() do
         delete_config(key)
         assert Config.get(key, default) == default
@@ -599,7 +599,7 @@ defmodule Deli.ConfigTest do
 
   describe "fetch!/1" do
     property "deli application value for key when set" do
-      check all key <- :alphanumeric |> atom(),
+      check all key <- atom(),
                 value <- term() do
         put_config(key, value)
         assert Config.fetch!(key) == value
@@ -607,7 +607,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "fails when there's no value set" do
-      check all key <- :alphanumeric |> atom() do
+      check all key <- atom() do
         delete_config(key)
         assert_raise ArgumentError, fn -> Config.fetch!(key) end
       end
@@ -621,13 +621,13 @@ defmodule Deli.ConfigTest do
     end
 
     property "atom when configured as atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         assert Config.mix_env(a) == a
       end
     end
 
     property "to_atom when configured as a binary" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         assert Config.mix_env(to_string(a)) == a
       end
     end
@@ -646,7 +646,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "to_string when configured as atom" do
-      check all a <- :alphanumeric |> atom() do
+      check all a <- atom() do
         assert Config.edeliver_target(a) == to_string(a)
       end
     end
