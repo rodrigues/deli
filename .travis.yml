@@ -1,0 +1,23 @@
+language: elixir
+elixir:
+  - 1.8
+otp_release:
+  - 20.3
+  - 21.2
+sudo: false
+env:
+  global:
+    - ELIXIR_ASSERT_TIMEOUT=2000
+before_script:
+  - mix deps.get
+script:
+  - mix test --cover
+  - mix format --check-formatted
+  - mix credo --all --strict
+  - MIX_ENV=dev mix do clean, compile, dialyzer --halt-exit-status
+after_script:
+  - cd $TRAVIS_BUILD_DIR
+  - MIX_ENV=docs mix inch.report
+cache:
+  directories:
+  - _build/dev
