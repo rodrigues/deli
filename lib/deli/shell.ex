@@ -34,11 +34,11 @@ defmodule Deli.Shell do
     if ok_signals |> Enum.member?(signal) do
       content =
         case content do
-          %IO.Stream{} = stream ->
-            stream
+          %IO.Stream{} ->
+            content
 
-          other ->
-            other |> to_string
+          _ ->
+            content |> to_string
         end
 
       {:ok, content}
