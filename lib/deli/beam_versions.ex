@@ -38,18 +38,18 @@ defmodule Deli.BeamVersions do
   end
 
   defp fetch_version({dep, version}) when dep in @deps and is_binary(version) do
-    {_, checksum} = @versions[dep] |> Enum.find(fn {v, _} -> v == version end)
+    case @versions[dep] |> Enum.find(fn {v, _} -> v == version end) do
+      {_, checksum} when is_binary(checksum) ->
+        {dep, version, checksum} |> fetch_version
 
-    if checksum do
-      {dep, version, checksum} |> fetch_version
-    else
-      raise """
-        Dependency #{dep} does not have version #{version} configured.
+      _ ->
+        raise """
+          Dependency #{dep} does not have version #{version} configured.
 
-        Try updating `deli`:
+          Try updating `deli`:
 
-            `$ mix deps.update deli`
-      """
+              `$ mix deps.update deli`
+        """
     end
   end
 
