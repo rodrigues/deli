@@ -1,7 +1,7 @@
 defmodule DeliCase do
   use ExUnit.CaseTemplate
 
-  @moduledoc "Basic test case"
+  @moduledoc false
 
   @limit_mismatches 100_000
 
