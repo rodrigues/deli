@@ -40,16 +40,17 @@ defmodule Deli.Command do
       $ mix my_app.xyz --arg_example=1 -t prod -h 01
   """
 
-  @callback run(OptionParser.argv()) :: :ok
+  @callback run(args :: OptionParser.argv()) :: :ok
 
   @doc ~S"""
   Either runs a command locally (dev), or through a RPC call
   to the remote target env
   """
   @spec call(Deli.env(), module, OptionParser.argv()) :: :ok
-  def call(:dev, mod, args) do
+  def call(:dev, mod, args) when is_atom(mod) and is_list(args) do
     {:ok, _} = Config.app() |> Application.ensure_all_started()
-    mod |> apply(:run, [args])
+    :ok = mod |> apply(:run, [args])
+    :ok
   end
 
   def call(env, mod, args) do

@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli.Release do
   use Mix.Task
   import Deli.Shell
-  alias Deli.{Config, Release}
+  alias Deli.Config
 
   @moduledoc """
   To build a release of current master into staging, do:
@@ -22,20 +22,20 @@ defmodule Mix.Tasks.Deli.Release do
 
   def run(args) do
     _ = Application.ensure_all_started(:deli)
+    system = Config.__system__()
     options = args |> parse_options
     target = options |> Keyword.fetch!(:target)
 
-    if assets?(options), do: System.put_env("ASSETS", "1")
+    if assets?(options), do: system.put_env("ASSETS", "1")
 
     {:ok, tag} =
-      options
-      |> Keyword.get(:version)
+      options[:version]
       |> Config.versioning().version_tag()
 
-    Release.build(tag, target)
+    Config.release().build(tag, target)
   end
 
   defp assets?(options) do
-    Keyword.get(options, :assets) || Config.assets?()
+    options[:assets] || Config.assets?()
   end
 end

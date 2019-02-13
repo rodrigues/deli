@@ -27,8 +27,7 @@ defmodule Mix.Tasks.Deli.Deploy do
     target = options |> Keyword.fetch!(:target)
 
     {:ok, tag} =
-      options
-      |> Keyword.get(:version)
+      options[:version]
       |> Config.versioning().version_tag()
 
     IO.puts("version: #{tag}")
