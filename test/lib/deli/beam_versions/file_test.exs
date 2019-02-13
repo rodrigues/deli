@@ -59,7 +59,7 @@ defmodule Deli.BeamVersions.FileTest do
         content = inspect(versions)
 
         assert_received {:__code_handler__, :format_string!, ^content}
-        assert_received {:__file_handler__, :write!, @path, ^content}
+        assert_received {:__file_handler__, :write!, @path, ^content, []}
       end
     end
   end

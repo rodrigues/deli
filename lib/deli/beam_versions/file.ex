@@ -24,6 +24,6 @@ defmodule Deli.BeamVersions.File do
       |> code_handler.format_string!()
       |> IO.iodata_to_binary()
 
-    @path |> file_handler.write!(content)
+    @path |> file_handler.write!(content, [])
   end
 end

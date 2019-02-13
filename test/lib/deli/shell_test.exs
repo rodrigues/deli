@@ -4,6 +4,7 @@ defmodule Deli.ShellTest do
 
   setup do
     put_config(:__system__, SystemStub)
+    put_config(:__file_handler__, FileStub)
   end
 
   describe "cmd/1..4" do
@@ -159,7 +160,7 @@ defmodule Deli.ShellTest do
 
         call = fn ->
           capture_io(fn ->
-            command |> Shell.edeliver(args)
+            Shell.edeliver(command, args)
           end)
         end
 
@@ -235,7 +236,7 @@ defmodule Deli.ShellTest do
 
         call = fn ->
           capture_io(fn ->
-            command |> Shell.docker_compose(args)
+            Shell.docker_compose(command, args)
           end)
         end
 
@@ -269,6 +270,56 @@ defmodule Deli.ShellTest do
         end
 
         assert catch_exit(call.()) == {:shutdown, signal}
+      end
+    end
+  end
+
+  describe "file_exists?/1" do
+    property "whether file exists or not in app project" do
+      check all path <- nonempty_string(),
+                cwd <- ?a..?z |> nonempty_string(),
+                exists? <- boolean() do
+        cwd = "/tmp/deli/#{cwd}"
+        expanded = "#{cwd}/#{path}"
+        :ok = :cwd! |> TestAgent.set(fn -> cwd end)
+        :ok = :exists? |> TestAgent.set(fn ^expanded -> exists? end)
+
+        assert Shell.file_exists?(path) == exists?
+      end
+    end
+  end
+
+  describe "write_file/2..3" do
+    property "writes content into file" do
+      check all path <- nonempty_string(),
+                cwd <- ?a..?z |> nonempty_string(),
+                content <- binary(),
+                result <- term() do
+        cwd = "/tmp/deli/#{cwd}"
+        expanded = "#{cwd}/#{path}"
+        :ok = :cwd! |> TestAgent.set(fn -> cwd end)
+        :ok = :write! |> TestAgent.set(fn ^expanded, ^content -> result end)
+
+        ^result = path |> Shell.write_file(content)
+
+        assert_received {:__file_handler__, :write!, ^expanded, ^content, []}
+      end
+    end
+
+    property "writes content into file with options" do
+      check all path <- nonempty_string(),
+                cwd <- ?a..?z |> nonempty_string(),
+                content <- binary(),
+                opts <- atom() |> list_of() |> nonempty(),
+                result <- term() do
+        cwd = "/tmp/deli/#{cwd}"
+        expanded = "#{cwd}/#{path}"
+        :ok = :cwd! |> TestAgent.set(fn -> cwd end)
+        :ok = :write! |> TestAgent.set(fn ^expanded, ^content -> result end)
+
+        ^result = path |> Shell.write_file(content, opts)
+
+        assert_received {:__file_handler__, :write!, ^expanded, ^content, ^opts}
       end
     end
   end
