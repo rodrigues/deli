@@ -117,7 +117,7 @@ defmodule Deli.ShellTest do
     end
   end
 
-  describe "edeliver/2" do
+  describe "edeliver/1..2" do
     property "calls edeliver with no args" do
       check all command <- non_empty_string() do
         stub_cmd({"", 0})
@@ -134,7 +134,7 @@ defmodule Deli.ShellTest do
       end
     end
 
-    property "calls edeliver" do
+    property "calls edeliver with args" do
       check all command <- non_empty_string(),
                 args <- non_empty_string() |> list_of() do
         stub_cmd({"", 0})
@@ -160,6 +160,111 @@ defmodule Deli.ShellTest do
         call = fn ->
           capture_io(fn ->
             command |> Shell.edeliver(args)
+          end)
+        end
+
+        assert catch_exit(call.()) == {:shutdown, signal}
+      end
+    end
+
+    property "propagates verbose downstream" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of() do
+        put_config(:verbose, true)
+        stub_cmd({"", 0})
+
+        expected_opts = [
+          into: %IO.Stream{device: :standard_io, line_or_bytes: :line, raw: false},
+          stderr_to_stdout: true
+        ]
+
+        expected_args = ["edeliver", command] ++ args ++ ["--verbose"]
+
+        :ok = command |> Shell.edeliver(args)
+
+        assert_received {
+          :__system__,
+          :cmd,
+          "mix",
+          ^expected_args,
+          ^expected_opts
+        }
+      end
+    end
+  end
+
+  describe "docker_compose/1..3" do
+    property "calls docker_compose with no args" do
+      check all command <- non_empty_string() do
+        stub_cmd({"", 0})
+        :ok = command |> Shell.docker_compose()
+        expected_opts = [env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}], into: ""]
+
+        assert_received {
+          :__system__,
+          :cmd,
+          "docker-compose",
+          ["-f", ".deli/docker-compose.yml", ^command],
+          ^expected_opts
+        }
+      end
+    end
+
+    property "calls docker_compose with args" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of() do
+        stub_cmd({"", 0})
+        :ok = command |> Shell.docker_compose(args)
+        expected_opts = [env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}], into: ""]
+
+        assert_received {
+          :__system__,
+          :cmd,
+          "docker-compose",
+          ["-f", ".deli/docker-compose.yml", ^command | ^args],
+          ^expected_opts
+        }
+      end
+    end
+
+    property "fails on a signal different than 0" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of(),
+                signal <- 1..999 |> integer() do
+        stub_cmd({"", signal})
+
+        call = fn ->
+          capture_io(fn ->
+            command |> Shell.docker_compose(args)
+          end)
+        end
+
+        assert catch_exit(call.()) == {:shutdown, signal}
+      end
+    end
+
+    property "ok on a signal in ok_signals" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of(),
+                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                [signal] = ok_signals |> Enum.take_random(1) do
+        stub_cmd({"", signal})
+
+        assert Shell.docker_compose(command, args, ok_signals) == :ok
+      end
+    end
+
+    property "fail on a signal not in ok_signals" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of(),
+                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                signal <- 0..999 |> integer(),
+                not Enum.member?(ok_signals, signal) do
+        stub_cmd({"", signal})
+
+        call = fn ->
+          capture_io(fn ->
+            Shell.docker_compose(command, args, ok_signals)
           end)
         end
 
