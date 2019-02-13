@@ -172,7 +172,7 @@ defmodule Deli.Shell do
     if Config.verbose?() do
       [into: IO.stream(:stdio, :line), stderr_to_stdout: true] ++ opts
     else
-      opts ++ [into: ""]
+      opts |> Keyword.put_new(:into, "")
     end
   end
 

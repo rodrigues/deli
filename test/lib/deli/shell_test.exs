@@ -112,7 +112,23 @@ defmodule Deli.ShellTest do
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({"", signal})
         :ok = command |> Shell.cmd(args, ok_signals, opts)
-        expected_opts = opts ++ [into: ""]
+        expected_opts = [into: ""] ++ opts
+        assert_received {:__system__, :cmd, ^command, ^args, ^expected_opts}
+      end
+    end
+  end
+
+  describe "cmd_result/2..4" do
+    property "returns tuple with result of cmd" do
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of(),
+                opts <- term() |> keyword_of(),
+                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                result <- binary(),
+                [signal] = ok_signals |> Enum.take_random(1) do
+        stub_cmd({result, signal})
+        {:ok, ^result} = command |> Shell.cmd_result(args, ok_signals, opts)
+        expected_opts = [into: ""] ++ opts
         assert_received {:__system__, :cmd, ^command, ^args, ^expected_opts}
       end
     end
@@ -199,7 +215,7 @@ defmodule Deli.ShellTest do
       check all command <- nonempty_string() do
         stub_cmd({"", 0})
         :ok = command |> Shell.docker_compose()
-        expected_opts = [env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}], into: ""]
+        expected_opts = [into: "", env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]]
 
         assert_received {
           :__system__,
@@ -216,7 +232,7 @@ defmodule Deli.ShellTest do
                 args <- nonempty_string() |> list_of() do
         stub_cmd({"", 0})
         :ok = command |> Shell.docker_compose(args)
-        expected_opts = [env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}], into: ""]
+        expected_opts = [into: "", env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]]
 
         assert_received {
           :__system__,
