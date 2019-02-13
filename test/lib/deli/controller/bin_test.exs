@@ -29,19 +29,24 @@ defmodule Deli.Controller.BinTest do
       end
     end
 
-    property "pings host and errors with not a pong" do
+    property "fails to start host if signal not expected" do
       check all app_user <- atom() |> except(&is_nil/1),
                 bin_path <- non_empty_string(),
                 env <- atom() |> except(&is_nil/1),
                 host <- non_empty_string(),
-                response <- non_empty_string(),
-                response != "pong" do
+                signal <- 1..500 |> integer() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
-        stub_cmd({response, 0})
+        stub_cmd({"", signal})
         id = env |> Config.host_id(host)
 
-        :ok = env |> Bin.start_host(host)
+        call = fn ->
+          capture_io(fn ->
+            env |> Bin.start_host(host)
+          end)
+        end
+
+        assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
           :__system__,
