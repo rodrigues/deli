@@ -668,7 +668,7 @@ defmodule Deli.ConfigTest do
 
   describe "version/0..1" do
     test "uses mix project's version by default" do
-      check = &String.starts_with?(to_string(&1), "0.1")
+      check = &String.starts_with?(to_string(&1), "0.2")
       assert check.(Config.version())
       assert check.(Config.version(nil))
     end

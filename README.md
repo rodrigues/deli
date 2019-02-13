@@ -20,7 +20,7 @@ Add `deli` to your deps:
 def deps do
   [
     # ...
-    {:deli, "~> 0.1.28", runtime: false}
+    {:deli, "~> 0.2.0-rc.1", runtime: false}
   ]
 end
 ```

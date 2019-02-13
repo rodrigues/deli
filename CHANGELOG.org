@@ -1,10 +1,12 @@
+*** v0.2.0-rc.1
+
 - [NEW] Added Travis CI build matrix: ex_unit, format, credo, dialyzer
+- [NEW] Start covering with properties and tests
 - [NEW] =mix deli.version --compare= for comparing local version with target
 - [NEW] =mix deli.version= handle dev target
 - [NEW] =mix deli.ping= to call release bin ping specifically, no matter controller
 - [NEW] Store specific files under =.deli/= from now on
 - [NEW] Ensure user configuration obeys to typespecs when fetching
-- [NEW] Property test =Deli.Config=
 - [NEW] Simplify host provider behaviour (=Stream= -> =List=)
 - [NEW] Support configuring beam versions (Elixir =1.8+=, OTP =20+=, Rebar3 =3.6.1+=)
 - [NEW] Allow a different release build strategy: =Deli.Release.Remote=
