@@ -7,7 +7,7 @@ defmodule Deli.PingTest do
   end
 
   describe "run/2" do
-    property "pings host" do
+    property "pings host and succeeds with a pong" do
       check all app <- atom() |> except(&is_nil/1),
                 app_user <- atom() |> except(&is_nil/1),
                 env <- atom() |> except(&is_nil/1),
@@ -33,6 +33,37 @@ defmodule Deli.PingTest do
         }
 
         assert output == "\e[32mpong #{id}\e[0m\n"
+      end
+    end
+
+    property "pings host and errors with not a pong" do
+      check all app <- atom() |> except(&is_nil/1),
+                app_user <- atom() |> except(&is_nil/1),
+                env <- atom() |> except(&is_nil/1),
+                host <- non_empty_string(),
+                response <- non_empty_string(),
+                response != "pong" do
+        put_config(:app, app)
+        put_config(:app_user, app_user)
+        stub_cmd({response, 0})
+
+        output =
+          capture_io(fn ->
+            :ok = env |> Ping.run(host)
+          end)
+
+        id = "#{app_user}@#{host}"
+        bin = "/opt/#{app}/bin/#{app}"
+
+        assert_receive {
+          :__system__,
+          :cmd,
+          "ssh",
+          [^id, ^bin, "ping"],
+          _
+        }
+
+        assert output == "\e[31mnot pong #{id}\e[0m\n#{response}\n"
       end
     end
   end
