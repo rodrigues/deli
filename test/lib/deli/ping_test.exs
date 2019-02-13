@@ -8,12 +8,12 @@ defmodule Deli.PingTest do
 
   describe "run/2" do
     property "pings host and succeeds with a pong" do
-      check all app <- atom() |> except(&is_nil/1),
-                app_user <- atom() |> except(&is_nil/1),
+      check all app_user <- atom() |> except(&is_nil/1),
+                bin_path <- non_empty_string(),
                 env <- atom() |> except(&is_nil/1),
                 host <- non_empty_string() do
-        put_config(:app, app)
         put_config(:app_user, app_user)
+        put_config(:bin_path, bin_path)
         stub_cmd({"pong", 0})
 
         output =
@@ -21,14 +21,13 @@ defmodule Deli.PingTest do
             :ok = env |> Ping.run(host)
           end)
 
-        id = "#{app_user}@#{host}"
-        bin = "/opt/#{app}/bin/#{app}"
+        id = env |> Config.host_id(host)
 
         assert_receive {
           :__system__,
           :cmd,
           "ssh",
-          [^id, ^bin, "ping"],
+          [^id, ^bin_path, "ping"],
           _
         }
 
@@ -37,14 +36,14 @@ defmodule Deli.PingTest do
     end
 
     property "pings host and errors with not a pong" do
-      check all app <- atom() |> except(&is_nil/1),
-                app_user <- atom() |> except(&is_nil/1),
+      check all app_user <- atom() |> except(&is_nil/1),
+                bin_path <- non_empty_string(),
                 env <- atom() |> except(&is_nil/1),
                 host <- non_empty_string(),
                 response <- non_empty_string(),
                 response != "pong" do
-        put_config(:app, app)
         put_config(:app_user, app_user)
+        put_config(:bin_path, bin_path)
         stub_cmd({response, 0})
 
         output =
@@ -52,14 +51,13 @@ defmodule Deli.PingTest do
             :ok = env |> Ping.run(host)
           end)
 
-        id = "#{app_user}@#{host}"
-        bin = "/opt/#{app}/bin/#{app}"
+        id = env |> Config.host_id(host)
 
         assert_receive {
           :__system__,
           :cmd,
           "ssh",
-          [^id, ^bin, "ping"],
+          [^id, ^bin_path, "ping"],
           _
         }
 
