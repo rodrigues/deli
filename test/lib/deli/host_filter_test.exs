@@ -9,7 +9,9 @@ defmodule Deli.HostFilterTest do
                 h2 <- ?l..?z |> non_empty_string(),
                 term_size <- 1..5 |> integer() do
         h3 = h1 <> h2
-        put_config(:hosts, [{e, [h1, h2, h3]}])
+
+        HostProviderMock
+        |> expect(:hosts, fn ^e -> [h1, h2, h3] end)
 
         {filter, _} = h1 |> String.split_at(term_size)
 
