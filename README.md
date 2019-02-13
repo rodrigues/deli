@@ -2,6 +2,8 @@
 
 [Package](https://hex.pm/packages/deli) • [Documentation](https://hexdocs.pm/deli) • [Source](https://github.com/rodrigues/deli)
 
+[![Build Status](https://travis-ci.org/rodrigues/deli.svg?branch=master)](https://travis-ci.org/rodrigues/deli)
+
 Provides a simple deployment solution for Elixir applications, using a couple of [`edeliver`](https://github.com/edeliver/edeliver) [tasks](https://hexdocs.pm/edeliver/Mix.Tasks.Edeliver.html#content) under the hood.
 
 Releases are built with [`distillery`](https://github.com/bitwalker/distillery), locally, through docker.
