@@ -14,7 +14,7 @@ defmodule Deli.BeamVersions.FileTest do
       check all versions <-
                   map_of(
                     atom(),
-                    list_of(tuple({non_empty_string(), non_empty_string()}), max_length: 5),
+                    list_of(tuple({nonempty_string(), nonempty_string()}), max_length: 5),
                     max_length: 5
                   ) do
         :ok = :eval_file |> TestAgent.set(fn @path -> {versions, []} end)
@@ -27,7 +27,7 @@ defmodule Deli.BeamVersions.FileTest do
                 versions <-
                   map_of(
                     atom(),
-                    list_of(tuple({non_empty_string(), non_empty_string()}), max_length: 5),
+                    list_of(tuple({nonempty_string(), nonempty_string()}), max_length: 5),
                     min_length: 1,
                     max_length: 5
                   ),
@@ -51,7 +51,7 @@ defmodule Deli.BeamVersions.FileTest do
       check all versions <-
                   map_of(
                     atom(),
-                    list_of(tuple({non_empty_string(), non_empty_string()}), max_length: 5),
+                    list_of(tuple({nonempty_string(), nonempty_string()}), max_length: 5),
                     min_length: 1,
                     max_length: 5
                   ) do

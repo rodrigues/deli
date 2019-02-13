@@ -263,7 +263,7 @@ defmodule Deli.ConfigTest do
 
     property "value when configured as binary list" do
       check all env <- atom(),
-                hosts <- non_empty_string() |> list_of() do
+                hosts <- nonempty_string() |> list_of() do
         put_config(:hosts, [{env, hosts}])
         assert Config.hosts(env) == hosts
       end

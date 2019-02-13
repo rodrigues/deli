@@ -77,12 +77,8 @@ defmodule DeliCase do
     :alphanumeric |> StreamData.string()
   end
 
-  def non_empty_string(type \\ :alphanumeric) do
+  def nonempty_string(type \\ :alphanumeric) do
     type |> StreamData.string() |> except(&empty_string?/1)
-  end
-
-  def non_empty_list_of(data) do
-    data |> StreamData.list_of() |> except(&Enum.empty?/1)
   end
 
   def term_except(predicate) do

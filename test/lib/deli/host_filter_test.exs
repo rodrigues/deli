@@ -5,8 +5,8 @@ defmodule Deli.HostFilterTest do
   describe "hosts/2" do
     property "all hosts when not filtering" do
       check all e <- atom(),
-                h1 <- non_empty_string(),
-                h2 <- non_empty_string() do
+                h1 <- nonempty_string(),
+                h2 <- nonempty_string() do
         h3 = h1 <> h2
 
         HostProviderMock
@@ -23,8 +23,8 @@ defmodule Deli.HostFilterTest do
 
     property "filters hosts" do
       check all e <- atom(),
-                h1 <- ?a..?k |> non_empty_string(),
-                h2 <- ?l..?z |> non_empty_string(),
+                h1 <- ?a..?k |> nonempty_string(),
+                h2 <- ?l..?z |> nonempty_string(),
                 term_size <- 1..5 |> integer() do
         h3 = h1 <> h2
 
@@ -44,9 +44,9 @@ defmodule Deli.HostFilterTest do
 
     property "fails if all hosts are excluded after filter" do
       check all e <- atom(),
-                h1 <- ?a..?k |> non_empty_string(),
-                h2 <- ?l..?z |> non_empty_string(),
-                filter <- ?0..?9 |> non_empty_string() do
+                h1 <- ?a..?k |> nonempty_string(),
+                h2 <- ?l..?z |> nonempty_string(),
+                filter <- ?0..?9 |> nonempty_string() do
         h3 = h1 <> h2
 
         HostProviderMock
@@ -64,7 +64,7 @@ defmodule Deli.HostFilterTest do
 
     property "fails if no hosts are defined for env and filtering" do
       check all e <- atom(),
-                filter <- ?a..?z |> non_empty_string() do
+                filter <- ?a..?z |> nonempty_string() do
         HostProviderMock
         |> expect(:hosts, fn ^e -> [] end)
 
@@ -97,7 +97,7 @@ defmodule Deli.HostFilterTest do
   describe "host/2" do
     property "host when only one configured and no filter" do
       check all e <- atom(),
-                h1 <- non_empty_string() do
+                h1 <- nonempty_string() do
         HostProviderMock
         |> expect(:hosts, fn ^e -> [h1] end)
 
@@ -107,7 +107,7 @@ defmodule Deli.HostFilterTest do
 
     property "host when only one configured and filter matches" do
       check all e <- atom(),
-                h1 <- non_empty_string(),
+                h1 <- nonempty_string(),
                 term_size <- 1..5 |> integer() do
         HostProviderMock
         |> expect(:hosts, fn ^e -> [h1] end)
@@ -120,8 +120,8 @@ defmodule Deli.HostFilterTest do
 
     property "error when only one configured and filter doesn't match" do
       check all e <- atom(),
-                h1 <- ?a..?z |> non_empty_string(),
-                filter <- ?0..?9 |> non_empty_string() do
+                h1 <- ?a..?z |> nonempty_string(),
+                filter <- ?0..?9 |> nonempty_string() do
         HostProviderMock
         |> expect(:hosts, fn ^e -> [h1] end)
 
@@ -137,9 +137,9 @@ defmodule Deli.HostFilterTest do
 
     property "error when several configured and filter doesn't match any" do
       check all e <- atom(),
-                h1 <- ?a..?z |> non_empty_string(),
-                h2 <- ?a..?z |> non_empty_string(),
-                filter <- ?0..?9 |> non_empty_string() do
+                h1 <- ?a..?z |> nonempty_string(),
+                h2 <- ?a..?z |> nonempty_string(),
+                filter <- ?0..?9 |> nonempty_string() do
         HostProviderMock
         |> expect(:hosts, fn ^e -> [h1, h2] end)
 
@@ -155,9 +155,9 @@ defmodule Deli.HostFilterTest do
 
     property "asks user when several configured and filter matches more than one" do
       check all e <- atom(),
-                filter <- non_empty_string(),
-                h1_suffix <- non_empty_string(),
-                h2_prefix <- non_empty_string() do
+                filter <- nonempty_string(),
+                h1_suffix <- nonempty_string(),
+                h2_prefix <- nonempty_string() do
         [position] = 0..1 |> Enum.take_random(1)
         h1 = filter <> h1_suffix
         h2 = h2_prefix <> filter
@@ -181,9 +181,9 @@ defmodule Deli.HostFilterTest do
 
     property "asks user again when user provides bad position" do
       check all e <- atom(),
-                filter <- non_empty_string(),
-                h1_suffix <- non_empty_string(),
-                h2_prefix <- non_empty_string(),
+                filter <- nonempty_string(),
+                h1_suffix <- nonempty_string(),
+                h2_prefix <- nonempty_string(),
                 bad_tries <- 2..42 |> integer() |> list_of() |> nonempty() do
         [position] = 0..1 |> Enum.take_random(1)
         h1 = filter <> h1_suffix

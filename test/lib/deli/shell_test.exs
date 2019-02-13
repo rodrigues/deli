@@ -24,7 +24,7 @@ defmodule Deli.ShellTest do
 
     property "accepts args" do
       check all a <- atom(),
-                args <- non_empty_string() |> list_of() do
+                args <- nonempty_string() |> list_of() do
         command = a |> to_string
         :ok = a |> Shell.cmd(args)
         assert_received {:__system__, :cmd, ^command, ^args, _}
@@ -34,8 +34,8 @@ defmodule Deli.ShellTest do
     property "optionally outputs command call" do
       put_config(:output_commands, true)
 
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> non_empty_list_of() do
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of() |> nonempty() do
         output =
           capture_io(fn ->
             :ok = command |> Shell.cmd(args)
@@ -51,8 +51,8 @@ defmodule Deli.ShellTest do
     property "outputs command output when verbose" do
       put_config(:verbose, true)
 
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of() do
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of() do
         :ok = command |> Shell.cmd(args)
 
         assert_received {
@@ -67,8 +67,8 @@ defmodule Deli.ShellTest do
     end
 
     property "does not output command output when not verbose" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of() do
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of() do
         :ok = command |> Shell.cmd(args)
 
         assert_received {:__system__, :cmd, ^command, ^args, into: ""}
@@ -76,8 +76,8 @@ defmodule Deli.ShellTest do
     end
 
     property "ok when signal is in ok_signals" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of(),
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({"", signal})
@@ -86,8 +86,8 @@ defmodule Deli.ShellTest do
     end
 
     property "fails when signal not in ok_signals" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of(),
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 signal <- 0..999 |> integer(),
                 not Enum.member?(ok_signals, signal) do
@@ -104,8 +104,8 @@ defmodule Deli.ShellTest do
     end
 
     property "propagates opts downstream" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of(),
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of(),
                 opts <- term() |> keyword_of(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 [signal] = ok_signals |> Enum.take_random(1) do
@@ -119,7 +119,7 @@ defmodule Deli.ShellTest do
 
   describe "edeliver/1..2" do
     property "calls edeliver with no args" do
-      check all command <- non_empty_string() do
+      check all command <- nonempty_string() do
         stub_cmd({"", 0})
         :ok = command |> Shell.edeliver()
         expected_opts = [into: ""]
@@ -135,8 +135,8 @@ defmodule Deli.ShellTest do
     end
 
     property "calls edeliver with args" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of() do
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of() do
         stub_cmd({"", 0})
         :ok = command |> Shell.edeliver(args)
         expected_opts = [into: ""]
@@ -152,8 +152,8 @@ defmodule Deli.ShellTest do
     end
 
     property "fails on a signal different than 0" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of(),
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of(),
                 signal <- 1..999 |> integer() do
         stub_cmd({"", signal})
 
@@ -168,8 +168,8 @@ defmodule Deli.ShellTest do
     end
 
     property "propagates verbose downstream" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of() do
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of() do
         put_config(:verbose, true)
         stub_cmd({"", 0})
 
@@ -195,7 +195,7 @@ defmodule Deli.ShellTest do
 
   describe "docker_compose/1..3" do
     property "calls docker_compose with no args" do
-      check all command <- non_empty_string() do
+      check all command <- nonempty_string() do
         stub_cmd({"", 0})
         :ok = command |> Shell.docker_compose()
         expected_opts = [env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}], into: ""]
@@ -211,8 +211,8 @@ defmodule Deli.ShellTest do
     end
 
     property "calls docker_compose with args" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of() do
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of() do
         stub_cmd({"", 0})
         :ok = command |> Shell.docker_compose(args)
         expected_opts = [env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}], into: ""]
@@ -228,8 +228,8 @@ defmodule Deli.ShellTest do
     end
 
     property "fails on a signal different than 0" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of(),
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of(),
                 signal <- 1..999 |> integer() do
         stub_cmd({"", signal})
 
@@ -244,8 +244,8 @@ defmodule Deli.ShellTest do
     end
 
     property "ok on a signal in ok_signals" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of(),
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({"", signal})
@@ -255,8 +255,8 @@ defmodule Deli.ShellTest do
     end
 
     property "fail on a signal not in ok_signals" do
-      check all command <- non_empty_string(),
-                args <- non_empty_string() |> list_of(),
+      check all command <- nonempty_string(),
+                args <- nonempty_string() |> list_of(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 signal <- 0..999 |> integer(),
                 not Enum.member?(ok_signals, signal) do

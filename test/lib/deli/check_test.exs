@@ -6,7 +6,7 @@ defmodule Deli.CheckTest do
     property "checks host and succeeds when service is running" do
       check all app_user <- atom() |> except(&is_nil/1),
                 env <- atom() |> except(&is_nil/1),
-                host <- non_empty_string() do
+                host <- nonempty_string() do
         put_config(:app_user, app_user)
 
         ControllerMock
@@ -25,7 +25,7 @@ defmodule Deli.CheckTest do
     property "checks host and fails when service is not running" do
       check all app_user <- atom() |> except(&is_nil/1),
                 env <- atom() |> except(&is_nil/1),
-                host <- non_empty_string(),
+                host <- nonempty_string(),
                 status <- string() do
         put_config(:app_user, app_user)
 
@@ -49,7 +49,7 @@ defmodule Deli.CheckTest do
                "but `running_good?` is false" do
       check all app_user <- atom() |> except(&is_nil/1),
                 env <- atom() |> except(&is_nil/1),
-                host <- non_empty_string(),
+                host <- nonempty_string(),
                 status <- string() do
         put_config(:app_user, app_user)
 
@@ -73,7 +73,7 @@ defmodule Deli.CheckTest do
                "but `running_good?` is false" do
       check all app_user <- atom() |> except(&is_nil/1),
                 env <- atom() |> except(&is_nil/1),
-                host <- non_empty_string() do
+                host <- nonempty_string() do
         put_config(:app_user, app_user)
 
         ControllerMock
