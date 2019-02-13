@@ -117,6 +117,57 @@ defmodule Deli.ShellTest do
     end
   end
 
+  describe "edeliver/2" do
+    property "calls edeliver with no args" do
+      check all command <- non_empty_string() do
+        stub_cmd({"", 0})
+        :ok = command |> Shell.edeliver()
+        expected_opts = [into: ""]
+
+        assert_received {
+          :__system__,
+          :cmd,
+          "mix",
+          ["edeliver", ^command],
+          ^expected_opts
+        }
+      end
+    end
+
+    property "calls edeliver" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of() do
+        stub_cmd({"", 0})
+        :ok = command |> Shell.edeliver(args)
+        expected_opts = [into: ""]
+
+        assert_received {
+          :__system__,
+          :cmd,
+          "mix",
+          ["edeliver", ^command | ^args],
+          ^expected_opts
+        }
+      end
+    end
+
+    property "fails on a signal different than 0" do
+      check all command <- non_empty_string(),
+                args <- non_empty_string() |> list_of(),
+                signal <- 1..999 |> integer() do
+        stub_cmd({"", signal})
+
+        call = fn ->
+          capture_io(fn ->
+            command |> Shell.edeliver(args)
+          end)
+        end
+
+        assert catch_exit(call.()) == {:shutdown, signal}
+      end
+    end
+  end
+
   describe "cancelled!/1" do
     property "prints operation was cancelled by user" do
       check all a <- atom() do
