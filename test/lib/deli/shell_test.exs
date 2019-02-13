@@ -340,6 +340,63 @@ defmodule Deli.ShellTest do
     end
   end
 
+  describe "confirm?/2" do
+    property "autoconfirms if yes passed as opt" do
+      check all app <- atom(),
+                target <- atom(),
+                operation <- atom(),
+                opts <- term() |> keyword_of() do
+        opts =
+          opts
+          |> Keyword.put(:target, target)
+          |> Keyword.put(:yes, true)
+
+        put_config(:app, app)
+
+        output =
+          capture_io(fn ->
+            true = operation |> Shell.confirm?(opts)
+          end)
+
+        assert output == "#{operation} #{app} at #{target}? [Yn] y\n"
+      end
+    end
+
+    property "asks user confirmation if yes not passed as opt" do
+      check all app <- atom(),
+                target <- atom(),
+                operation <- atom(),
+                opts <- term() |> keyword_of(),
+                confirms? <- boolean() do
+        opts =
+          opts
+          |> Keyword.put(:target, target)
+
+        put_config(:app, app)
+
+        input = if confirms?, do: "\n", else: "n\n"
+
+        output =
+          capture_io([input: input, capture_prompt: true], fn ->
+            ^confirms? = operation |> Shell.confirm?(opts)
+          end)
+
+        assert output == "#{operation} #{app} at #{target}? [Yn] "
+      end
+    end
+
+    property "fails when target is not provided" do
+      check all app <- atom(),
+                operation <- atom(),
+                opts <- term() |> keyword_of(),
+                not Keyword.has_key?(opts, :target) do
+        put_config(:app, app)
+
+        assert_raise KeyError, fn -> Shell.confirm?(operation, opts) end
+      end
+    end
+  end
+
   describe "cancelled!/1" do
     property "prints operation was cancelled by user" do
       check all a <- atom() do

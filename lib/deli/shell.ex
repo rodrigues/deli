@@ -91,7 +91,7 @@ defmodule Deli.Shell do
     message = "#{operation} #{app} at #{target}?"
 
     if options[:yes] do
-      IO.puts("#{message} (Y/n) YES")
+      IO.puts("#{message} [Yn] y")
       true
     else
       message |> Mix.shell().yes?()
