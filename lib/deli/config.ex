@@ -1,4 +1,5 @@
 defmodule Deli.Config do
+  import Deli, only: [is_env: 1, is_host: 1]
   import Deli.Config.Ensure
 
   @moduledoc "Provides access to deli configuration"
@@ -49,7 +50,7 @@ defmodule Deli.Config do
   end
 
   @spec app_user(Deli.env()) :: atom
-  def app_user(env) when is_atom(env) do
+  def app_user(env) when is_env(env) do
     app_user = :app_user |> get()
 
     app_user =
@@ -140,7 +141,7 @@ defmodule Deli.Config do
   If there is a custom host provider configured, it might not be correct.
   """
   @spec hosts(Deli.env()) :: [Deli.host()]
-  def hosts(env) when is_atom(env) do
+  def hosts(env) when is_env(env) do
     :hosts
     |> get([])
     |> Keyword.get(mix_env(env), [])
@@ -148,7 +149,7 @@ defmodule Deli.Config do
   end
 
   @spec host_id(Deli.env(), Deli.host()) :: String.t()
-  def host_id(env, host) when is_atom(env) and is_binary(host) do
+  def host_id(env, host) when is_env(env) and is_host(host) do
     "#{app_user(env)}@#{host}"
   end
 
@@ -239,28 +240,28 @@ defmodule Deli.Config do
   end
 
   @spec get(Application.key(), Application.value()) :: Application.value()
-  def get(key, default \\ nil) do
+  def get(key, default \\ nil) when is_atom(key) do
     :deli |> Application.get_env(key, default)
   end
 
   @spec fetch!(Application.key()) :: Application.value()
-  def fetch!(key) do
+  def fetch!(key) when is_atom(key) do
     :deli |> Application.fetch_env!(key)
   end
 
-  @spec mix_env(atom | String.t()) :: Deli.env()
+  @spec mix_env(Deli.env() | String.t()) :: Deli.env()
   def mix_env("production"), do: :prod
   def mix_env(:production), do: :prod
-  def mix_env(env) when is_atom(env), do: env
+  def mix_env(env) when is_env(env), do: env
 
   def mix_env(env) when is_binary(env) do
     env |> String.to_atom() |> mix_env()
   end
 
-  @spec edeliver_target(atom | String.t()) :: String.t()
+  @spec edeliver_target(Deli.env() | String.t()) :: String.t()
   def edeliver_target("prod"), do: "production"
   def edeliver_target(:prod), do: "production"
-  def edeliver_target(env) when is_atom(env), do: env |> Atom.to_string()
+  def edeliver_target(env) when is_env(env), do: env |> Atom.to_string()
   def edeliver_target(target) when is_binary(target), do: target
 
   @spec project(module | nil) :: Keyword.t()
