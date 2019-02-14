@@ -7,14 +7,14 @@ defmodule Deli.BeamVersions.File do
   @path "lib/deli/beam_versions/data.exs"
 
   @spec versions_from_file([BeamVersions.dep()]) :: BeamVersions.versions()
-  def versions_from_file(deps \\ []) do
+  def versions_from_file(deps \\ []) when is_list(deps) do
     code_handler = Config.__code_handler__()
     {%{} = versions, _} = @path |> code_handler.eval_file()
     deps |> Enum.reduce(versions, &Map.put_new(&2, &1, []))
   end
 
   @spec persist_versions(BeamVersions.versions()) :: :ok
-  def persist_versions(versions) do
+  def persist_versions(versions) when is_map(versions) do
     file_handler = Config.__file_handler__()
     code_handler = Config.__code_handler__()
 

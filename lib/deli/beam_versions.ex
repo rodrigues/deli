@@ -23,7 +23,7 @@ defmodule Deli.BeamVersions do
   def versions, do: @versions
 
   @spec fetch([opt]) :: [beam_version]
-  def fetch(opts \\ []) do
+  def fetch(opts \\ []) when is_list(opts) do
     deps() |> Enum.map(&fetch_version({&1, opts[&1]}))
   end
 
