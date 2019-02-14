@@ -7,33 +7,33 @@ defmodule Deli.ShellTest do
     put_config(:__file_handler__, FileStub)
   end
 
-  def command_args do
-    command = nonempty_string()
-    args = nonempty_string() |> list_of()
-    tuple({command, args})
-  end
+  def command, do: nonempty_string()
+
+  def args, do: nonempty_string() |> list_of()
+
+  def command_args, do: tuple({command(), args()})
+
+  def ok_signals, do: 0..999 |> integer() |> list_of() |> nonempty()
 
   describe "cmd/1..4" do
     property "runs shell command without args as atom" do
-      check all a <- atom() do
-        :ok = a |> Shell.cmd()
-        command = a |> to_string
+      check all c <- atom() do
+        :ok = c |> Shell.cmd()
+        command = c |> to_string
         assert_received {:__system__, :cmd, ^command, [], _}
       end
     end
 
     property "runs shell command without args as binary" do
-      check all a <- string() do
-        :ok = a |> Shell.cmd()
-        assert_received {:__system__, :cmd, ^a, [], _}
+      check all command <- command() do
+        :ok = command |> Shell.cmd()
+        assert_received {:__system__, :cmd, ^command, [], _}
       end
     end
 
     property "accepts args" do
-      check all a <- atom(),
-                args <- nonempty_string() |> list_of() do
-        command = a |> to_string
-        :ok = a |> Shell.cmd(args)
+      check all {command, args} <- command_args() do
+        :ok = command |> Shell.cmd(args)
         assert_received {:__system__, :cmd, ^command, ^args, _}
       end
     end
@@ -41,7 +41,7 @@ defmodule Deli.ShellTest do
     property "optionally outputs command call" do
       put_config(:output_commands, true)
 
-      check all command <- nonempty_string(),
+      check all command <- command(),
                 args <- nonempty_string() |> list_of() |> nonempty() do
         output =
           capture_io(fn ->
@@ -82,7 +82,7 @@ defmodule Deli.ShellTest do
 
     property "ok when signal is in ok_signals" do
       check all {command, args} <- command_args(),
-                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                ok_signals <- ok_signals(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({"", signal})
         assert :ok == Shell.cmd(command, args, ok_signals)
@@ -91,7 +91,7 @@ defmodule Deli.ShellTest do
 
     property "fails when signal not in ok_signals" do
       check all {command, args} <- command_args(),
-                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                ok_signals <- ok_signals(),
                 signal <- 0..999 |> integer(),
                 not Enum.member?(ok_signals, signal) do
         stub_cmd({"", signal})
@@ -109,7 +109,7 @@ defmodule Deli.ShellTest do
     property "propagates opts downstream" do
       check all {command, args} <- command_args(),
                 opts <- term() |> keyword_of(),
-                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                ok_signals <- ok_signals(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({"", signal})
         :ok = command |> Shell.cmd(args, ok_signals, opts)
@@ -123,7 +123,7 @@ defmodule Deli.ShellTest do
     property "returns tuple with result of cmd" do
       check all {command, args} <- command_args(),
                 opts <- term() |> keyword_of(),
-                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
+                ok_signals <- ok_signals(),
                 result <- nonempty_string(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({result, signal})
