@@ -1,13 +1,14 @@
 defmodule Deli.HostFilter do
-  import Deli.Shell
-  import Deli.Config.Ensure
+  import Deli, only: [is_env: 1, is_host: 1]
+  import Deli.Config.Ensure, only: [ensure_binary: 1]
+  import Deli.Shell, only: [error!: 1]
   alias Deli.Config
 
   @moduledoc false
 
   @spec hosts(Deli.env(), OptionParser.argv(), boolean) :: {:ok, [Deli.host()]}
   def hosts(env, args, silent? \\ false)
-      when is_atom(env) and is_list(args) and is_boolean(silent?) do
+      when is_env(env) and is_list(args) and is_boolean(silent?) do
     hosts = env |> Config.host_provider().hosts()
 
     with %Regex{} = exp <- args |> host_filter do
@@ -35,7 +36,7 @@ defmodule Deli.HostFilter do
   end
 
   @spec host(Deli.env(), OptionParser.argv()) :: {:ok, Deli.host()} | {:error, term}
-  def host(env, args) when is_atom(env) and is_list(args) do
+  def host(env, args) when is_env(env) and is_list(args) do
     {:ok, hosts} = env |> hosts(args, true)
     length = hosts |> Enum.count()
 
@@ -52,7 +53,7 @@ defmodule Deli.HostFilter do
     end
   end
 
-  defp select_host(hosts) do
+  defp select_host(hosts) when is_list(hosts) do
     hosts |> Enum.with_index() |> Enum.each(&print_host_option/1)
     count = hosts |> Enum.count()
 
@@ -70,7 +71,8 @@ defmodule Deli.HostFilter do
     end
   end
 
-  defp print_host_option({host, index}) do
+  defp print_host_option({host, index})
+       when is_host(host) and is_integer(index) do
     IO.puts([
       IO.ANSI.bright(),
       "[#{index}] ",
@@ -81,7 +83,7 @@ defmodule Deli.HostFilter do
     ])
   end
 
-  defp host_filter(args) do
+  defp host_filter(args) when is_list(args) do
     filter =
       args
       |> OptionParser.parse(aliases: [h: :host], switches: [host: :string])
@@ -91,11 +93,11 @@ defmodule Deli.HostFilter do
     if filter, do: ~r/#{filter}/
   end
 
-  defp list_hosts(hosts) do
+  defp list_hosts(hosts) when is_list(hosts) do
     IO.puts(hosts_line(hosts))
   end
 
-  defp hosts_line(hosts) do
+  defp hosts_line(hosts) when is_list(hosts) do
     list = hosts |> Enum.map(&"## #{&1}") |> Enum.join("\n")
     "# hosts\n#{list}"
   end
