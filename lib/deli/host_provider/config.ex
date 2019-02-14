@@ -1,5 +1,6 @@
 defmodule Deli.HostProvider.Config do
-  import Deli.Config.Ensure
+  import Deli, only: [is_env: 1]
+  import Deli.Config.Ensure, only: [ensure_binary: 1]
   alias Deli.Config
 
   @moduledoc """
@@ -10,7 +11,7 @@ defmodule Deli.HostProvider.Config do
   @behaviour Deli.HostProvider
 
   @impl true
-  def hosts(env) do
+  def hosts(env) when is_env(env) do
     env |> Config.hosts() |> Enum.map(&ensure_binary/1)
   end
 end
