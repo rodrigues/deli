@@ -415,4 +415,56 @@ defmodule Deli.ShellTest do
       end
     end
   end
+
+  describe "parse_options/1" do
+    property "user target when valid" do
+      chars = Enum.to_list(?a..?z) ++ [?_]
+
+      check all target <- chars |> nonempty_string(),
+                short? <- boolean() do
+        flag = if short?, do: "-t", else: "--target"
+        opts = [flag, target]
+        parsed_opts = opts |> Shell.parse_options()
+
+        assert parsed_opts[:target] == String.to_atom(target)
+      end
+    end
+
+    property "default target when not provided" do
+      check all env <- atom() do
+        put_config(:default_target, env)
+        parsed_opts = [] |> Shell.parse_options()
+
+        assert parsed_opts[:target] == env
+      end
+    end
+
+    property "yes when passed" do
+      check all short? <- boolean() do
+        flag = if short?, do: "-y", else: "--yes"
+        parsed_opts = [flag] |> Shell.parse_options()
+
+        assert parsed_opts[:yes]
+      end
+    end
+
+    property "assets when passed" do
+      check all short? <- boolean() do
+        flag = if short?, do: "-a", else: "--assets"
+        parsed_opts = [flag] |> Shell.parse_options()
+
+        assert parsed_opts[:assets]
+      end
+    end
+
+    property "versions when passed" do
+      check all short? <- boolean(),
+                version <- nonempty_string() do
+        flag = if short?, do: "-v", else: "--version"
+        parsed_opts = [flag, version] |> Shell.parse_options()
+
+        assert parsed_opts[:version] == version
+      end
+    end
+  end
 end
