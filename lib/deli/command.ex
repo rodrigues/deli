@@ -53,7 +53,7 @@ defmodule Deli.Command do
     :ok
   end
 
-  def call(env, mod, args) do
+  def call(env, mod, args) when is_atom(env) and is_atom(mod) and is_list(args) do
     mod = mod |> to_string |> String.replace(~r/^Elixir\./, "")
     mfa = ~s("#{mod}.run/1")
     terms = args |> Enum.map(&to_string/1) |> Enum.join(" ")
@@ -65,7 +65,7 @@ defmodule Deli.Command do
   Fetches env from target (specified or default), and runs `call/3`
   """
   @spec run(module, OptionParser.argv()) :: :ok
-  def run(command, args) do
+  def run(command, args) when is_atom(command) and is_list(args) do
     args
     |> OptionParser.parse(aliases: [t: :target], switches: [target: :string])
     |> elem(0)
@@ -75,7 +75,8 @@ defmodule Deli.Command do
   end
 
   @spec call_host(Deli.env(), Deli.host(), String.t(), String.t()) :: :ok
-  defp call_host(env, host, mfa, terms) do
+  defp call_host(env, host, mfa, terms)
+       when is_atom(env) and is_binary(host) and is_binary(mfa) and is_binary(terms) do
     cmd_args = [
       Config.host_id(env, host),
       Config.bin_path(),
