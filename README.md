@@ -4,8 +4,6 @@
 [![Hex.pm](https://img.shields.io/hexpm/v/deli.svg)](https://hex.pm/packages/deli)
 [![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/deli)
 
-[Package](https://hex.pm/packages/deli) • [Documentation](https://hexdocs.pm/deli) • [Source](https://github.com/rodrigues/deli)
-
 Provides a simple deployment solution for Elixir applications, using a couple of [`edeliver`](https://github.com/edeliver/edeliver) [tasks](https://hexdocs.pm/edeliver/Mix.Tasks.Edeliver.html#content) under the hood.
 
 Releases are built with [`distillery`](https://github.com/bitwalker/distillery), locally, through docker.
