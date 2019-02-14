@@ -36,8 +36,7 @@ defmodule Deli.MixProject do
       {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
       {:stream_data, "~> 0.4.2", only: :test},
-      {:mox, "~> 0.5.0", only: :test},
-      {:inch_ex, "~> 2.0.0", only: :docs}
+      {:mox, "~> 0.5.0", only: :test}
     ]
   end
 

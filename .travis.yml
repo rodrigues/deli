@@ -15,9 +15,6 @@ script:
   - mix format --check-formatted
   - mix credo --all --strict
   - MIX_ENV=dev mix do clean, compile, dialyzer --halt-exit-status
-after_script:
-  - cd $TRAVIS_BUILD_DIR
-  - MIX_ENV=docs mix inch.report
 cache:
   directories:
   - _build/dev
