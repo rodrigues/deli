@@ -120,12 +120,27 @@ defmodule Deli.ShellTest do
   end
 
   describe "cmd_result/2..4" do
-    property "returns tuple with result of cmd" do
+    property "result when succeeds" do
       check all {command, args} <- command_args(),
                 opts <- term() |> keyword_of(),
                 ok_signals <- ok_signals(),
                 result <- nonempty_string(),
                 [signal] = ok_signals |> Enum.take_random(1) do
+        stub_cmd({result, signal})
+
+        {:ok, ^result} = command |> Shell.cmd_result(args, ok_signals, opts)
+
+        expected_opts = [into: ""] ++ opts
+        assert_received {:__system__, :cmd, ^command, ^args, ^expected_opts}
+      end
+    end
+
+    property "stream when succeeds and result is a stream" do
+      check all {command, args} <- command_args(),
+                opts <- term() |> keyword_of(),
+                ok_signals <- ok_signals(),
+                [signal] = ok_signals |> Enum.take_random(1) do
+        result = %IO.Stream{device: :standard_io, line_or_bytes: :line, raw: false}
         stub_cmd({result, signal})
 
         {:ok, ^result} = command |> Shell.cmd_result(args, ok_signals, opts)
