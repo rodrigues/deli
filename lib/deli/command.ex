@@ -1,6 +1,6 @@
 defmodule Deli.Command do
-  import Deli.Shell
-  alias Deli.{Config, HostFilter}
+  import Deli, only: [is_env: 1, is_host: 1]
+  alias Deli.{Config, HostFilter, Shell}
 
   @moduledoc ~S"""
   Run commands locally or remotely.
@@ -53,7 +53,7 @@ defmodule Deli.Command do
     :ok
   end
 
-  def call(env, mod, args) when is_atom(env) and is_atom(mod) and is_list(args) do
+  def call(env, mod, args) when is_env(env) and is_atom(mod) and is_list(args) do
     mod = mod |> to_string |> String.replace(~r/^Elixir\./, "")
     mfa = ~s("#{mod}.run/1")
     terms = args |> Enum.map(&to_string/1) |> Enum.join(" ")
@@ -76,7 +76,7 @@ defmodule Deli.Command do
 
   @spec call_host(Deli.env(), Deli.host(), String.t(), String.t()) :: :ok
   defp call_host(env, host, mfa, terms)
-       when is_atom(env) and is_binary(host) and is_binary(mfa) and is_binary(terms) do
+       when is_env(env) and is_host(host) and is_binary(mfa) and is_binary(terms) do
     cmd_args = [
       Config.host_id(env, host),
       Config.bin_path(),
@@ -88,7 +88,7 @@ defmodule Deli.Command do
       terms
     ]
 
-    {:ok, result} = :ssh |> cmd_result(cmd_args)
+    {:ok, result} = :ssh |> Shell.cmd_result(cmd_args)
     IO.puts(result)
   end
 end
