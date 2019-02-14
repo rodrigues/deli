@@ -14,6 +14,8 @@ defmodule Deli.BeamVersions do
 
   @versions @deps |> File.versions_from_file()
 
+  defguardp is_dep(dep) when dep in @deps
+
   @spec deps() :: [dep, ...]
   def deps, do: @deps
 
@@ -25,11 +27,11 @@ defmodule Deli.BeamVersions do
     deps() |> Enum.map(&fetch_version({&1, opts[&1]}))
   end
 
-  defp fetch_version({dep, nil}) when dep in @deps do
+  defp fetch_version({dep, nil}) when is_dep(dep) do
     {dep, :latest} |> fetch_version
   end
 
-  defp fetch_version({dep, :latest}) when dep in @deps do
+  defp fetch_version({dep, :latest}) when is_dep(dep) do
     {version, _} =
       @versions[dep]
       |> Enum.find(fn {v, _} -> not String.contains?(v, "rc") end)
@@ -37,7 +39,7 @@ defmodule Deli.BeamVersions do
     {dep, version} |> fetch_version
   end
 
-  defp fetch_version({dep, version}) when dep in @deps and is_binary(version) do
+  defp fetch_version({dep, version}) when is_dep(dep) and is_binary(version) do
     case @versions[dep] |> Enum.find(fn {v, _} -> v == version end) do
       {_, checksum} when is_binary(checksum) ->
         {dep, version, checksum} |> fetch_version
@@ -54,7 +56,7 @@ defmodule Deli.BeamVersions do
   end
 
   defp fetch_version({dep, version, checksum})
-       when dep in @deps and is_binary(version) and is_binary(checksum) do
+       when is_dep(dep) and is_binary(version) and is_binary(checksum) do
     {dep, version: version, checksum: checksum}
   end
 end
