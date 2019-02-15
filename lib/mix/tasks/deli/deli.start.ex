@@ -43,7 +43,7 @@ defmodule Mix.Tasks.Deli.Start do
     :ok = env |> controller.start_host(host)
     IO.puts([IO.ANSI.green(), "started #{id}", IO.ANSI.reset()])
 
-    :timer.sleep(1_000)
+    :timer.sleep(Config.wait(:started_check))
     Check.run(env, host)
   end
 end
