@@ -25,14 +25,18 @@ defmodule Deli.Config do
     output_commands?: false,
     # wait in seconds when running `mix deli.shell`
     port_forwarding_timeout: 3_600,
-    # wait in ms between port forwarding and iex command
-    port_forwarding_wait: 2_000,
     # use local docker as default release strategy
     release: Deli.Release.Docker,
     # used when `release` is configured as `Deli.Release.Remote`
     remote_build: [
       user: :deli,
       host: "localhost"
+    ],
+    waits: [
+      # wait in ms between port forwarding and iex command
+      port_forwarding: 2_000,
+      # wait in ms between start_host and check if it's ok
+      started_check: 1_000
     ],
     # default commands to staging environment
     target: :staging,
@@ -174,13 +178,6 @@ defmodule Deli.Config do
     |> ensure_pos_integer
   end
 
-  @spec port_forwarding_wait() :: pos_integer
-  def port_forwarding_wait do
-    :port_forwarding_wait
-    |> get(@defaults.port_forwarding_wait)
-    |> ensure_pos_integer
-  end
-
   @spec release() :: module
   def release do
     :release
@@ -216,6 +213,14 @@ defmodule Deli.Config do
     :versioning
     |> get(@defaults.versioning)
     |> ensure_atom
+  end
+
+  @spec wait(atom()) :: pos_integer
+  def wait(key) do
+    :waits
+    |> get([])
+    |> Keyword.get(key, @defaults.waits[key])
+    |> ensure_pos_integer
   end
 
   @spec __system__() :: module

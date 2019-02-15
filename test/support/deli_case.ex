@@ -19,15 +19,20 @@ defmodule DeliCase do
     host_provider
     output_commands
     port_forwarding_timeout
-    port_forwarding_wait
     release
     remote_build
     target
     verbose
     versioning
+    waits
     __system__
     __file_handler__
     __code_handler__
+  )a
+
+  @waits ~w(
+    port_forwarding
+    started_check
   )a
 
   using do
@@ -45,6 +50,7 @@ defmodule DeliCase do
 
   setup opts do
     @keys |> Enum.each(&delete_config/1)
+    waits() |> Enum.each(&put_config(:waits, &1, 1))
 
     mock? = opts |> Map.get(:mock, true)
     if mock?, do: setup_mocks()
@@ -61,8 +67,24 @@ defmodule DeliCase do
     put_config(:versioning, VersioningMock)
   end
 
+  def waits, do: @waits
+
+  def get_config(key) do
+    :deli |> Application.get_env(key)
+  end
+
   def put_config(key, value) do
     :ok = :deli |> Application.put_env(key, value)
+  end
+
+  def put_config(outer_key, inner_key, inner_value) do
+    new_outer_value =
+      outer_key
+      |> get_config()
+      |> Kernel.||([])
+      |> Keyword.put(inner_key, inner_value)
+
+    put_config(outer_key, new_outer_value)
   end
 
   def delete_config(key) do

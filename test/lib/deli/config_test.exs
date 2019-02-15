@@ -372,27 +372,6 @@ defmodule Deli.ConfigTest do
     end
   end
 
-  describe "port_forwarding_wait/0" do
-    test "default wait when not configured" do
-      delete_config(:port_forwarding_wait)
-      assert Config.port_forwarding_wait() == 2000
-    end
-
-    property "port forwarding wait when configured" do
-      check all a <- positive_integer() do
-        put_config(:port_forwarding_wait, a)
-        assert Config.port_forwarding_wait() == a
-      end
-    end
-
-    property "fails when configured as something else" do
-      check all a <- term_except(&(is_integer(&1) and &1 > 0)) do
-        put_config(:port_forwarding_wait, a)
-        assert catch_error(Config.port_forwarding_wait())
-      end
-    end
-  end
-
   describe "release/0" do
     test "default release strategy when not configured" do
       delete_config(:release)
@@ -680,6 +659,31 @@ defmodule Deli.ConfigTest do
                 version = "#{major}.#{minor}.#{patch}",
                 m = %{project: [version: version]} do
         assert to_string(Config.version(m)) == version
+      end
+    end
+  end
+
+  describe "wait/0" do
+    property "default wait when not configured" do
+      check all key <- waits() |> member_of() do
+        delete_config(:waits)
+        assert Config.wait(key) > 0
+      end
+    end
+
+    property "defined wait when configured" do
+      check all key <- waits() |> member_of(),
+                wait <- positive_integer() do
+        put_config(:waits, [{key, wait}])
+        assert Config.wait(key) == wait
+      end
+    end
+
+    property "fails when configured as something else" do
+      check all key <- waits() |> member_of(),
+                wait <- term_except(&(is_integer(&1) and &1 > 0)) do
+        put_config(:waits, [{key, wait}])
+        assert catch_error(Config.wait(key))
       end
     end
   end

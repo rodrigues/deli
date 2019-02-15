@@ -25,7 +25,7 @@ defmodule Mix.Tasks.Deli.Shell do
 
     spawn(fn -> port_forwarding(env, host) end)
 
-    :timer.sleep(Config.port_forwarding_wait())
+    :timer.sleep(Config.wait(:port_forwarding))
 
     command =
       extra_options
@@ -34,7 +34,7 @@ defmodule Mix.Tasks.Deli.Shell do
 
     print_command(command)
 
-    :timer.sleep(Config.port_forwarding_wait())
+    :timer.sleep(Config.wait(:port_forwarding))
   end
 
   defp port_forwarding(env, host) do
