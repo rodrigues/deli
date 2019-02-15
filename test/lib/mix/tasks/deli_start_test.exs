@@ -37,7 +37,8 @@ defmodule Mix.DeliStartTest do
         end)
 
       log =
-        Enum.map(hosts, fn host ->
+        hosts
+        |> Enum.map(fn host ->
           id = "#{app_user}@#{host}"
 
           "\e[32mnot running #{id}\e[0m\nstarting #{id}...\n" <>
@@ -72,7 +73,8 @@ defmodule Mix.DeliStartTest do
         end)
 
       log =
-        Enum.map(hosts, fn host ->
+        hosts
+        |> Enum.map(fn host ->
           id = "deli@#{host}"
 
           "\e[32mnot running #{id}\e[0m\nstarting #{id}...\n" <>
