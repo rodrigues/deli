@@ -126,7 +126,7 @@ defmodule Deli.Config do
     |> ensure_port_number
   end
 
-  @spec docker_build_user() :: atom()
+  @spec docker_build_user() :: atom
   def docker_build_user do
     :docker_build
     |> get([])
@@ -195,7 +195,7 @@ defmodule Deli.Config do
     |> ensure_binary
   end
 
-  @spec remote_build_user() :: atom()
+  @spec remote_build_user() :: atom
   def remote_build_user do
     :remote_build
     |> get([])
@@ -217,7 +217,7 @@ defmodule Deli.Config do
     |> ensure_atom
   end
 
-  @spec wait(atom()) :: pos_integer
+  @spec wait(atom) :: pos_integer
   def wait(key) do
     :waits
     |> get([])
