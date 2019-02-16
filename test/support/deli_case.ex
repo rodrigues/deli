@@ -4,8 +4,6 @@ defmodule DeliCase do
 
   @moduledoc false
 
-  @limit_mismatches 100_000
-
   @keys ~w(
     app
     app_user
@@ -33,12 +31,14 @@ defmodule DeliCase do
   @waits ~w(
     port_forwarding
     started_check
+    stopped_check
   )a
 
   using do
     quote do
       use ExUnitProperties
       import unquote(__MODULE__)
+      import StreamGenerators
       import ExUnit.CaptureIO
       import Mox
       alias Deli.Config
@@ -90,29 +90,6 @@ defmodule DeliCase do
   def delete_config(key) do
     :ok = :deli |> Application.delete_env(key)
   end
-
-  def atom do
-    :alphanumeric |> StreamData.atom()
-  end
-
-  def string do
-    :alphanumeric |> StreamData.string()
-  end
-
-  def nonempty_string(type \\ :alphanumeric) do
-    type |> StreamData.string() |> except(&empty_string?/1)
-  end
-
-  def term_except(predicate) do
-    StreamData.term() |> except(predicate)
-  end
-
-  def except(data, predicate) do
-    data |> StreamData.filter(&(not predicate.(&1)), @limit_mismatches)
-  end
-
-  def empty_string?(""), do: true
-  def empty_string?(_), do: false
 
   def stub_cmd(result) do
     :ok = :cmd |> TestAgent.set(fn _, _, _ -> result end)

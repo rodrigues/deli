@@ -2,16 +2,8 @@ defmodule Mix.DeliStartTest do
   use DeliCase
   alias Mix.Tasks.Deli.Start
 
-  def hosts do
-    :alphanumeric
-    |> string(max_length: 3)
-    |> except(&(&1 == ""))
-    |> list_of(max_length: 3)
-    |> nonempty()
-  end
-
   property "starts application in all default target hosts by default" do
-    check all app <- atom(),
+    check all app <- app(),
               app_user <- atom(),
               env <- atom(),
               hosts <- hosts(),

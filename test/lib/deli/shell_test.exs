@@ -352,7 +352,7 @@ defmodule Deli.ShellTest do
 
   describe "confirm?/2" do
     property "autoconfirms if yes passed as opt" do
-      check all app <- atom(),
+      check all app <- app(),
                 target <- atom(),
                 operation <- atom(),
                 opts <- term() |> keyword_of() do
@@ -373,7 +373,7 @@ defmodule Deli.ShellTest do
     end
 
     property "asks user confirmation if yes not passed as opt" do
-      check all app <- atom(),
+      check all app <- app(),
                 target <- atom(),
                 operation <- atom(),
                 opts <- term() |> keyword_of(),
@@ -396,7 +396,7 @@ defmodule Deli.ShellTest do
     end
 
     property "fails when target is not provided" do
-      check all app <- atom(),
+      check all app <- app(),
                 operation <- atom(),
                 opts <- term() |> keyword_of(),
                 not Keyword.has_key?(opts, :target) do

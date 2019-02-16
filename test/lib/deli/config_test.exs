@@ -1,5 +1,6 @@
 defmodule Deli.ConfigTest do
   use DeliCase
+  import Deli, only: [is_app: 1, is_env: 1, is_host: 1]
 
   describe "app/0" do
     test "uses mix project app when app not configured" do
@@ -7,69 +8,64 @@ defmodule Deli.ConfigTest do
       assert Config.app() == :deli
     end
 
-    property "app configured when atom" do
-      check all a <- atom() do
-        put_config(:app, a)
-        assert Config.app() == a
+    property "app configured correctly" do
+      check all app <- app() do
+        put_config(:app, app)
+        assert Config.app() == app
       end
     end
 
-    property "fails when app configured but not an atom" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:app, a)
+    property "fails when app is invalid" do
+      check all app <- term_except(&is_app/1) do
+        put_config(:app, app)
         assert_raise RuntimeError, &Config.app/0
       end
     end
   end
 
   describe "app_user/1" do
-    property "fails if `env` is not an atom" do
-      check all a <- term_except(&is_atom/1) do
-        call = fn -> Config.app_user(a) end
+    property "fails when env is invalid" do
+      check all env <- term_except(&is_env/1) do
+        call = fn -> Config.app_user(env) end
         assert_raise FunctionClauseError, call
       end
     end
 
     property "app when not configured" do
-      check all a <- atom() do
-        put_config(:app, a)
+      check all app <- app(),
+                env <- env() do
+        put_config(:app, app)
         delete_config(:app_user)
-        assert Config.app_user(:staging) == a
-        assert Config.app_user(:prod) == a
+
+        assert Config.app_user(:staging) == app
+        assert Config.app_user(:prod) == app
+        assert Config.app_user(env) == app
       end
     end
 
-    property "app_user configured when atom" do
-      check all a <- atom() do
-        put_config(:app_user, a)
-        assert Config.app_user(:staging) == a
-        assert Config.app_user(:prod) == a
+    property "app_user when configured solo" do
+      check all app_user <- app_user() do
+        put_config(:app_user, app_user)
+        assert Config.app_user(:staging) == app_user
+        assert Config.app_user(:prod) == app_user
       end
     end
 
-    property "app_user configured when binary" do
-      check all a <- binary() do
-        put_config(:app_user, a)
-        assert Config.app_user(:staging) == a
-        assert Config.app_user(:prod) == a
+    property "env specific user when configured correctly" do
+      check all staging_user <- app_user(),
+                prod_user <- app_user() do
+        put_config(:app_user, staging: staging_user, prod: prod_user)
+        assert Config.app_user(:staging) == staging_user
+        assert Config.app_user(:prod) == prod_user
       end
     end
 
-    property "env specific user when configured as such" do
-      check all s <- atom(),
-                p <- atom() do
-        put_config(:app_user, staging: s, prod: p)
-        assert Config.app_user(:staging) == s
-        assert Config.app_user(:prod) == p
-      end
-    end
-
-    property "app if app_user is configured as something else" do
-      check all a <- atom(),
-                b <- term_except(&(is_atom(&1) or is_binary(&1))) do
-        put_config(:app, a)
-        put_config(:app_user, b)
-        assert Config.app_user(:staging) == a
+    property "app when app_user is invalid" do
+      check all app <- app(),
+                app_user <- term_except(&(is_atom(&1) or is_binary(&1))) do
+        put_config(:app, app)
+        put_config(:app_user, app_user)
+        assert Config.app_user(:staging) == app
       end
     end
   end
@@ -80,16 +76,16 @@ defmodule Deli.ConfigTest do
       assert Config.assets?() == false
     end
 
-    property "returns assets? when configured as boolean" do
-      check all a <- boolean() do
-        put_config(:assets, a)
-        assert Config.assets?() == a
+    property "returns assets? when configured correctly" do
+      check all assets? <- boolean() do
+        put_config(:assets, assets?)
+        assert Config.assets?() == assets?
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_boolean/1) do
-        put_config(:assets, a)
+    property "fails when is invalid" do
+      check all assets? <- term_except(&is_boolean/1) do
+        put_config(:assets, assets?)
         assert_raise RuntimeError, &Config.assets?/0
       end
     end
@@ -102,16 +98,16 @@ defmodule Deli.ConfigTest do
       assert Config.bin_path() == "/opt/fish/bin/fish"
     end
 
-    property "path when binary" do
-      check all a <- binary() do
-        put_config(:bin_path, a)
-        assert Config.bin_path() == a
+    property "path when configured correctly" do
+      check all path <- binary() do
+        put_config(:bin_path, path)
+        assert Config.bin_path() == path
       end
     end
 
-    property "fails when path is configured as something other than a binary" do
-      check all a <- term_except(&is_binary/1) do
-        put_config(:bin_path, a)
+    property "fails when path is invalid" do
+      check all path <- term_except(&is_binary/1) do
+        put_config(:bin_path, path)
         assert_raise CaseClauseError, &Config.bin_path/0
       end
     end
@@ -123,16 +119,16 @@ defmodule Deli.ConfigTest do
       assert Config.controller() == Deli.Controller.Bin
     end
 
-    property "controller when configured as atom" do
-      check all a <- atom() do
-        put_config(:controller, a)
-        assert Config.controller() == a
+    property "controller when configured correctly" do
+      check all controller <- atom() do
+        put_config(:controller, controller)
+        assert Config.controller() == controller
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:controller, a)
+    property "fails when invalid" do
+      check all controller <- term_except(&is_atom/1) do
+        put_config(:controller, controller)
         assert_raise RuntimeError, &Config.controller/0
       end
     end
@@ -140,23 +136,23 @@ defmodule Deli.ConfigTest do
 
   describe "cookie/0" do
     test "app when not configured" do
-      check all a <- atom() do
-        put_config(:app, a)
+      check all app <- app() do
+        put_config(:app, app)
         delete_config(:cookie)
-        assert Config.cookie() == a
+        assert Config.cookie() == app
       end
     end
 
-    property "cookie when configured as atom" do
-      check all a <- atom() do
-        put_config(:cookie, a)
-        assert Config.cookie() == a
+    property "cookie when configured correctly" do
+      check all cookie <- atom() do
+        put_config(:cookie, cookie)
+        assert Config.cookie() == cookie
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:cookie, a)
+    property "fails when cookie is invalid" do
+      check all cookie <- term_except(&is_atom/1) do
+        put_config(:cookie, cookie)
         assert_raise RuntimeError, &Config.cookie/0
       end
     end
@@ -168,16 +164,16 @@ defmodule Deli.ConfigTest do
       assert Config.default_target() == :staging
     end
 
-    property "default_target when configured as atom" do
-      check all a <- atom() do
-        put_config(:default_target, a)
-        assert Config.default_target() == a
+    property "default_target when configured correctly" do
+      check all env <- env() do
+        put_config(:default_target, env)
+        assert Config.default_target() == env
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:default_target, a)
+    property "fails when is invalid" do
+      check all env <- term_except(&is_env/1) do
+        put_config(:default_target, env)
         assert_raise RuntimeError, &Config.default_target/0
       end
     end
@@ -190,9 +186,9 @@ defmodule Deli.ConfigTest do
     end
 
     property "docker build image when configured" do
-      check all a <- term() do
-        put_config(:docker_build, image: a)
-        assert Config.docker_build_image() == a
+      check all image <- term() do
+        put_config(:docker_build, image: image)
+        assert Config.docker_build_image() == image
       end
     end
   end
@@ -203,10 +199,17 @@ defmodule Deli.ConfigTest do
       assert Config.docker_build_port() == 4441
     end
 
-    property "docker build port when configured" do
-      check all a <- 0..65_535 |> integer() do
-        put_config(:docker_build, port: a)
-        assert Config.docker_build_port() == a
+    property "docker build port when configured correctly" do
+      check all port <- 0..65_535 |> integer() do
+        put_config(:docker_build, port: port)
+        assert Config.docker_build_port() == port
+      end
+    end
+
+    property "fails when is invalid" do
+      check all port <- term_except(&is_integer/1) do
+        put_config(:docker_build, port: port)
+        assert_raise RuntimeError, &Config.docker_build_port/0
       end
     end
   end
@@ -217,16 +220,16 @@ defmodule Deli.ConfigTest do
       assert Config.docker_build_user() == :deli
     end
 
-    property "docker build user when configured as an atom" do
-      check all a <- atom() do
-        put_config(:docker_build, user: a)
-        assert Config.docker_build_user() == a
+    property "docker build user when configured correctly" do
+      check all user <- atom() do
+        put_config(:docker_build, user: user)
+        assert Config.docker_build_user() == user
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:docker_build, user: a)
+    property "fails when is invalid" do
+      check all user <- term_except(&is_atom/1) do
+        put_config(:docker_build, user: user)
         assert_raise RuntimeError, &Config.docker_build_user/0
       end
     end
@@ -238,16 +241,16 @@ defmodule Deli.ConfigTest do
       refute Config.docker_build_yarn?()
     end
 
-    property "value when configured as boolean" do
-      check all a <- boolean() do
-        put_config(:docker_build, yarn: a)
-        assert Config.docker_build_yarn?() == a
+    property "value when configured correctly" do
+      check all yarn? <- boolean() do
+        put_config(:docker_build, yarn: yarn?)
+        assert Config.docker_build_yarn?() == yarn?
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_boolean/1) do
-        put_config(:docker_build, yarn: a)
+    property "fails when is invalid" do
+      check all yarn? <- term_except(&is_boolean/1) do
+        put_config(:docker_build, yarn: yarn?)
         assert_raise RuntimeError, &Config.docker_build_yarn?/0
       end
     end
@@ -255,21 +258,21 @@ defmodule Deli.ConfigTest do
 
   describe "hosts/1" do
     test "empty if not configured" do
-      check all a <- atom() do
+      check all env <- env() do
         delete_config(:hosts)
-        assert Config.hosts(a) == []
+        assert Config.hosts(env) == []
       end
     end
 
-    property "value when configured as binary list" do
-      check all env <- atom(),
-                hosts <- nonempty_string() |> list_of() do
+    property "value when configured correctly" do
+      check all env <- env(),
+                hosts <- hosts() do
         put_config(:hosts, [{env, hosts}])
         assert Config.hosts(env) == hosts
       end
     end
 
-    property "fails when configured not as a list" do
+    property "fails when is invalid" do
       check all env <- atom(),
                 hosts <- term_except(&(is_list(&1) or &1 == %{})) do
         put_config(:hosts, [{env, hosts}])
@@ -277,8 +280,8 @@ defmodule Deli.ConfigTest do
       end
     end
 
-    property "fails when env is not an atom" do
-      check all env <- term_except(&is_atom/1) do
+    property "fails when env is invalid" do
+      check all env <- term_except(&is_env/1) do
         assert_raise FunctionClauseError, fn -> Config.hosts(env) end
       end
     end
@@ -286,24 +289,24 @@ defmodule Deli.ConfigTest do
 
   describe "host_id/2" do
     test "ssh user@host identifier" do
-      check all env <- atom(),
-                app_user <- atom(),
-                host <- binary() do
+      check all env <- env(),
+                app_user <- app_user(),
+                host <- host() do
         put_config(:app_user, [{env, app_user}])
         assert Config.host_id(env, host) == "#{app_user}@#{host}"
       end
     end
 
     property "fails if env not an atom" do
-      check all env <- term_except(&is_atom/1),
-                host <- binary() do
+      check all env <- term_except(&is_env/1),
+                host <- host() do
         assert_raise FunctionClauseError, fn -> Config.host_id(env, host) end
       end
     end
 
     property "fails if host not a binary" do
-      check all env <- atom(),
-                host <- term_except(&is_binary/1) do
+      check all env <- env(),
+                host <- term_except(&is_host/1) do
         assert_raise FunctionClauseError, fn -> Config.host_id(env, host) end
       end
     end
@@ -315,16 +318,16 @@ defmodule Deli.ConfigTest do
       assert Config.host_provider() == Deli.HostProvider.Config
     end
 
-    property "host provider when configured as atom" do
-      check all a <- atom() do
-        put_config(:host_provider, a)
-        assert Config.host_provider() == a
+    property "host provider when configured correctly" do
+      check all host_provider <- atom() do
+        put_config(:host_provider, host_provider)
+        assert Config.host_provider() == host_provider
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:host_provider, a)
+    property "fails when is invalid" do
+      check all host_provider <- term_except(&is_atom/1) do
+        put_config(:host_provider, host_provider)
         assert_raise RuntimeError, &Config.host_provider/0
       end
     end
@@ -336,16 +339,16 @@ defmodule Deli.ConfigTest do
       refute Config.output_commands?()
     end
 
-    property "value when configured as boolean" do
-      check all a <- boolean() do
-        put_config(:output_commands, a)
-        assert Config.output_commands?() == a
+    property "value when configured correctly" do
+      check all output? <- boolean() do
+        put_config(:output_commands, output?)
+        assert Config.output_commands?() == output?
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_boolean/1) do
-        put_config(:output_commands, a)
+    property "fails when is invalid" do
+      check all output? <- term_except(&is_boolean/1) do
+        put_config(:output_commands, output?)
         assert_raise RuntimeError, &Config.output_commands?/0
       end
     end
@@ -358,15 +361,15 @@ defmodule Deli.ConfigTest do
     end
 
     property "port forwarding timeout when configured" do
-      check all a <- positive_integer() do
-        put_config(:port_forwarding_timeout, a)
-        assert Config.port_forwarding_timeout() == a
+      check all timeout <- positive_integer() do
+        put_config(:port_forwarding_timeout, timeout)
+        assert Config.port_forwarding_timeout() == timeout
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&(is_integer(&1) and &1 > 0)) do
-        put_config(:port_forwarding_timeout, a)
+    property "fails when is invalid" do
+      check all timeout <- term_except(&(is_integer(&1) and &1 > 0)) do
+        put_config(:port_forwarding_timeout, timeout)
         assert catch_error(Config.port_forwarding_timeout())
       end
     end
@@ -378,16 +381,16 @@ defmodule Deli.ConfigTest do
       assert Config.release() == Deli.Release.Docker
     end
 
-    property "release strategy when configured as atom" do
-      check all a <- atom() do
-        put_config(:release, a)
-        assert Config.release() == a
+    property "release strategy when configured correctly" do
+      check all release <- atom() do
+        put_config(:release, release)
+        assert Config.release() == release
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:release, a)
+    property "fails when is invalid" do
+      check all release <- term_except(&is_atom/1) do
+        put_config(:release, release)
         assert_raise RuntimeError, &Config.release/0
       end
     end
@@ -399,16 +402,16 @@ defmodule Deli.ConfigTest do
       assert Config.remote_build_host() == "localhost"
     end
 
-    property "host when configured as a binary" do
-      check all a <- binary() do
-        put_config(:remote_build, host: a)
-        assert Config.remote_build_host() == a
+    property "host when configured correctly" do
+      check all host <- host() do
+        put_config(:remote_build, host: host)
+        assert Config.remote_build_host() == host
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_binary/1) do
-        put_config(:remote_build, host: a)
+    property "fails when is invalid" do
+      check all host <- term_except(&is_host/1) do
+        put_config(:remote_build, host: host)
         assert_raise RuntimeError, &Config.remote_build_host/0
       end
     end
@@ -420,16 +423,16 @@ defmodule Deli.ConfigTest do
       assert Config.remote_build_user() == :deli
     end
 
-    property "user when configured as an atom" do
-      check all a <- atom() do
-        put_config(:remote_build, user: a)
-        assert Config.remote_build_user() == a
+    property "user when configured correctly" do
+      check all user <- atom() do
+        put_config(:remote_build, user: user)
+        assert Config.remote_build_user() == user
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:remote_build, user: a)
+    property "fails when is invalid" do
+      check all user <- term_except(&is_atom/1) do
+        put_config(:remote_build, user: user)
         assert_raise RuntimeError, &Config.remote_build_user/0
       end
     end
@@ -441,16 +444,16 @@ defmodule Deli.ConfigTest do
       assert Config.versioning() == Deli.Versioning.Default
     end
 
-    property "versioning strategy when configured as atom" do
-      check all a <- atom() do
-        put_config(:versioning, a)
-        assert Config.versioning() == a
+    property "versioning strategy when configured correctly" do
+      check all versioning <- atom() do
+        put_config(:versioning, versioning)
+        assert Config.versioning() == versioning
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:versioning, a)
+    property "fails when is invalid" do
+      check all versioning <- term_except(&is_atom/1) do
+        put_config(:versioning, versioning)
         assert_raise RuntimeError, &Config.versioning/0
       end
     end
@@ -462,17 +465,42 @@ defmodule Deli.ConfigTest do
       assert Config.verbose?()
     end
 
-    property "value when configured as boolean" do
-      check all a <- boolean() do
-        put_config(:verbose, a)
-        assert Config.verbose?() == a
+    property "value when configured correctly" do
+      check all verbose? <- boolean() do
+        put_config(:verbose, verbose?)
+        assert Config.verbose?() == verbose?
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_boolean/1) do
-        put_config(:verbose, a)
+    property "fails when is invalid" do
+      check all verbose? <- term_except(&is_boolean/1) do
+        put_config(:verbose, verbose?)
         assert_raise RuntimeError, &Config.verbose?/0
+      end
+    end
+  end
+
+  describe "wait/0" do
+    property "default wait when not configured" do
+      check all key <- waits() |> member_of() do
+        delete_config(:waits)
+        assert Config.wait(key) > 0
+      end
+    end
+
+    property "defined wait when configured" do
+      check all key <- waits() |> member_of(),
+                wait <- positive_integer() do
+        put_config(:waits, [{key, wait}])
+        assert Config.wait(key) == wait
+      end
+    end
+
+    property "fails when is invalid" do
+      check all key <- waits() |> member_of(),
+                wait <- term_except(&(is_integer(&1) and &1 > 0)) do
+        put_config(:waits, [{key, wait}])
+        assert catch_error(Config.wait(key))
       end
     end
   end
@@ -483,16 +511,16 @@ defmodule Deli.ConfigTest do
       assert Config.__system__() == System
     end
 
-    property "value when configured as an atom" do
-      check all a <- atom() do
-        put_config(:__system__, a)
-        assert Config.__system__() == a
+    property "value when configured correctly" do
+      check all system <- atom() do
+        put_config(:__system__, system)
+        assert Config.__system__() == system
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:__system__, a)
+    property "fails when is invalid" do
+      check all system <- term_except(&is_atom/1) do
+        put_config(:__system__, system)
         assert_raise RuntimeError, &Config.__system__/0
       end
     end
@@ -504,16 +532,16 @@ defmodule Deli.ConfigTest do
       assert Config.__file_handler__() == File
     end
 
-    property "value when configured as an atom" do
-      check all a <- atom() do
-        put_config(:__file_handler__, a)
-        assert Config.__file_handler__() == a
+    property "value when configured correctly" do
+      check all file <- atom() do
+        put_config(:__file_handler__, file)
+        assert Config.__file_handler__() == file
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:__file_handler__, a)
+    property "fails when is invalid" do
+      check all file <- term_except(&is_atom/1) do
+        put_config(:__file_handler__, file)
         assert_raise RuntimeError, &Config.__file_handler__/0
       end
     end
@@ -525,16 +553,16 @@ defmodule Deli.ConfigTest do
       assert Config.__code_handler__() == Code
     end
 
-    property "value when configured as an atom" do
-      check all a <- atom() do
-        put_config(:__code_handler__, a)
-        assert Config.__code_handler__() == a
+    property "value when configured correctly" do
+      check all code <- atom() do
+        put_config(:__code_handler__, code)
+        assert Config.__code_handler__() == code
       end
     end
 
-    property "fails when configured as something else" do
-      check all a <- term_except(&is_atom/1) do
-        put_config(:__code_handler__, a)
+    property "fails when is invalid" do
+      check all code <- term_except(&is_atom/1) do
+        put_config(:__code_handler__, code)
         assert_raise RuntimeError, &Config.__code_handler__/0
       end
     end
@@ -599,15 +627,15 @@ defmodule Deli.ConfigTest do
       assert Config.mix_env("production") == :prod
     end
 
-    property "atom when configured as atom" do
-      check all a <- atom() do
-        assert Config.mix_env(a) == a
+    property "env when configured as atom" do
+      check all env <- atom() do
+        assert Config.mix_env(env) == env
       end
     end
 
-    property "to_atom when configured as a binary" do
-      check all a <- atom() do
-        assert Config.mix_env(to_string(a)) == a
+    property "to_atom when configured as binary" do
+      check all env <- atom() do
+        assert Config.mix_env(to_string(env)) == env
       end
     end
   end
@@ -618,15 +646,15 @@ defmodule Deli.ConfigTest do
       assert Config.edeliver_target("prod") == "production"
     end
 
-    property "binary when configured as a binary" do
-      check all a <- binary() do
-        assert Config.edeliver_target(a) == a
+    property "binary when configured as atom" do
+      check all target <- binary() do
+        assert Config.edeliver_target(target) == target
       end
     end
 
-    property "to_string when configured as atom" do
-      check all a <- atom() do
-        assert Config.edeliver_target(a) == to_string(a)
+    property "to_string when configured as binary" do
+      check all target <- atom() do
+        assert Config.edeliver_target(target) == to_string(target)
       end
     end
   end
@@ -638,9 +666,9 @@ defmodule Deli.ConfigTest do
     end
 
     property "accepts mix_project as argument" do
-      check all k <- term(),
-                m = %{project: k} do
-        assert Config.project(m) == k
+      check all project <- term(),
+                mix_project = %{project: project} do
+        assert Config.project(mix_project) == project
       end
     end
   end
@@ -657,33 +685,8 @@ defmodule Deli.ConfigTest do
                 minor <- 0..256 |> integer(),
                 patch <- 0..512 |> integer(),
                 version = "#{major}.#{minor}.#{patch}",
-                m = %{project: [version: version]} do
-        assert to_string(Config.version(m)) == version
-      end
-    end
-  end
-
-  describe "wait/0" do
-    property "default wait when not configured" do
-      check all key <- waits() |> member_of() do
-        delete_config(:waits)
-        assert Config.wait(key) > 0
-      end
-    end
-
-    property "defined wait when configured" do
-      check all key <- waits() |> member_of(),
-                wait <- positive_integer() do
-        put_config(:waits, [{key, wait}])
-        assert Config.wait(key) == wait
-      end
-    end
-
-    property "fails when configured as something else" do
-      check all key <- waits() |> member_of(),
-                wait <- term_except(&(is_integer(&1) and &1 > 0)) do
-        put_config(:waits, [{key, wait}])
-        assert catch_error(Config.wait(key))
+                mix_project = %{project: [version: version]} do
+        assert to_string(Config.version(mix_project)) == version
       end
     end
   end
