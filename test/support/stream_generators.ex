@@ -1,4 +1,5 @@
 defmodule StreamGenerators do
+  import ExUnitProperties
   import StreamData
 
   @moduledoc false
@@ -22,6 +23,14 @@ defmodule StreamGenerators do
     host()
     |> list_of(max_length: 3)
     |> nonempty()
+  end
+
+  def version do
+    gen all major <- 0..128 |> integer(),
+            minor <- 0..256 |> integer(),
+            patch <- 0..512 |> integer() do
+      "#{major}.#{minor}.#{patch}"
+    end
   end
 
   def atom do

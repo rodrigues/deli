@@ -683,10 +683,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "accepts mix_project as argument" do
-      check all major <- 0..21 |> integer(),
-                minor <- 0..256 |> integer(),
-                patch <- 0..512 |> integer(),
-                version = "#{major}.#{minor}.#{patch}",
+      check all version <- version(),
                 mix_project = %{project: [version: version]} do
         assert to_string(Config.version(mix_project)) == version
       end

@@ -119,7 +119,7 @@ defmodule Mix.Tasks.Deli.Version do
 
     case result do
       "{:ok, '" <> rest ->
-        version = rest |> String.split("'") |> Enum.at(0) |> Version.parse!()
+        version = rest |> String.split("'", parts: 2) |> Enum.at(0) |> Version.parse!()
         {:ok, version}
 
       other ->
