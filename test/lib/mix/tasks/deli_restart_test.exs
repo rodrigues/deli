@@ -1,8 +1,8 @@
-defmodule Mix.DeliStartTest do
+defmodule Mix.DeliRestartTest do
   use DeliCase
-  alias Mix.Tasks.Deli.Start
+  alias Mix.Tasks.Deli.Restart
 
-  property "starts application in all default target hosts by default" do
+  property "restarts application in all default target hosts by default" do
     check all app <- app(),
               app_user <- atom(),
               env <- atom(),
@@ -18,14 +18,14 @@ defmodule Mix.DeliStartTest do
 
       for host <- hosts do
         ControllerMock
-        |> expect(:service_running?, fn ^env, ^host -> false end)
-        |> expect(:start_host, fn ^env, ^host -> :ok end)
+        |> expect(:service_running?, fn ^env, ^host -> true end)
+        |> expect(:restart_host, fn ^env, ^host -> :ok end)
         |> expect(:service_running?, fn ^env, ^host -> true end)
       end
 
       output =
         capture_io(fn ->
-          :ok = [flag] |> Start.run()
+          :ok = [flag] |> Restart.run()
         end)
 
       log =
@@ -33,18 +33,18 @@ defmodule Mix.DeliStartTest do
         |> Enum.map(fn host ->
           id = "#{app_user}@#{host}"
 
-          "\e[32mnot running #{id}\e[0m\nstarting #{id}...\n" <>
-            "\e[32mstarted #{id}\e[0m\n\e[32mrunning #{id}\e[0m\n"
+          "\e[32mrunning #{id}\e[0m\nrestarting #{id}...\n" <>
+            "\e[32mrestarted #{id}\e[0m\n\e[32mrunning #{id}\e[0m\n"
         end)
         |> Enum.join("")
 
       assert output ==
-               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nstart #{app} at #{env}? [Yn] y\n" <>
+               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nrestart #{app} at #{env}? [Yn] y\n" <>
                  log
     end
   end
 
-  property "starts after confirmation when not passing yes" do
+  property "restarts after confirmation when not passing yes" do
     check all env <- atom(),
               hosts <- hosts() do
       put_config(:default_target, env)
@@ -54,14 +54,14 @@ defmodule Mix.DeliStartTest do
 
       for host <- hosts do
         ControllerMock
-        |> expect(:service_running?, fn ^env, ^host -> false end)
-        |> expect(:start_host, fn ^env, ^host -> :ok end)
+        |> expect(:service_running?, fn ^env, ^host -> true end)
+        |> expect(:restart_host, fn ^env, ^host -> :ok end)
         |> expect(:service_running?, fn ^env, ^host -> true end)
       end
 
       output =
         capture_io([input: "y\n", capture_prompt: true], fn ->
-          :ok = Start.run([])
+          :ok = Restart.run([])
         end)
 
       log =
@@ -69,13 +69,13 @@ defmodule Mix.DeliStartTest do
         |> Enum.map(fn host ->
           id = "deli@#{host}"
 
-          "\e[32mnot running #{id}\e[0m\nstarting #{id}...\n" <>
-            "\e[32mstarted #{id}\e[0m\n\e[32mrunning #{id}\e[0m\n"
+          "\e[32mrunning #{id}\e[0m\nrestarting #{id}...\n" <>
+            "\e[32mrestarted #{id}\e[0m\n\e[32mrunning #{id}\e[0m\n"
         end)
         |> Enum.join("")
 
       assert output ==
-               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nstart deli at #{env}? [Yn] " <>
+               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nrestart deli at #{env}? [Yn] " <>
                  log
     end
   end
@@ -88,21 +88,14 @@ defmodule Mix.DeliStartTest do
       HostProviderMock
       |> stub(:hosts, fn ^env -> hosts end)
 
-      for host <- hosts do
-        ControllerMock
-        |> expect(:service_running?, fn ^env, ^host -> false end)
-        |> expect(:start_host, fn ^env, ^host -> :ok end)
-        |> expect(:service_running?, fn ^env, ^host -> true end)
-      end
-
       output =
         capture_io([input: "n\n", capture_prompt: true], fn ->
-          :ok = Start.run([])
+          :ok = Restart.run([])
         end)
 
       assert output ==
-               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nstart deli at #{env}? [Yn] " <>
-                 "\e[32mstart cancelled by user\e[0m\n"
+               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nrestart deli at #{env}? [Yn] " <>
+                 "\e[32mrestart cancelled by user\e[0m\n"
     end
   end
 end

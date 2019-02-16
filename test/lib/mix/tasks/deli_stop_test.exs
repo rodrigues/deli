@@ -14,7 +14,7 @@ defmodule Mix.DeliStopTest do
       put_config(:default_target, env)
 
       HostProviderMock
-      |> expect(:hosts, fn ^env -> hosts end)
+      |> stub(:hosts, fn ^env -> hosts end)
 
       for host <- hosts do
         ControllerMock
@@ -50,7 +50,7 @@ defmodule Mix.DeliStopTest do
       put_config(:default_target, env)
 
       HostProviderMock
-      |> expect(:hosts, fn ^env -> hosts end)
+      |> stub(:hosts, fn ^env -> hosts end)
 
       for host <- hosts do
         ControllerMock
@@ -86,7 +86,7 @@ defmodule Mix.DeliStopTest do
       put_config(:default_target, env)
 
       HostProviderMock
-      |> expect(:hosts, fn ^env -> hosts end)
+      |> stub(:hosts, fn ^env -> hosts end)
 
       for host <- hosts do
         ControllerMock

@@ -44,7 +44,7 @@ defmodule Mix.Tasks.Deli.Restart do
     :ok = env |> controller.restart_host(host)
     IO.puts([IO.ANSI.green(), "restarted #{id}", IO.ANSI.reset()])
 
-    :timer.sleep(1_000)
+    :timer.sleep(Config.wait(:started_check))
     Check.run(env, host)
   end
 end
