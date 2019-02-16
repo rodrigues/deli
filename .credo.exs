@@ -137,12 +137,15 @@
         #
         # Controversial and experimental checks (opt-in, just remove `, false`)
         #
-        {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
-        {Credo.Check.Design.DuplicatedCode, false},
+        # experimenting the ones below
+        {Credo.Check.Design.DuplicatedCode, []},
+        {Credo.Check.Refactor.DoubleBooleanNegation, []},
+        # the ones below good to run from time to time
         {Credo.Check.Readability.Specs, false},
+        {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
         {Credo.Check.Refactor.ABCSize, false},
+        # this ones not so sure
         {Credo.Check.Refactor.AppendSingleItem, false},
-        {Credo.Check.Refactor.DoubleBooleanNegation, false},
         {Credo.Check.Refactor.ModuleDependencies, false},
         {Credo.Check.Refactor.VariableRebinding, false},
         {Credo.Check.Warning.MapGetUnsafePass, false},
