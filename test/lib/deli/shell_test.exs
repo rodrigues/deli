@@ -418,7 +418,7 @@ defmodule Deli.ShellTest do
 
   describe "parse_options/1" do
     property "user target when valid" do
-      chars = Enum.to_list(?a..?z) ++ [?_]
+      chars = [?_ | Enum.to_list(?a..?z)]
 
       check all target <- chars |> nonempty_string(),
                 short? <- boolean() do
