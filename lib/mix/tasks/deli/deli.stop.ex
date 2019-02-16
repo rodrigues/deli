@@ -43,7 +43,7 @@ defmodule Mix.Tasks.Deli.Stop do
     :ok = env |> controller.stop_host(host)
     IO.puts([IO.ANSI.green(), "stopped #{id}", IO.ANSI.reset()])
 
-    :timer.sleep(1_000)
+    :timer.sleep(Config.wait(:stopped_check))
     Check.run(env, host, false)
   end
 end

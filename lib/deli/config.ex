@@ -36,7 +36,9 @@ defmodule Deli.Config do
       # wait in ms between port forwarding and iex command
       port_forwarding: 2_000,
       # wait in ms between start_host and check if it's ok
-      started_check: 1_000
+      started_check: 1_000,
+      # wait in ms between stop_host and check if it's ok
+      stopped_check: 1_000
     ],
     # default commands to staging environment
     target: :staging,
