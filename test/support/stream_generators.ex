@@ -1,6 +1,8 @@
 defmodule StreamGenerators do
   import StreamData
 
+  @moduledoc false
+
   @limit_mismatches 100_000
 
   def app, do: atom()
