@@ -480,11 +480,13 @@ defmodule Deli.ConfigTest do
     end
   end
 
+  @min_wait 100
+
   describe "wait/0" do
     property "default wait when not configured" do
       check all key <- waits() |> member_of() do
         delete_config(:waits)
-        assert Config.wait(key) > 0
+        assert Config.wait(key) > @min_wait
       end
     end
 
