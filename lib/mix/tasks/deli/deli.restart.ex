@@ -21,6 +21,7 @@ defmodule Mix.Tasks.Deli.Restart do
 
   @shortdoc "Restarts application"
 
+  @impl true
   def run(args) do
     _ = Application.ensure_all_started(:deli)
     options = args |> parse_options

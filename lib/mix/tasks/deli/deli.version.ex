@@ -15,6 +15,7 @@ defmodule Mix.Tasks.Deli.Version do
 
   @shortdoc "Checks application version"
 
+  @impl true
   def run(args) do
     _ = Application.ensure_all_started(:deli)
 
@@ -106,7 +107,7 @@ defmodule Mix.Tasks.Deli.Version do
     end
   end
 
-  def print_version(version) do
+  defp print_version(version) do
     IO.puts([IO.ANSI.green(), to_string(version), IO.ANSI.reset()])
   end
 

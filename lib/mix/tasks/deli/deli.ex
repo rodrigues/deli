@@ -29,6 +29,7 @@ defmodule Mix.Tasks.Deli do
 
   @shortdoc "Deploys application full-cycle"
 
+  @impl true
   def run(args) do
     _ = Application.ensure_all_started(:deli)
     options = args |> parse_options
@@ -38,9 +39,8 @@ defmodule Mix.Tasks.Deli do
     # calling this before so operation stops fast
     # in case there are no valid hosts given filter
     {:ok, _} = target |> HostFilter.hosts(args)
+    :ok = args |> Release.run()
 
-    with :ok <- args |> Release.run() do
-      Deploy.run(args)
-    end
+    Deploy.run(args)
   end
 end

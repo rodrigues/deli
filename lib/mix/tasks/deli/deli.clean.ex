@@ -17,6 +17,7 @@ defmodule Mix.Tasks.Deli.Clean do
     .deli/docker-compose.yml
   )
 
+  @impl true
   def run(_args) do
     _ = Application.ensure_all_started(:deli)
     releases_path = ".deli/releases" |> expand_path

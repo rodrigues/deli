@@ -15,6 +15,7 @@ defmodule Mix.Tasks.Deli.Status do
 
   @shortdoc "Checks application status"
 
+  @impl true
   def run(args) do
     _ = Application.ensure_all_started(:deli)
     options = args |> parse_options

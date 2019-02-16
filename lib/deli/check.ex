@@ -3,6 +3,7 @@ defmodule Deli.Check do
 
   @moduledoc false
 
+  @spec run(Deli.env(), Deli.host(), boolean, module | nil, atom) :: :ok
   def run(env, host, running_good? \\ true, controller \\ nil, action \\ :running) do
     controller = controller || Config.controller()
     id = env |> Config.host_id(host)

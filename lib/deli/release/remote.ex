@@ -1,6 +1,6 @@
 defmodule Deli.Release.Remote do
   import Deli.Shell
-  alias Deli.Config
+  alias Deli.{Config, Versioning}
   alias Deli.Templates.EdeliverConfig
 
   @moduledoc "Release strategy that relies on a remote build host"
@@ -14,11 +14,13 @@ defmodule Deli.Release.Remote do
     edeliver_build(tag, target)
   end
 
+  @spec edeliver_build(Versioning.tag(), Deli.env()) :: :ok
   def edeliver_build(tag, target) do
     target_mix_env = target |> Config.mix_env()
     edeliver(:build, [:release, "--tag=#{tag}", "--mix-env=#{target_mix_env}"])
   end
 
+  @spec ensure_edeliver_config(boolean) :: :ok
   def ensure_edeliver_config(remote? \\ true) do
     path = ".deliver/config"
 
@@ -50,10 +52,12 @@ defmodule Deli.Release.Remote do
     end
   end
 
+  @spec clear_previous_releases() :: :ok
   def clear_previous_releases do
     cmd(:rm, ["-rf", ".deli/releases"], [0, 1])
   end
 
+  @spec add_to_gitignore(Path.t()) :: :ok
   def add_to_gitignore(path) do
     gitignore = ".gitignore"
     content = gitignore |> expand_path |> file_handler().read!()

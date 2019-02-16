@@ -6,6 +6,7 @@ defmodule Deli.Versioning.Default do
 
   @behaviour Deli.Versioning
 
+  @impl true
   def version_tag(nil) do
     version = Config.version()
     tag = git_tags() |> List.last()

@@ -20,6 +20,7 @@ defmodule Mix.Tasks.Deli.Release do
 
   @shortdoc "Only builds application release (without deploy)"
 
+  @impl true
   def run(args) do
     _ = Application.ensure_all_started(:deli)
     system = Config.__system__()

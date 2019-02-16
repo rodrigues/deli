@@ -12,6 +12,7 @@ defmodule Mix.Tasks.Deli.Shell do
 
   @shortdoc "Provides shell command to run remote console"
 
+  @impl true
   def run(args) do
     _ = Application.ensure_all_started(:deli)
 
@@ -98,7 +99,7 @@ defmodule Mix.Tasks.Deli.Shell do
     ]
   end
 
-  def print_command(command) do
+  defp print_command(command) do
     IO.write(command |> Enum.join(" "))
   end
 
@@ -130,7 +131,7 @@ defmodule Mix.Tasks.Deli.Shell do
     port
   end
 
-  def app_port(line) do
+  defp app_port(line) do
     app = Config.app()
     prefix = "name #{app} at port "
 
@@ -139,7 +140,7 @@ defmodule Mix.Tasks.Deli.Shell do
     end
   end
 
-  def determine_shell(extra_options) do
+  defp determine_shell(extra_options) do
     case extra_options |> Enum.at(0) do
       {shell, true} ->
         shell

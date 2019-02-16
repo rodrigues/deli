@@ -5,6 +5,7 @@ defmodule Deli.Deploy do
 
   @moduledoc false
 
+  @spec run(Deli.env(), Deli.host()) :: :ok
   def run(target, host) when is_env(target) and is_host(host) do
     edeliver_target = target |> Config.edeliver_target()
     edeliver(:deploy, [:release, :to, edeliver_target, "--host=#{host}"])
