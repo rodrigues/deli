@@ -4,8 +4,8 @@ defmodule Mix.DeliStopTest do
 
   property "stops application in all default target hosts by default" do
     check all app <- app(),
-              app_user <- atom(),
-              env <- atom(),
+              app_user <- app_user(),
+              env <- env(),
               hosts <- hosts(),
               short? <- boolean() do
       flag = if short?, do: "-y", else: "--yes"
@@ -45,7 +45,7 @@ defmodule Mix.DeliStopTest do
   end
 
   property "stops after confirmation when not passing yes" do
-    check all env <- atom(),
+    check all env <- env(),
               hosts <- hosts() do
       put_config(:default_target, env)
 
@@ -81,7 +81,7 @@ defmodule Mix.DeliStopTest do
   end
 
   property "cancels after denial of confirmation when not passing yes" do
-    check all env <- atom(),
+    check all env <- env(),
               hosts <- hosts() do
       put_config(:default_target, env)
 

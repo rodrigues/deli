@@ -273,7 +273,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "fails when is invalid" do
-      check all env <- atom(),
+      check all env <- env(),
                 hosts <- term_except(&(is_list(&1) or &1 == %{})) do
         put_config(:hosts, [{env, hosts}])
         assert catch_error(Config.hosts(env))
