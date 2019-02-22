@@ -50,51 +50,50 @@ defmodule Mix.Tasks.Deli.Version do
   end
 
   defp compare_host_version(env, host) do
-    with {:ok, version} <- env |> host_version(host) do
-      local = Config.version()
+    {:ok, version} = env |> host_version(host)
+    local = Config.version()
 
-      case local |> Version.compare(version) do
-        :lt ->
-          IO.puts([
-            IO.ANSI.bright(),
-            "* #{host} ",
-            IO.ANSI.reset(),
-            IO.ANSI.red(),
-            IO.ANSI.underline(),
-            "ahead",
-            IO.ANSI.reset(),
-            IO.ANSI.bright(),
-            "  (#{version}, local #{local})",
-            IO.ANSI.reset()
-          ])
+    case local |> Version.compare(version) do
+      :lt ->
+        IO.puts([
+          IO.ANSI.bright(),
+          "* #{host} ",
+          IO.ANSI.reset(),
+          IO.ANSI.red(),
+          IO.ANSI.underline(),
+          "ahead",
+          IO.ANSI.reset(),
+          IO.ANSI.bright(),
+          "  (#{version}, local #{local})",
+          IO.ANSI.reset()
+        ])
 
-        :gt ->
-          IO.puts([
-            IO.ANSI.bright(),
-            "* #{host} ",
-            IO.ANSI.reset(),
-            IO.ANSI.red(),
-            IO.ANSI.underline(),
-            "outdated",
-            IO.ANSI.reset(),
-            IO.ANSI.bright(),
-            "  (#{version}, local #{local})",
-            IO.ANSI.reset()
-          ])
+      :gt ->
+        IO.puts([
+          IO.ANSI.bright(),
+          "* #{host} ",
+          IO.ANSI.reset(),
+          IO.ANSI.red(),
+          IO.ANSI.underline(),
+          "outdated",
+          IO.ANSI.reset(),
+          IO.ANSI.bright(),
+          "  (#{version}, local #{local})",
+          IO.ANSI.reset()
+        ])
 
-        :eq ->
-          IO.puts([
-            IO.ANSI.bright(),
-            "* #{host} ",
-            IO.ANSI.reset(),
-            IO.ANSI.green(),
-            "up-to-date",
-            IO.ANSI.reset(),
-            IO.ANSI.faint(),
-            "  (#{version})",
-            IO.ANSI.reset()
-          ])
-      end
+      :eq ->
+        IO.puts([
+          IO.ANSI.bright(),
+          "* #{host} ",
+          IO.ANSI.reset(),
+          IO.ANSI.green(),
+          "up-to-date",
+          IO.ANSI.reset(),
+          IO.ANSI.faint(),
+          "  (#{version})",
+          IO.ANSI.reset()
+        ])
     end
   end
 

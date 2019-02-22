@@ -6,32 +6,39 @@ defmodule Mix.DeliVersionTest do
     put_config(:__system__, SystemStub)
   end
 
+  def setup_versions(env, hosts) do
+    length = hosts |> Enum.count()
+    versions = version() |> Enum.take(length) |> Enum.map(&to_string/1)
+
+    versions =
+      hosts
+      |> Enum.zip(versions)
+      |> Enum.into(%{})
+
+    HostProviderMock
+    |> stub(:hosts, fn ^env -> hosts end)
+
+    TestAgent.set(:cmd, fn _, [id | _], _ ->
+      host = id |> String.split("@") |> List.last()
+      result = "{:ok, '#{versions[host]}'}"
+      {result, 0}
+    end)
+
+    versions
+  end
+
   property "versions of application in all default target hosts by default" do
     check all app <- app(),
               app_user <- app_user(),
               bin_path <- bin_path(),
               env <- env(),
               hosts <- hosts() do
-      length = hosts |> Enum.count()
-      versions = version() |> Enum.take(length)
-
-      versions =
-        hosts
-        |> Enum.zip(versions)
-        |> Enum.into(%{})
-
       put_config(:app, app)
       put_config(:app_user, [{env, app_user}])
       put_config(:bin_path, bin_path)
       put_config(:default_target, env)
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
-
-      TestAgent.set(:cmd, fn _, [id | _], _ ->
-        host = id |> String.split("@") |> List.last()
-        {versions[host], 0}
-      end)
+      versions = env |> setup_versions(hosts)
 
       output =
         capture_io(fn ->
@@ -40,7 +47,7 @@ defmodule Mix.DeliVersionTest do
 
       host_output = fn f -> hosts |> Enum.map(f) |> Enum.join("") end
       hosts_output = host_output.(&"## #{&1}\n")
-      versions_output = host_output.(&"\e[31m\"#{versions[&1]}\"\e[0m\n")
+      versions_output = host_output.(&"\e[32m#{versions[&1]}\e[0m\n")
 
       assert output ==
                "# hosts\n#{hosts_output}checking version of #{app} at" <>
@@ -70,25 +77,11 @@ defmodule Mix.DeliVersionTest do
               hosts <- hosts(),
               short? <- boolean() do
       flag = if short?, do: "-t", else: "--target"
-      length = hosts |> Enum.count()
-      versions = version() |> Enum.take(length)
-
-      versions =
-        hosts
-        |> Enum.zip(versions)
-        |> Enum.into(%{})
+      versions = env |> setup_versions(hosts)
 
       put_config(:app, app)
       put_config(:app_user, [{env, app_user}])
       put_config(:bin_path, bin_path)
-
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
-
-      TestAgent.set(:cmd, fn _, [id | _], _ ->
-        host = id |> String.split("@") |> List.last()
-        {versions[host], 0}
-      end)
 
       opts = [flag, to_string(env)]
 
@@ -99,7 +92,7 @@ defmodule Mix.DeliVersionTest do
 
       host_output = fn f -> hosts |> Enum.map(f) |> Enum.join("") end
       hosts_output = host_output.(&"## #{&1}\n")
-      versions_output = host_output.(&"\e[31m\"#{versions[&1]}\"\e[0m\n")
+      versions_output = host_output.(&"\e[32m#{versions[&1]}\e[0m\n")
 
       assert output ==
                "# hosts\n#{hosts_output}checking version of #{app} at" <>
@@ -142,6 +135,51 @@ defmodule Mix.DeliVersionTest do
         _,
         [into: ""]
       }
+    end
+  end
+
+  property "compares versions of application in target env hosts" do
+    check all app <- app(),
+              app_user <- app_user(),
+              bin_path <- bin_path(),
+              env <- env(),
+              hosts <- hosts(),
+              short? <- boolean() do
+      target_flag = if short?, do: "-t", else: "--target"
+      compare_flag = if short?, do: "-c", else: "--compare"
+      setup_versions(env, hosts)
+
+      put_config(:app, app)
+      put_config(:app_user, [{env, app_user}])
+      put_config(:bin_path, bin_path)
+
+      opts = [target_flag, to_string(env), compare_flag]
+
+      output =
+        capture_io(fn ->
+          :ok = opts |> Version.run()
+        end)
+
+      host_output = fn f -> hosts |> Enum.map(f) |> Enum.join("") end
+      hosts_output = host_output.(&"## #{&1}\n")
+
+      hosts_involved = "# hosts\n#{hosts_output}"
+
+      assert String.starts_with?(output, hosts_involved)
+
+      rpc_call = "\":application.get_key(:#{app}, :vsn)\""
+
+      for host <- hosts do
+        id = "#{app_user}@#{host}"
+
+        assert_received {
+          :__system__,
+          :cmd,
+          "ssh",
+          [^id, ^bin_path, "rpc", ^rpc_call],
+          [into: ""]
+        }
+      end
     end
   end
 end
