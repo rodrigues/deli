@@ -7,6 +7,7 @@ defmodule StreamGenerators do
   @limit_mismatches 100_000
 
   def app, do: atom()
+  def bin_path, do: path()
   def env, do: atom()
 
   def app_user do
@@ -23,6 +24,12 @@ defmodule StreamGenerators do
     host()
     |> list_of(max_length: 3)
     |> nonempty()
+  end
+
+  def path do
+    gen all parts <- nonempty_string() |> list_of() |> nonempty() do
+      "/#{parts |> Enum.join("/")}"
+    end
   end
 
   def version do

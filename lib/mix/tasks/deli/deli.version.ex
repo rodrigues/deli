@@ -41,16 +41,16 @@ defmodule Mix.Tasks.Deli.Version do
     app = Config.app()
 
     IO.puts("checking version of #{app} at target #{env}")
-    hosts |> Enum.each(&print_host_version/1)
+    hosts |> Enum.each(&print_host_version(env, &1))
   end
 
   defp compare_versions(env, args) do
     {:ok, hosts} = env |> HostFilter.hosts(args)
-    hosts |> Enum.each(&compare_host_version/1)
+    hosts |> Enum.each(&compare_host_version(env, &1))
   end
 
-  defp compare_host_version(host) do
-    with {:ok, version} <- host |> host_version do
+  defp compare_host_version(env, host) do
+    with {:ok, version} <- env |> host_version(host) do
       local = Config.version()
 
       case local |> Version.compare(version) do
@@ -98,8 +98,8 @@ defmodule Mix.Tasks.Deli.Version do
     end
   end
 
-  defp print_host_version(host) do
-    with {:ok, version} <- host |> host_version do
+  defp print_host_version(env, host) do
+    with {:ok, version} <- env |> host_version(host) do
       print_version(version)
     else
       {:error, error} ->
@@ -111,10 +111,11 @@ defmodule Mix.Tasks.Deli.Version do
     IO.puts([IO.ANSI.green(), to_string(version), IO.ANSI.reset()])
   end
 
-  defp host_version(host) do
+  defp host_version(env, host) do
     app = Config.app()
+    app_user = env |> Config.app_user()
     code = ~s|":application.get_key(:#{app}, :vsn)"|
-    args = ["#{app}@#{host}", Config.bin_path(), :rpc, code]
+    args = ["#{app_user}@#{host}", Config.bin_path(), :rpc, code]
     {:ok, result} = :ssh |> cmd_result(args)
 
     case result do
