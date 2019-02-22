@@ -182,4 +182,51 @@ defmodule Mix.DeliVersionTest do
       end
     end
   end
+
+  test "prints error when host version fails" do
+    app = app() |> pick()
+    app_user = app_user() |> pick()
+    bin_path = bin_path() |> pick()
+    env = env() |> pick()
+    host = host() |> pick()
+    hosts = [host]
+
+    HostProviderMock
+    |> stub(:hosts, fn ^env -> hosts end)
+
+    TestAgent.set(:cmd, fn _, _, _ ->
+      {"bad version", 0}
+    end)
+
+    put_config(:app, app)
+    put_config(:app_user, [{env, app_user}])
+    put_config(:bin_path, bin_path)
+
+    opts = ["-t", to_string(env)]
+
+    output =
+      capture_io(fn ->
+        :ok = opts |> Version.run()
+      end)
+
+    hosts_output = "## #{host}\n"
+
+    assert output ==
+             "# hosts\n#{hosts_output}checking version of #{app} at" <>
+               " target #{env}\n\e[31m\"bad version\"\e[0m\n"
+
+    rpc_call = "\":application.get_key(:#{app}, :vsn)\""
+
+    for host <- hosts do
+      id = "#{app_user}@#{host}"
+
+      assert_received {
+        :__system__,
+        :cmd,
+        "ssh",
+        [^id, ^bin_path, "rpc", ^rpc_call],
+        [into: ""]
+      }
+    end
+  end
 end
