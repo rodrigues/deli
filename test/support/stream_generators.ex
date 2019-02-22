@@ -11,7 +11,7 @@ defmodule StreamGenerators do
   def env, do: atom()
 
   def app_user do
-    [atom(), binary()] |> one_of()
+    [atom(), nonempty_string()] |> one_of()
   end
 
   def host do
