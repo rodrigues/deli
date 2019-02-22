@@ -24,3 +24,6 @@ deli-*.tar
 
 # Temporary file generated to calculate checksum
 src.tar.gz
+
+# Language server cache
+/.elixir_ls/
