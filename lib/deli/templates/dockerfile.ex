@@ -41,16 +41,7 @@ defmodule Deli.Templates.Dockerfile do
              is_atom(app) and is_atom(user) and is_boolean(yarn?) and
              is_binary(node_version) and is_list(beam_versions_opts) do
     beam_versions = beam_versions_opts |> BeamVersions.fetch()
-
-    builder =
-      case deli_image do
-        :centos ->
-          &build_centos/6
-
-        :debian ->
-          &build_debian/6
-      end
-
+    builder = builder(deli_image)
     tag |> builder.(beam_versions, app, user, yarn?, node_version)
   end
 
@@ -68,13 +59,18 @@ defmodule Deli.Templates.Dockerfile do
 
   def build(docker_image, app, user, yarn?, node_version)
       when (is_atom(docker_image) or is_binary(docker_image)) and
-             is_atom(app) and is_atom(user) and is_boolean(yarn?) and is_binary(node_version) do
+             is_atom(app) and is_atom(user) and is_boolean(yarn?) and
+             is_binary(node_version) do
     docker_image |> build_custom(app, user, yarn?, node_version)
   end
 
   def build({docker_image, tag}, app, user, yarn?, node_version)
       when (is_atom(docker_image) or is_binary(docker_image)) and
-             is_atom(app) and is_atom(user) and is_boolean(yarn?) and is_binary(node_version) do
+             is_atom(app) and is_atom(user) and is_boolean(yarn?) and
+             is_binary(node_version) do
     "#{docker_image}:#{tag}" |> build(app, user, yarn?, node_version)
   end
+
+  defp builder(:centos), do: &build_centos/6
+  defp builder(:debian), do: &build_debian/6
 end
