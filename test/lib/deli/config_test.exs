@@ -193,6 +193,27 @@ defmodule Deli.ConfigTest do
     end
   end
 
+  describe "docker_build_node_version/0" do
+    test "default version when not configured" do
+      delete_config(:node_version)
+      assert Config.docker_build_node_version() == "9.x"
+    end
+
+    property "provided version when configured correctly" do
+      check all node_version <- nonempty_string() do
+        put_config(:docker_build, node_version: node_version)
+        assert Config.docker_build_node_version() == node_version
+      end
+    end
+
+    property "fails when is invalid" do
+      check all node_version <- term_except(&is_binary/1) do
+        put_config(:docker_build, node_version: node_version)
+        assert_raise RuntimeError, &Config.docker_build_node_version/0
+      end
+    end
+  end
+
   describe "docker_build_port/0" do
     test "default port when not configured" do
       delete_config(:docker_build)

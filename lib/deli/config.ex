@@ -12,10 +12,12 @@ defmodule Deli.Config do
     docker_build: [
       # check `Deli.Release.Docker.build_target()` type for all options
       image: {:deli, :centos},
+      # needs to be available in nodesource.com
+      node_version: "9.x",
+      port: 4441,
       # in deli images, this user is automatically generated
       # in other docker images, you need to ensure it is created
       user: :deli,
-      port: 4441,
       # when app has web assets
       yarn?: false
     ],
@@ -116,6 +118,14 @@ defmodule Deli.Config do
   @spec docker_build_image() :: Deli.Release.Docker.build_target()
   def docker_build_image do
     :docker_build |> get([]) |> Keyword.get(:image, @defaults.docker_build[:image])
+  end
+
+  @spec docker_build_node_version() :: String.t()
+  def docker_build_node_version do
+    :docker_build
+    |> get([])
+    |> Keyword.get(:node_version, @defaults.docker_build[:node_version])
+    |> ensure_binary
   end
 
   @spec docker_build_port() :: :inet.port_number()

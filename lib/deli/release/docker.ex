@@ -61,7 +61,8 @@ defmodule Deli.Release.Docker do
           Config.docker_build_image(),
           Config.app(),
           Config.docker_build_user(),
-          Config.docker_build_yarn?()
+          Config.docker_build_yarn?(),
+          Config.docker_build_node_version()
         )
 
       write_file(path, content)
