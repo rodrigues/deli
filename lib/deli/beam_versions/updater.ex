@@ -15,7 +15,7 @@ defmodule Deli.BeamVersions.Updater do
   @archive_path "src.tar.gz"
 
   @headers [
-    {'User-Agent', 'Delibot/0.1 (+https://github.com/rodrigues/deli)'},
+    {'User-Agent', 'Delibot/0.2 (+https://github.com/rodrigues/deli)'},
     {'Accepts', 'application/vnd.github.v3+json'}
   ]
 
