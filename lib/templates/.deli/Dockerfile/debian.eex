@@ -76,21 +76,14 @@ RUN set -xe \
 
 <%= if yarn? do %>
 # Yarn
-<% distro = if tag == :latest, do: "stretch", else: tag %>
-<% node_uri = "https://deb.nodesource.com" %>
-
 RUN set -xe \
-  && apt-get -y install cairo \
-  && curl -sSO "<%= node_uri %>/gpgkey/nodesource.gpg.key" \
-  && apt-key add nodesource.gpg.key \
-  && echo "deb <%= node_uri %>/node_<%= node_version %> <%= distro %> main" > /etc/apt/sources.list.d/nodesource.list \
-  && echo "deb-src <%= node_uri %>/node_<%= node_version %> <%= distro %> main" >> /etc/apt/sources.list.d/nodesource.list \
-  && apt-get update -q \
+  && apt-get -y install libcairo2-dev \
+  && curl -sL https://deb.nodesource.com/setup_<%= node_version %> | bash - \
   && apt-get install -y nodejs \
   && npm -g up \
-  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
-  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
-  && apt-get update -q \
+  && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+  && apt-get update \
   && apt-get -y install --no-install-recommends yarn
 <% end %>
 COPY authorized_keys /authorized_keys
