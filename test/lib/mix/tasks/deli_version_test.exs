@@ -183,6 +183,80 @@ defmodule Mix.DeliVersionTest do
     end
   end
 
+  test "compare indicates when version is smaller" do
+    env = env() |> pick()
+    host = host() |> pick()
+
+    HostProviderMock
+    |> stub(:hosts, fn ^env -> [host] end)
+
+    TestAgent.set(:cmd, fn _, _, _ ->
+      {"{:ok, '0.0.1'}", 0}
+    end)
+
+    opts = ["-c", "-t", to_string(env)]
+
+    output =
+      capture_io(fn ->
+        :ok = opts |> Version.run()
+      end)
+
+    version = Deli.MixProject.project()[:version]
+
+    assert output ==
+             "# hosts\n## #{host}\n" <>
+               "\e[1m* #{host} \e[0m\e[31m\e[4moutdated\e[0m\e[1m  (0.0.1, local #{version})\e[0m\n"
+  end
+
+  test "compare indicates when version is bigger" do
+    env = env() |> pick()
+    host = host() |> pick()
+
+    HostProviderMock
+    |> stub(:hosts, fn ^env -> [host] end)
+
+    TestAgent.set(:cmd, fn _, _, _ ->
+      {"{:ok, '100.0.1'}", 0}
+    end)
+
+    opts = ["-c", "-t", to_string(env)]
+
+    output =
+      capture_io(fn ->
+        :ok = opts |> Version.run()
+      end)
+
+    version = Deli.MixProject.project()[:version]
+
+    assert output ==
+             "# hosts\n## #{host}\n" <>
+               "\e[1m* #{host} \e[0m\e[31m\e[4mahead\e[0m\e[1m  (100.0.1, local #{version})\e[0m\n"
+  end
+
+  test "compare indicates when version is equal" do
+    env = env() |> pick()
+    host = host() |> pick()
+    version = Deli.MixProject.project()[:version]
+
+    HostProviderMock
+    |> stub(:hosts, fn ^env -> [host] end)
+
+    TestAgent.set(:cmd, fn _, _, _ ->
+      {"{:ok, '#{version}'}", 0}
+    end)
+
+    opts = ["-c", "-t", to_string(env)]
+
+    output =
+      capture_io(fn ->
+        :ok = opts |> Version.run()
+      end)
+
+    assert output ==
+             "# hosts\n## #{host}\n" <>
+               "\e[1m* #{host} \e[0m\e[32mup-to-date\e[0m\e[2m  (#{version})\e[0m\n"
+  end
+
   test "prints error when host version fails" do
     app = app() |> pick()
     app_user = app_user() |> pick()
