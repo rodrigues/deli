@@ -14,7 +14,6 @@ defmodule DeliCase do
       import ExUnit.CaptureIO
       import Mox
       alias Deli.Config
-      alias TestAgent
     end
   end
 
