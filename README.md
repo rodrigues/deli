@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/rodrigues/deli.svg?branch=master)](https://travis-ci.org/rodrigues/deli)
 [![Hex.pm](https://img.shields.io/hexpm/v/deli.svg)](https://hex.pm/packages/deli)
-[![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/0.2.0-rc.1/deli)
+[![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/deli/0.2.0-rc.1)
 
 Provides a simple deployment solution for Elixir applications, using a couple of [`edeliver`](https://github.com/edeliver/edeliver) [tasks](https://hexdocs.pm/edeliver/Mix.Tasks.Edeliver.html#content) under the hood.
 
