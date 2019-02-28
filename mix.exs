@@ -15,7 +15,7 @@ defmodule Deli.MixProject do
       package: package(),
       source_url: "https://github.com/rodrigues/deli",
       homepage_url: "https://hexdocs.pm/deli",
-      description: "A deploy task for Elixir applications"
+      description: "Easy deployment for Elixir apps"
     ]
   end
 
