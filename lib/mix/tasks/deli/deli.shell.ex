@@ -44,8 +44,6 @@ defmodule Mix.Tasks.Deli.Shell do
     {:ok, processes} = :ps |> cmd_result([:aux])
 
     args = [
-      Config.port_forwarding_timeout(),
-      :ssh,
       Config.host_id(env, host),
       "-L#{epmd_port}:localhost:#{epmd_port}",
       "-L#{app_port}:localhost:#{app_port}"
@@ -57,7 +55,7 @@ defmodule Mix.Tasks.Deli.Shell do
       |> Enum.any?(&matching_ssh_command(&1, args))
 
     unless running? do
-      :timeout |> cmd(args, [0], into: "", parallelism: true)
+      :ssh |> cmd(args, [0], into: "", parallelism: true)
     end
   end
 

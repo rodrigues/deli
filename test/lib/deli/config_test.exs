@@ -375,27 +375,6 @@ defmodule Deli.ConfigTest do
     end
   end
 
-  describe "port_forwarding_timeout/0" do
-    test "default timeout when not configured" do
-      delete_config(:port_forwarding_timeout)
-      assert Config.port_forwarding_timeout() == 3600
-    end
-
-    property "port forwarding timeout when configured" do
-      check all timeout <- positive_integer() do
-        put_config(:port_forwarding_timeout, timeout)
-        assert Config.port_forwarding_timeout() == timeout
-      end
-    end
-
-    property "fails when is invalid" do
-      check all timeout <- term_except(&(is_integer(&1) and &1 > 0)) do
-        put_config(:port_forwarding_timeout, timeout)
-        assert catch_error(Config.port_forwarding_timeout())
-      end
-    end
-  end
-
   describe "release/0" do
     test "default release strategy when not configured" do
       delete_config(:release)

@@ -13,7 +13,6 @@ defmodule ConfigHelpers do
     hosts
     host_provider
     output_commands
-    port_forwarding_timeout
     release
     remote_build
     target

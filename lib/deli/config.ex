@@ -25,8 +25,6 @@ defmodule Deli.Config do
     host_provider: Deli.HostProvider.Config,
     # verbose won't output `Deli.Shell` cmd calls, meant for debugging
     output_commands?: false,
-    # wait in seconds when running `mix deli.shell`
-    port_forwarding_timeout: 3_600,
     # use local docker as default release strategy
     release: Deli.Release.Docker,
     # used when `release` is configured as `Deli.Release.Remote`
@@ -181,13 +179,6 @@ defmodule Deli.Config do
     :output_commands
     |> get(@defaults.output_commands?)
     |> ensure_boolean
-  end
-
-  @spec port_forwarding_timeout() :: pos_integer
-  def port_forwarding_timeout do
-    :port_forwarding_timeout
-    |> get(@defaults.port_forwarding_timeout)
-    |> ensure_pos_integer
   end
 
   @spec release() :: module
