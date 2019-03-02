@@ -38,8 +38,8 @@ defmodule Deli.Controller.Systemctl do
     cmd(command, args)
   end
 
-  defp systemctl(env, host, cmd, sudo \\ false) do
-    sudo = if sudo, do: :sudo
+  defp systemctl(env, host, cmd, sudo? \\ false) do
+    sudo = if sudo?, do: :sudo
     [:ssh, Config.host_id(env, host), sudo, :systemctl, cmd, Config.app()]
   end
 end

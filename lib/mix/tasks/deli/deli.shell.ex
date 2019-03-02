@@ -52,14 +52,14 @@ defmodule Mix.Tasks.Deli.Shell do
     running? =
       processes
       |> String.split("\n", trim: true)
-      |> Enum.any?(&matching_ssh_command(&1, args))
+      |> Enum.any?(&matching_ssh_command?(&1, args))
 
     unless running? do
       :ssh |> cmd(args, [0], into: "", parallelism: true)
     end
   end
 
-  defp matching_ssh_command(command, [_timeout | args]) do
+  defp matching_ssh_command?(command, [_timeout | args]) do
     args = args |> Enum.join(" ")
     command |> String.contains?(args)
   end
