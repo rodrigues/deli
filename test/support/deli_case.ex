@@ -9,10 +9,11 @@ defmodule DeliCase do
     quote do
       use ExUnitProperties
       import unquote(__MODULE__)
-      import StreamGenerators
+      import Behaves
       import ConfigHelpers
       import ExUnit.CaptureIO
       import Mox
+      import StreamGenerators
       alias Deli.Config
     end
   end
