@@ -431,7 +431,7 @@ defmodule Deli.ShellTest do
     end
 
     property "default target when not provided" do
-      check all env <- atom() do
+      check all env <- env() do
         put_config(:default_target, env)
         parsed_opts = [] |> Shell.parse_options()
 

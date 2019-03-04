@@ -8,10 +8,10 @@ defmodule Deli.PingTest do
 
   describe "run/2" do
     property "pings host and succeeds with a pong" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string() do
+      check all env <- env(),
+                app_user <- app_user(),
+                bin_path <- bin_path(),
+                host <- host() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"pong", 0})
@@ -36,10 +36,10 @@ defmodule Deli.PingTest do
     end
 
     property "pings host and errors with not a pong" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string(),
+      check all env <- env(),
+                app_user <- app_user(),
+                bin_path <- bin_path(),
+                host <- host(),
                 response <- nonempty_string(),
                 response != "pong" do
         put_config(:app_user, app_user)
