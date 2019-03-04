@@ -8,10 +8,10 @@ defmodule Deli.Controller.BinTest do
 
   describe "start_host/2" do
     property "starts host" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string() do
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", 0})
@@ -30,10 +30,10 @@ defmodule Deli.Controller.BinTest do
     end
 
     property "fails to start host if signal not expected" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string(),
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host(),
                 signal <- 1..500 |> integer() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
@@ -61,10 +61,10 @@ defmodule Deli.Controller.BinTest do
 
   describe "stop_host/2" do
     property "stops host" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string() do
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", 0})
@@ -83,10 +83,10 @@ defmodule Deli.Controller.BinTest do
     end
 
     property "fails to stop host if signal not expected" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string(),
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host(),
                 signal <- 1..500 |> integer() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
@@ -114,10 +114,10 @@ defmodule Deli.Controller.BinTest do
 
   describe "restart_host/2" do
     property "restarts host" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string() do
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", 0})
@@ -136,10 +136,10 @@ defmodule Deli.Controller.BinTest do
     end
 
     property "fails to restart host if signal not expected" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string(),
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host(),
                 signal <- 1..500 |> integer() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
@@ -167,10 +167,10 @@ defmodule Deli.Controller.BinTest do
 
   describe "service_status/2" do
     property "returns status" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string(),
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host(),
                 status <- string(),
                 [signal] = [0, 1, 127] |> Enum.take_random(1) do
         put_config(:app_user, app_user)
@@ -191,10 +191,10 @@ defmodule Deli.Controller.BinTest do
     end
 
     property "fails to check status if signal not expected" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string(),
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host(),
                 signal <- 2..500 |> integer() |> except(&(&1 == 127)) do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
@@ -222,10 +222,10 @@ defmodule Deli.Controller.BinTest do
 
   describe "service_running?/2" do
     property "true if status is pong and signal ok" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string(),
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host(),
                 [signal] = [0, 1, 127] |> Enum.take_random(1) do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
@@ -245,10 +245,10 @@ defmodule Deli.Controller.BinTest do
     end
 
     property "false if status not pong and signal ok" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string(),
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host(),
                 [signal] = [0, 1, 127] |> Enum.take_random(1) do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
@@ -268,10 +268,10 @@ defmodule Deli.Controller.BinTest do
     end
 
     property "fails to check status if signal not expected" do
-      check all app_user <- atom() |> except(&is_nil/1),
-                bin_path <- nonempty_string(),
-                env <- atom() |> except(&is_nil/1),
-                host <- nonempty_string(),
+      check all app_user <- app_user(),
+                bin_path <- bin_path(),
+                env <- env(),
+                host <- host(),
                 signal <- 2..500 |> integer() |> except(&(&1 == 127)) do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
