@@ -24,7 +24,7 @@ defmodule Deli.Shell do
   defp do_cmd(command, args, ok_signals, opts)
        when (is_atom(command) or is_binary(command)) and
               is_list(args) and is_list(ok_signals) and is_list(opts) do
-    system = Config.__system__()
+    system = Config.__system_handler__()
     command = command |> to_string
     args = args |> Enum.map(&to_string/1)
     verbose_inspect([command | args])
@@ -128,6 +128,10 @@ defmodule Deli.Shell do
     |> OptionParser.parse(aliases: aliases, switches: options)
     |> elem(0)
     |> ensure_target
+  end
+
+  def ensure_all_started(app) do
+    app |> Config.__application_handler__().ensure_all_started()
   end
 
   defp ensure_target(opts) do

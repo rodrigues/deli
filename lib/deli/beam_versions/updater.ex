@@ -167,5 +167,5 @@ defmodule Deli.BeamVersions.Updater do
   defp generic_version_compare([v1 | _r1], [v2 | _r2]) when v1 > v2, do: :gt
   defp generic_version_compare([v1 | _r1], [v2 | _r2]) when v1 < v2, do: :lt
 
-  defp system, do: Config.__system__()
+  defp system, do: Config.__system_handler__()
 end

@@ -22,8 +22,8 @@ defmodule Mix.Tasks.Deli.Release do
 
   @impl true
   def run(args) do
-    _ = Application.ensure_all_started(:deli)
-    system = Config.__system__()
+    _ = :deli |> ensure_all_started
+    system = Config.__system_handler__()
     options = args |> parse_options
     target = options |> Keyword.fetch!(:target)
 

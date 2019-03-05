@@ -3,7 +3,7 @@ defmodule Deli.PingTest do
   alias Deli.Ping
 
   setup do
-    put_config(:__system__, SystemStub)
+    put_config(:__system_handler__, SystemStub)
   end
 
   describe "run/2" do
@@ -24,7 +24,7 @@ defmodule Deli.PingTest do
         id = env |> Config.host_id(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "ping"],
@@ -54,7 +54,7 @@ defmodule Deli.PingTest do
         id = env |> Config.host_id(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "ping"],

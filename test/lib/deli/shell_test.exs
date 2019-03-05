@@ -3,8 +3,9 @@ defmodule Deli.ShellTest do
   alias Deli.Shell
 
   setup do
-    put_config(:__system__, SystemStub)
+    put_config(:__application_handler__, ApplicationStub)
     put_config(:__file_handler__, FileStub)
+    put_config(:__system_handler__, SystemStub)
   end
 
   def command, do: nonempty_string()
@@ -20,21 +21,21 @@ defmodule Deli.ShellTest do
       check all c <- atom() do
         :ok = c |> Shell.cmd()
         command = c |> to_string
-        assert_received {:__system__, :cmd, ^command, [], _}
+        assert_received {:__system_handler__, :cmd, ^command, [], _}
       end
     end
 
     property "runs shell command without args as binary" do
       check all command <- command() do
         :ok = command |> Shell.cmd()
-        assert_received {:__system__, :cmd, ^command, [], _}
+        assert_received {:__system_handler__, :cmd, ^command, [], _}
       end
     end
 
     property "accepts args" do
       check all {command, args} <- command_args() do
         :ok = command |> Shell.cmd(args)
-        assert_received {:__system__, :cmd, ^command, ^args, _}
+        assert_received {:__system_handler__, :cmd, ^command, ^args, _}
       end
     end
 
@@ -51,7 +52,7 @@ defmodule Deli.ShellTest do
         argv = args |> Enum.join(" ")
 
         assert output == "\e[1m$ \e[0m\e[4m#{command} #{argv}\e[0m\n"
-        assert_received {:__system__, :cmd, ^command, ^args, _}
+        assert_received {:__system_handler__, :cmd, ^command, ^args, _}
       end
     end
 
@@ -62,7 +63,7 @@ defmodule Deli.ShellTest do
         :ok = command |> Shell.cmd(args)
 
         assert_received {
-          :__system__,
+          :__system_handler__,
           :cmd,
           ^command,
           ^args,
@@ -76,7 +77,7 @@ defmodule Deli.ShellTest do
       check all {command, args} <- command_args() do
         :ok = command |> Shell.cmd(args)
 
-        assert_received {:__system__, :cmd, ^command, ^args, into: ""}
+        assert_received {:__system_handler__, :cmd, ^command, ^args, into: ""}
       end
     end
 
@@ -114,7 +115,7 @@ defmodule Deli.ShellTest do
         stub_cmd({"", signal})
         :ok = command |> Shell.cmd(args, ok_signals, opts)
         expected_opts = [into: ""] ++ opts
-        assert_received {:__system__, :cmd, ^command, ^args, ^expected_opts}
+        assert_received {:__system_handler__, :cmd, ^command, ^args, ^expected_opts}
       end
     end
   end
@@ -131,7 +132,7 @@ defmodule Deli.ShellTest do
         {:ok, ^result} = command |> Shell.cmd_result(args, ok_signals, opts)
 
         expected_opts = [into: ""] ++ opts
-        assert_received {:__system__, :cmd, ^command, ^args, ^expected_opts}
+        assert_received {:__system_handler__, :cmd, ^command, ^args, ^expected_opts}
       end
     end
 
@@ -146,7 +147,7 @@ defmodule Deli.ShellTest do
         {:ok, ^result} = command |> Shell.cmd_result(args, ok_signals, opts)
 
         expected_opts = [into: ""] ++ opts
-        assert_received {:__system__, :cmd, ^command, ^args, ^expected_opts}
+        assert_received {:__system_handler__, :cmd, ^command, ^args, ^expected_opts}
       end
     end
   end
@@ -159,7 +160,7 @@ defmodule Deli.ShellTest do
         expected_opts = [into: ""]
 
         assert_received {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "mix",
           ["edeliver", ^command],
@@ -175,7 +176,7 @@ defmodule Deli.ShellTest do
         expected_opts = [into: ""]
 
         assert_received {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "mix",
           ["edeliver", ^command | ^args],
@@ -214,7 +215,7 @@ defmodule Deli.ShellTest do
         :ok = command |> Shell.edeliver(args)
 
         assert_received {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "mix",
           ^expected_args,
@@ -232,7 +233,7 @@ defmodule Deli.ShellTest do
         expected_opts = [into: "", env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]]
 
         assert_received {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "docker-compose",
           ["-f", ".deli/docker-compose.yml", ^command],
@@ -248,7 +249,7 @@ defmodule Deli.ShellTest do
         expected_opts = [into: "", env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]]
 
         assert_received {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "docker-compose",
           ["-f", ".deli/docker-compose.yml", ^command | ^args],
@@ -412,6 +413,20 @@ defmodule Deli.ShellTest do
       check all a <- atom() do
         output = capture_io(fn -> Shell.cancelled!(a) end)
         assert output == "\e[32m#{a} cancelled by user\e[0m\n"
+      end
+    end
+  end
+
+  describe "ensure_all_started/1" do
+    property "ensures application and dependencies started" do
+      check all app <- app() do
+        {:ok, [^app]} = app |> Shell.ensure_all_started()
+
+        assert_received {
+          :__application_handler__,
+          :ensure_all_started,
+          ^app
+        }
       end
     end
   end

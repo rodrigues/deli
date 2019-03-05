@@ -9,12 +9,12 @@ defmodule Mix.DeliCleanTest do
   )
 
   setup do
-    put_config(:__system__, SystemStub)
+    put_config(:__system_handler__, SystemStub)
     put_config(:__file_handler__, FileStub)
   end
 
   def cmd_call(command, args) do
-    {:__system__, :cmd, command, args, into: ""}
+    {:__system_handler__, :cmd, command, args, into: ""}
   end
 
   test "cleans releases dir" do

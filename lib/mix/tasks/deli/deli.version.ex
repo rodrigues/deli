@@ -17,7 +17,7 @@ defmodule Mix.Tasks.Deli.Version do
 
   @impl true
   def run(args) do
-    _ = Application.ensure_all_started(:deli)
+    _ = :deli |> ensure_all_started
 
     target = args |> parse_options |> Keyword.fetch!(:target)
     opts = args |> parse_extra_options

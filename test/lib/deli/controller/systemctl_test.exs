@@ -3,7 +3,7 @@ defmodule Deli.Controller.SystemctlTest do
   alias Deli.Controller.Systemctl
 
   setup do
-    put_config(:__system__, SystemStub)
+    put_config(:__system_handler__, SystemStub)
   end
 
   describe "start_host/2" do
@@ -19,7 +19,7 @@ defmodule Deli.Controller.SystemctlTest do
         :ok = env |> Systemctl.start_host(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "sudo", "systemctl", "start", ^app],
@@ -47,7 +47,7 @@ defmodule Deli.Controller.SystemctlTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "sudo", "systemctl", "start", ^app],
@@ -70,7 +70,7 @@ defmodule Deli.Controller.SystemctlTest do
         :ok = env |> Systemctl.stop_host(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "sudo", "systemctl", "stop", ^app],
@@ -98,7 +98,7 @@ defmodule Deli.Controller.SystemctlTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "sudo", "systemctl", "stop", ^app],
@@ -121,7 +121,7 @@ defmodule Deli.Controller.SystemctlTest do
         :ok = env |> Systemctl.restart_host(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "sudo", "systemctl", "restart", ^app],
@@ -149,7 +149,7 @@ defmodule Deli.Controller.SystemctlTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "sudo", "systemctl", "restart", ^app],
@@ -174,7 +174,7 @@ defmodule Deli.Controller.SystemctlTest do
         ^status = env |> Systemctl.service_status(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "", "systemctl", "status", ^app],
@@ -202,7 +202,7 @@ defmodule Deli.Controller.SystemctlTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "", "systemctl", "status", ^app],
@@ -226,7 +226,7 @@ defmodule Deli.Controller.SystemctlTest do
         assert Systemctl.service_running?(env, host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "", "systemctl", "status", ^app],
@@ -248,7 +248,7 @@ defmodule Deli.Controller.SystemctlTest do
         refute Systemctl.service_running?(env, host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "", "systemctl", "status", ^app],
@@ -276,7 +276,7 @@ defmodule Deli.Controller.SystemctlTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, "", "systemctl", "status", ^app],

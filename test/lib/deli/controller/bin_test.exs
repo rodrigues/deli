@@ -3,7 +3,7 @@ defmodule Deli.Controller.BinTest do
   alias Deli.Controller.Bin
 
   setup do
-    put_config(:__system__, SystemStub)
+    put_config(:__system_handler__, SystemStub)
   end
 
   describe "start_host/2" do
@@ -20,7 +20,7 @@ defmodule Deli.Controller.BinTest do
         :ok = env |> Bin.start_host(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "start"],
@@ -49,7 +49,7 @@ defmodule Deli.Controller.BinTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "start"],
@@ -73,7 +73,7 @@ defmodule Deli.Controller.BinTest do
         :ok = env |> Bin.stop_host(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "stop"],
@@ -102,7 +102,7 @@ defmodule Deli.Controller.BinTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "stop"],
@@ -126,7 +126,7 @@ defmodule Deli.Controller.BinTest do
         :ok = env |> Bin.restart_host(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "restart"],
@@ -155,7 +155,7 @@ defmodule Deli.Controller.BinTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "restart"],
@@ -181,7 +181,7 @@ defmodule Deli.Controller.BinTest do
         ^status = env |> Bin.service_status(host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "ping"],
@@ -210,7 +210,7 @@ defmodule Deli.Controller.BinTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "ping"],
@@ -235,7 +235,7 @@ defmodule Deli.Controller.BinTest do
         assert Bin.service_running?(env, host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "ping"],
@@ -258,7 +258,7 @@ defmodule Deli.Controller.BinTest do
         refute Bin.service_running?(env, host)
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "ping"],
@@ -287,7 +287,7 @@ defmodule Deli.Controller.BinTest do
         assert catch_exit(call.()) == {:shutdown, signal}
 
         assert_receive {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "ping"],

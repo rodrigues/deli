@@ -507,23 +507,44 @@ defmodule Deli.ConfigTest do
     end
   end
 
-  describe "__system__/0" do
-    test "System when not configured" do
-      delete_config(:__system__)
-      assert Config.__system__() == System
+  describe "__application_handler__/0" do
+    test "Application when not configured" do
+      delete_config(:__application_handler__)
+      assert Config.__application_handler__() == Application
     end
 
     property "value when configured correctly" do
-      check all system <- atom() do
-        put_config(:__system__, system)
-        assert Config.__system__() == system
+      check all application <- atom() do
+        put_config(:__application_handler__, application)
+        assert Config.__application_handler__() == application
       end
     end
 
     property "fails when is invalid" do
-      check all system <- term_except(&is_atom/1) do
-        put_config(:__system__, system)
-        assert_raise RuntimeError, &Config.__system__/0
+      check all application <- term_except(&is_atom/1) do
+        put_config(:__application_handler__, application)
+        assert_raise RuntimeError, &Config.__application_handler__/0
+      end
+    end
+  end
+
+  describe "__code_handler__/0" do
+    test "Code when not configured" do
+      delete_config(:__code_handler__)
+      assert Config.__code_handler__() == Code
+    end
+
+    property "value when configured correctly" do
+      check all code <- atom() do
+        put_config(:__code_handler__, code)
+        assert Config.__code_handler__() == code
+      end
+    end
+
+    property "fails when is invalid" do
+      check all code <- term_except(&is_atom/1) do
+        put_config(:__code_handler__, code)
+        assert_raise RuntimeError, &Config.__code_handler__/0
       end
     end
   end
@@ -549,23 +570,23 @@ defmodule Deli.ConfigTest do
     end
   end
 
-  describe "__code_handler__/0" do
-    test "Code when not configured" do
-      delete_config(:__code_handler__)
-      assert Config.__code_handler__() == Code
+  describe "__system_handler__/0" do
+    test "System when not configured" do
+      delete_config(:__system_handler__)
+      assert Config.__system_handler__() == System
     end
 
     property "value when configured correctly" do
-      check all code <- atom() do
-        put_config(:__code_handler__, code)
-        assert Config.__code_handler__() == code
+      check all system <- atom() do
+        put_config(:__system_handler__, system)
+        assert Config.__system_handler__() == system
       end
     end
 
     property "fails when is invalid" do
-      check all code <- term_except(&is_atom/1) do
-        put_config(:__code_handler__, code)
-        assert_raise RuntimeError, &Config.__code_handler__/0
+      check all system <- term_except(&is_atom/1) do
+        put_config(:__system_handler__, system)
+        assert_raise RuntimeError, &Config.__system_handler__/0
       end
     end
   end

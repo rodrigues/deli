@@ -48,7 +48,7 @@ defmodule Deli.Command do
   """
   @spec call(Deli.env(), module, OptionParser.argv()) :: :ok
   def call(:dev, mod, args) when is_atom(mod) and is_list(args) do
-    {:ok, _} = Config.app() |> Application.ensure_all_started()
+    {:ok, _} = Config.app() |> Shell.ensure_all_started()
     :ok = mod |> apply(:run, [args])
     :ok
   end

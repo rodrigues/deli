@@ -3,7 +3,7 @@ defmodule Mix.DeliVersionTest do
   alias Mix.Tasks.Deli.Version
 
   setup do
-    put_config(:__system__, SystemStub)
+    put_config(:__system_handler__, SystemStub)
   end
 
   def setup_versions(env, hosts) do
@@ -59,7 +59,7 @@ defmodule Mix.DeliVersionTest do
         id = "#{app_user}@#{host}"
 
         assert_received {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "rpc", ^rpc_call],
@@ -104,7 +104,7 @@ defmodule Mix.DeliVersionTest do
         id = "#{app_user}@#{host}"
 
         assert_received {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "rpc", ^rpc_call],
@@ -129,7 +129,7 @@ defmodule Mix.DeliVersionTest do
       assert output == "checking version of deli at dev environment\n\e[32m#{version}\e[0m\n"
 
       refute_received {
-        :__system__,
+        :__system_handler__,
         :cmd,
         "ssh",
         _,
@@ -173,7 +173,7 @@ defmodule Mix.DeliVersionTest do
         id = "#{app_user}@#{host}"
 
         assert_received {
-          :__system__,
+          :__system_handler__,
           :cmd,
           "ssh",
           [^id, ^bin_path, "rpc", ^rpc_call],
@@ -295,7 +295,7 @@ defmodule Mix.DeliVersionTest do
       id = "#{app_user}@#{host}"
 
       assert_received {
-        :__system__,
+        :__system_handler__,
         :cmd,
         "ssh",
         [^id, ^bin_path, "rpc", ^rpc_call],

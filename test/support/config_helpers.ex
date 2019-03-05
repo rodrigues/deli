@@ -19,9 +19,10 @@ defmodule ConfigHelpers do
     verbose
     versioning
     waits
-    __system__
-    __file_handler__
+    __application_handler__
     __code_handler__
+    __file_handler__
+    __system_handler__
   )a
 
   @waits ~w(

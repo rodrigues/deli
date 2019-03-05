@@ -226,10 +226,17 @@ defmodule Deli.Config do
     |> ensure_pos_integer
   end
 
-  @spec __system__() :: module
-  def __system__ do
-    :__system__
-    |> get(System)
+  @spec __application_handler__() :: module
+  def __application_handler__ do
+    :__application_handler__
+    |> get(Application)
+    |> ensure_atom
+  end
+
+  @spec __code_handler__() :: module
+  def __code_handler__ do
+    :__code_handler__
+    |> get(Code)
     |> ensure_atom
   end
 
@@ -240,10 +247,10 @@ defmodule Deli.Config do
     |> ensure_atom
   end
 
-  @spec __code_handler__() :: module
-  def __code_handler__ do
-    :__code_handler__
-    |> get(Code)
+  @spec __system_handler__() :: module
+  def __system_handler__ do
+    :__system_handler__
+    |> get(System)
     |> ensure_atom
   end
 

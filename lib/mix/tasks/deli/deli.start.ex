@@ -23,7 +23,7 @@ defmodule Mix.Tasks.Deli.Start do
 
   @impl true
   def run(args) do
-    _ = Application.ensure_all_started(:deli)
+    _ = :deli |> ensure_all_started
     options = args |> parse_options
     target = options |> Keyword.fetch!(:target)
     {:ok, hosts} = target |> HostFilter.hosts(args)

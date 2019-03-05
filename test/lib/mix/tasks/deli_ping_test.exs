@@ -3,7 +3,7 @@ defmodule Mix.DeliPingTest do
   alias Mix.Tasks.Deli.Ping
 
   setup do
-    put_config(:__system__, SystemStub)
+    put_config(:__system_handler__, SystemStub)
   end
 
   property "pings application in all default target hosts by default" do

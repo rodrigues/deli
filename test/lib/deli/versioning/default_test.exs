@@ -3,7 +3,7 @@ defmodule Deli.Versioning.DefaultTest do
   alias Deli.Versioning.Default, as: Versioning
 
   setup do
-    put_config(:__system__, SystemStub)
+    put_config(:__system_handler__, SystemStub)
   end
 
   test "behaviour" do
