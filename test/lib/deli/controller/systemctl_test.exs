@@ -187,7 +187,7 @@ defmodule Deli.Controller.SystemctlTest do
       check all app <- app(),
                 env <- env(),
                 host <- host(),
-                signal <- 2..500 |> integer() |> except(&(&1 == 127)) do
+                signal <- 1..500 |> integer() |> except(&(&1 == 3)) do
         put_config(:app, app)
         stub_cmd({"", signal})
         app = app |> to_string
