@@ -267,6 +267,8 @@ defmodule Deli.Config do
   @spec mix_env(Deli.env() | String.t()) :: Deli.env()
   def mix_env("production"), do: :prod
   def mix_env(:production), do: :prod
+  def mix_env("nil"), do: default_target()
+  def mix_env(nil), do: default_target()
   def mix_env(env) when is_env(env), do: env
 
   def mix_env(env) when is_binary(env) do
