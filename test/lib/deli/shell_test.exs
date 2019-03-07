@@ -8,64 +8,58 @@ defmodule Deli.ShellTest do
     put_config(:__system_handler__, SystemStub)
   end
 
-  def command, do: nonempty_string()
-
-  def args, do: nonempty_string() |> list_of()
-
-  def command_args, do: tuple({command(), args()})
-
   def ok_signals, do: 0..999 |> integer() |> list_of() |> nonempty()
 
   describe "cmd/1..4" do
     property "runs shell command without args as atom" do
-      check all c <- atom() do
-        :ok = c |> Shell.cmd()
-        command = c |> to_string
-        assert_received {:__system_handler__, :cmd, ^command, [], _}
+      check all cmd <- atom() do
+        :ok = cmd |> Shell.cmd()
+        cmd = cmd |> to_string
+        assert_received {:__system_handler__, :cmd, ^cmd, [], _}
       end
     end
 
     property "runs shell command without args as binary" do
-      check all command <- command() do
-        :ok = command |> Shell.cmd()
-        assert_received {:__system_handler__, :cmd, ^command, [], _}
+      check all cmd <- cmd() do
+        :ok = cmd |> Shell.cmd()
+        assert_received {:__system_handler__, :cmd, ^cmd, [], _}
       end
     end
 
     property "accepts args" do
-      check all {command, args} <- command_args() do
-        :ok = command |> Shell.cmd(args)
-        assert_received {:__system_handler__, :cmd, ^command, ^args, _}
+      check all {cmd, args} <- cmd_with_args() do
+        :ok = cmd |> Shell.cmd(args)
+        assert_received {:__system_handler__, :cmd, ^cmd, ^args, _}
       end
     end
 
     property "optionally outputs command call" do
       put_config(:output_commands, true)
 
-      check all command <- command(),
+      check all cmd <- cmd(),
                 args <- nonempty_string() |> list_of() |> nonempty() do
         output =
           capture_io(fn ->
-            :ok = command |> Shell.cmd(args)
+            :ok = cmd |> Shell.cmd(args)
           end)
 
         argv = args |> Enum.join(" ")
 
-        assert output == "\e[1m$ \e[0m\e[4m#{command} #{argv}\e[0m\n"
-        assert_received {:__system_handler__, :cmd, ^command, ^args, _}
+        assert output == "\e[1m$ \e[0m\e[4m#{cmd} #{argv}\e[0m\n"
+        assert_received {:__system_handler__, :cmd, ^cmd, ^args, _}
       end
     end
 
     property "outputs command output when verbose" do
       put_config(:verbose, true)
 
-      check all {command, args} <- command_args() do
-        :ok = command |> Shell.cmd(args)
+      check all {cmd, args} <- cmd_with_args() do
+        :ok = cmd |> Shell.cmd(args)
 
         assert_received {
           :__system_handler__,
           :cmd,
-          ^command,
+          ^cmd,
           ^args,
           into: %IO.Stream{device: :standard_io, line_or_bytes: :line, raw: false},
           stderr_to_stdout: true
@@ -74,24 +68,24 @@ defmodule Deli.ShellTest do
     end
 
     property "does not output command output when not verbose" do
-      check all {command, args} <- command_args() do
-        :ok = command |> Shell.cmd(args)
+      check all {cmd, args} <- cmd_with_args() do
+        :ok = cmd |> Shell.cmd(args)
 
-        assert_received {:__system_handler__, :cmd, ^command, ^args, into: ""}
+        assert_received {:__system_handler__, :cmd, ^cmd, ^args, into: ""}
       end
     end
 
     property "ok when signal is in ok_signals" do
-      check all {command, args} <- command_args(),
+      check all {cmd, args} <- cmd_with_args(),
                 ok_signals <- ok_signals(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({"", signal})
-        assert :ok == Shell.cmd(command, args, ok_signals)
+        assert :ok == Shell.cmd(cmd, args, ok_signals)
       end
     end
 
     property "fails when signal not in ok_signals" do
-      check all {command, args} <- command_args(),
+      check all {cmd, args} <- cmd_with_args(),
                 ok_signals <- ok_signals(),
                 signal <- 0..999 |> integer(),
                 not Enum.member?(ok_signals, signal) do
@@ -99,7 +93,7 @@ defmodule Deli.ShellTest do
 
         call = fn ->
           capture_io(fn ->
-            Shell.cmd(command, args, ok_signals)
+            Shell.cmd(cmd, args, ok_signals)
           end)
         end
 
@@ -108,91 +102,91 @@ defmodule Deli.ShellTest do
     end
 
     property "propagates opts downstream" do
-      check all {command, args} <- command_args(),
+      check all {cmd, args} <- cmd_with_args(),
                 opts <- term() |> keyword_of(),
                 ok_signals <- ok_signals(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({"", signal})
-        :ok = command |> Shell.cmd(args, ok_signals, opts)
+        :ok = cmd |> Shell.cmd(args, ok_signals, opts)
         expected_opts = [into: ""] ++ opts
-        assert_received {:__system_handler__, :cmd, ^command, ^args, ^expected_opts}
+        assert_received {:__system_handler__, :cmd, ^cmd, ^args, ^expected_opts}
       end
     end
   end
 
   describe "cmd_result/2..4" do
     property "result when succeeds" do
-      check all {command, args} <- command_args(),
+      check all {cmd, args} <- cmd_with_args(),
                 opts <- term() |> keyword_of(),
                 ok_signals <- ok_signals(),
                 result <- nonempty_string(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({result, signal})
 
-        {:ok, ^result} = command |> Shell.cmd_result(args, ok_signals, opts)
+        {:ok, ^result} = cmd |> Shell.cmd_result(args, ok_signals, opts)
 
         expected_opts = [into: ""] ++ opts
-        assert_received {:__system_handler__, :cmd, ^command, ^args, ^expected_opts}
+        assert_received {:__system_handler__, :cmd, ^cmd, ^args, ^expected_opts}
       end
     end
 
     property "stream when succeeds and result is a stream" do
-      check all {command, args} <- command_args(),
+      check all {cmd, args} <- cmd_with_args(),
                 opts <- term() |> keyword_of(),
                 ok_signals <- ok_signals(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         result = %IO.Stream{device: :standard_io, line_or_bytes: :line, raw: false}
         stub_cmd({result, signal})
 
-        {:ok, ^result} = command |> Shell.cmd_result(args, ok_signals, opts)
+        {:ok, ^result} = cmd |> Shell.cmd_result(args, ok_signals, opts)
 
         expected_opts = [into: ""] ++ opts
-        assert_received {:__system_handler__, :cmd, ^command, ^args, ^expected_opts}
+        assert_received {:__system_handler__, :cmd, ^cmd, ^args, ^expected_opts}
       end
     end
   end
 
   describe "edeliver/1..2" do
     property "calls edeliver with no args" do
-      check all command <- nonempty_string() do
+      check all cmd <- nonempty_string() do
         stub_cmd({"", 0})
-        :ok = command |> Shell.edeliver()
+        :ok = cmd |> Shell.edeliver()
         expected_opts = [into: ""]
 
         assert_received {
           :__system_handler__,
           :cmd,
           "mix",
-          ["edeliver", ^command],
+          ["edeliver", ^cmd],
           ^expected_opts
         }
       end
     end
 
     property "calls edeliver with args" do
-      check all {command, args} <- command_args() do
+      check all {cmd, args} <- cmd_with_args() do
         stub_cmd({"", 0})
-        :ok = command |> Shell.edeliver(args)
+        :ok = cmd |> Shell.edeliver(args)
         expected_opts = [into: ""]
 
         assert_received {
           :__system_handler__,
           :cmd,
           "mix",
-          ["edeliver", ^command | ^args],
+          ["edeliver", ^cmd | ^args],
           ^expected_opts
         }
       end
     end
 
     property "fails on a signal different than 0" do
-      check all {command, args} <- command_args(),
+      check all {cmd, args} <- cmd_with_args(),
                 signal <- 1..999 |> integer() do
         stub_cmd({"", signal})
 
         call = fn ->
           capture_io(fn ->
-            Shell.edeliver(command, args)
+            Shell.edeliver(cmd, args)
           end)
         end
 
@@ -201,7 +195,7 @@ defmodule Deli.ShellTest do
     end
 
     property "propagates verbose downstream" do
-      check all {command, args} <- command_args() do
+      check all {cmd, args} <- cmd_with_args() do
         put_config(:verbose, true)
         stub_cmd({"", 0})
 
@@ -210,9 +204,9 @@ defmodule Deli.ShellTest do
           stderr_to_stdout: true
         ]
 
-        expected_args = ["edeliver", command] ++ args ++ ["--verbose"]
+        expected_args = ["edeliver", cmd] ++ args ++ ["--verbose"]
 
-        :ok = command |> Shell.edeliver(args)
+        :ok = cmd |> Shell.edeliver(args)
 
         assert_received {
           :__system_handler__,
@@ -227,45 +221,45 @@ defmodule Deli.ShellTest do
 
   describe "docker_compose/1..3" do
     property "calls docker_compose with no args" do
-      check all command <- nonempty_string() do
+      check all cmd <- nonempty_string() do
         stub_cmd({"", 0})
-        :ok = command |> Shell.docker_compose()
+        :ok = cmd |> Shell.docker_compose()
         expected_opts = [into: "", env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]]
 
         assert_received {
           :__system_handler__,
           :cmd,
           "docker-compose",
-          ["-f", ".deli/docker-compose.yml", ^command],
+          ["-f", ".deli/docker-compose.yml", ^cmd],
           ^expected_opts
         }
       end
     end
 
     property "calls docker_compose with args" do
-      check all {command, args} <- command_args() do
+      check all {cmd, args} <- cmd_with_args() do
         stub_cmd({"", 0})
-        :ok = command |> Shell.docker_compose(args)
+        :ok = cmd |> Shell.docker_compose(args)
         expected_opts = [into: "", env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]]
 
         assert_received {
           :__system_handler__,
           :cmd,
           "docker-compose",
-          ["-f", ".deli/docker-compose.yml", ^command | ^args],
+          ["-f", ".deli/docker-compose.yml", ^cmd | ^args],
           ^expected_opts
         }
       end
     end
 
     property "fails on a signal different than 0" do
-      check all {command, args} <- command_args(),
+      check all {cmd, args} <- cmd_with_args(),
                 signal <- 1..999 |> integer() do
         stub_cmd({"", signal})
 
         call = fn ->
           capture_io(fn ->
-            Shell.docker_compose(command, args)
+            Shell.docker_compose(cmd, args)
           end)
         end
 
@@ -274,17 +268,17 @@ defmodule Deli.ShellTest do
     end
 
     property "ok on a signal in ok_signals" do
-      check all {command, args} <- command_args(),
+      check all {cmd, args} <- cmd_with_args(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 [signal] = ok_signals |> Enum.take_random(1) do
         stub_cmd({"", signal})
 
-        assert Shell.docker_compose(command, args, ok_signals) == :ok
+        assert Shell.docker_compose(cmd, args, ok_signals) == :ok
       end
     end
 
     property "fail on a signal not in ok_signals" do
-      check all {command, args} <- command_args(),
+      check all {cmd, args} <- cmd_with_args(),
                 ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
                 signal <- 0..999 |> integer(),
                 not Enum.member?(ok_signals, signal) do
@@ -292,7 +286,7 @@ defmodule Deli.ShellTest do
 
         call = fn ->
           capture_io(fn ->
-            Shell.docker_compose(command, args, ok_signals)
+            Shell.docker_compose(cmd, args, ok_signals)
           end)
         end
 

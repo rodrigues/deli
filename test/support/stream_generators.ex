@@ -6,18 +6,26 @@ defmodule StreamGenerators do
 
   @limit_mismatches 100_000
 
-  def app, do: atom()
-  def bin_path, do: path()
-  def env, do: atom()
+  def app, do: strict_atom()
 
   def app_user do
-    [atom(), nonempty_string()] |> one_of()
+    [strict_atom(), nonempty_string()] |> one_of()
   end
+
+  def bin_path, do: path()
+
+  def cmd, do: nonempty_string()
+
+  def cmd_args, do: nonempty_string() |> list_of()
+
+  def cmd_with_args, do: tuple({cmd(), cmd_args()})
+
+  def env, do: strict_atom()
 
   def host do
     :alphanumeric
     |> string(max_length: 20)
-    |> except(&(&1 == ""))
+    |> except(&(&1 == "" || &1 =~ "@"))
   end
 
   def hosts do
@@ -42,6 +50,10 @@ defmodule StreamGenerators do
 
   def atom do
     :alphanumeric |> atom()
+  end
+
+  def strict_atom do
+    atom() |> except(&(is_nil(&1) || to_string(&1) =~ "@"))
   end
 
   def string do
