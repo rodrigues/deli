@@ -650,14 +650,22 @@ defmodule Deli.ConfigTest do
       assert Config.mix_env("production") == :prod
     end
 
+    property "makes nil be default target" do
+      check all env <- env() do
+        put_config(:default_target, env)
+        assert Config.mix_env(nil) == env
+        assert Config.mix_env("nil") == env
+      end
+    end
+
     property "env when configured as atom" do
-      check all env <- atom() do
+      check all env <- strict_atom() do
         assert Config.mix_env(env) == env
       end
     end
 
     property "to_atom when configured as binary" do
-      check all env <- atom() do
+      check all env <- strict_atom() do
         assert Config.mix_env(to_string(env)) == env
       end
     end
