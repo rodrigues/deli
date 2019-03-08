@@ -31,6 +31,7 @@ defmodule DeliCase do
 
   def setup_mocks do
     put_config(:controller, ControllerMock)
+    put_config(:host_filter, HostFilterMock)
     put_config(:host_provider, HostProviderMock)
     put_config(:release, ReleaseMock)
     put_config(:versioning, VersioningMock)

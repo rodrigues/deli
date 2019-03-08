@@ -15,8 +15,8 @@ defmodule Mix.DeliVersionTest do
       |> Enum.zip(versions)
       |> Enum.into(%{})
 
-    HostProviderMock
-    |> stub(:hosts, fn ^env -> hosts end)
+    HostFilterMock
+    |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
     TestAgent.set(:cmd, fn _, [id | _], _ ->
       host = id |> String.split("@") |> List.last()
@@ -46,11 +46,10 @@ defmodule Mix.DeliVersionTest do
         end)
 
       host_output = fn f -> hosts |> Enum.map(f) |> Enum.join("") end
-      hosts_output = host_output.(&"## #{&1}\n")
       versions_output = host_output.(&"\e[32m#{versions[&1]}\e[0m\n")
 
       assert output ==
-               "# hosts\n#{hosts_output}checking version of #{app} at" <>
+               "checking version of #{app} at" <>
                  " target #{env}\n#{versions_output}"
 
       rpc_call = "\":application.get_key(:#{app}, :vsn)\""
@@ -91,11 +90,10 @@ defmodule Mix.DeliVersionTest do
         end)
 
       host_output = fn f -> hosts |> Enum.map(f) |> Enum.join("") end
-      hosts_output = host_output.(&"## #{&1}\n")
       versions_output = host_output.(&"\e[32m#{versions[&1]}\e[0m\n")
 
       assert output ==
-               "# hosts\n#{hosts_output}checking version of #{app} at" <>
+               "checking version of #{app} at" <>
                  " target #{env}\n#{versions_output}"
 
       rpc_call = "\":application.get_key(:#{app}, :vsn)\""
@@ -155,17 +153,9 @@ defmodule Mix.DeliVersionTest do
 
       opts = [target_flag, to_string(env), compare_flag]
 
-      output =
-        capture_io(fn ->
-          :ok = opts |> Version.run()
-        end)
-
-      host_output = fn f -> hosts |> Enum.map(f) |> Enum.join("") end
-      hosts_output = host_output.(&"## #{&1}\n")
-
-      hosts_involved = "# hosts\n#{hosts_output}"
-
-      assert String.starts_with?(output, hosts_involved)
+      capture_io(fn ->
+        :ok = opts |> Version.run()
+      end)
 
       rpc_call = "\":application.get_key(:#{app}, :vsn)\""
 
@@ -187,8 +177,8 @@ defmodule Mix.DeliVersionTest do
     env = env() |> pick()
     host = host() |> pick()
 
-    HostProviderMock
-    |> stub(:hosts, fn ^env -> [host] end)
+    HostFilterMock
+    |> stub(:hosts, fn ^env, _ -> {:ok, [host]} end)
 
     TestAgent.set(:cmd, fn _, _, _ ->
       {"{:ok, '0.0.1'}", 0}
@@ -204,16 +194,15 @@ defmodule Mix.DeliVersionTest do
     version = Deli.MixProject.project()[:version]
 
     assert output ==
-             "# hosts\n## #{host}\n" <>
-               "\e[1m* #{host} \e[0m\e[31m\e[4moutdated\e[0m\e[1m  (0.0.1, local #{version})\e[0m\n"
+             "\e[1m* #{host} \e[0m\e[31m\e[4moutdated\e[0m\e[1m  (0.0.1, local #{version})\e[0m\n"
   end
 
   test "compare indicates when version is bigger" do
     env = env() |> pick()
     host = host() |> pick()
 
-    HostProviderMock
-    |> stub(:hosts, fn ^env -> [host] end)
+    HostFilterMock
+    |> stub(:hosts, fn ^env, _ -> {:ok, [host]} end)
 
     TestAgent.set(:cmd, fn _, _, _ ->
       {"{:ok, '100.0.1'}", 0}
@@ -229,8 +218,7 @@ defmodule Mix.DeliVersionTest do
     version = Deli.MixProject.project()[:version]
 
     assert output ==
-             "# hosts\n## #{host}\n" <>
-               "\e[1m* #{host} \e[0m\e[31m\e[4mahead\e[0m\e[1m  (100.0.1, local #{version})\e[0m\n"
+             "\e[1m* #{host} \e[0m\e[31m\e[4mahead\e[0m\e[1m  (100.0.1, local #{version})\e[0m\n"
   end
 
   test "compare indicates when version is equal" do
@@ -238,8 +226,8 @@ defmodule Mix.DeliVersionTest do
     host = host() |> pick()
     version = Deli.MixProject.project()[:version]
 
-    HostProviderMock
-    |> stub(:hosts, fn ^env -> [host] end)
+    HostFilterMock
+    |> stub(:hosts, fn ^env, _ -> {:ok, [host]} end)
 
     TestAgent.set(:cmd, fn _, _, _ ->
       {"{:ok, '#{version}'}", 0}
@@ -253,8 +241,7 @@ defmodule Mix.DeliVersionTest do
       end)
 
     assert output ==
-             "# hosts\n## #{host}\n" <>
-               "\e[1m* #{host} \e[0m\e[32mup-to-date\e[0m\e[2m  (#{version})\e[0m\n"
+             "\e[1m* #{host} \e[0m\e[32mup-to-date\e[0m\e[2m  (#{version})\e[0m\n"
   end
 
   test "prints error when host version fails" do
@@ -265,8 +252,8 @@ defmodule Mix.DeliVersionTest do
     host = host() |> pick()
     hosts = [host]
 
-    HostProviderMock
-    |> stub(:hosts, fn ^env -> hosts end)
+    HostFilterMock
+    |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
     TestAgent.set(:cmd, fn _, _, _ ->
       {"bad version", 0}
@@ -283,10 +270,8 @@ defmodule Mix.DeliVersionTest do
         :ok = opts |> Version.run()
       end)
 
-    hosts_output = "## #{host}\n"
-
     assert output ==
-             "# hosts\n#{hosts_output}checking version of #{app} at" <>
+             "checking version of #{app} at" <>
                " target #{env}\n\e[31m\"bad version\"\e[0m\n"
 
     rpc_call = "\":application.get_key(:#{app}, :vsn)\""

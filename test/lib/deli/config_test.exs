@@ -333,6 +333,27 @@ defmodule Deli.ConfigTest do
     end
   end
 
+  describe "host_filter/0" do
+    test "default host filter when not configured" do
+      delete_config(:host_filter)
+      assert Config.host_filter() == Deli.HostFilter.Default
+    end
+
+    property "host filter when configured correctly" do
+      check all host_filter <- atom() do
+        put_config(:host_filter, host_filter)
+        assert Config.host_filter() == host_filter
+      end
+    end
+
+    property "fails when is invalid" do
+      check all host_filter <- term_except(&is_atom/1) do
+        put_config(:host_filter, host_filter)
+        assert_raise RuntimeError, &Config.host_filter/0
+      end
+    end
+  end
+
   describe "host_provider/0" do
     test "default host provider when not configured" do
       delete_config(:host_provider)

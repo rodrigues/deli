@@ -21,6 +21,8 @@ defmodule Deli.Config do
       # when app has web assets
       yarn?: false
     ],
+    # by default allows to filter hosts with -h regex
+    host_filter: Deli.HostFilter.Default,
     # by default use hosts configured in mix config
     host_provider: Deli.HostProvider.Config,
     # verbose won't output `Deli.Shell` cmd calls, meant for debugging
@@ -165,6 +167,13 @@ defmodule Deli.Config do
   @spec host_id(Deli.env(), Deli.host()) :: String.t()
   def host_id(env, host) when is_env(env) and is_host(host) do
     "#{app_user(env)}@#{host}"
+  end
+
+  @spec host_filter() :: module
+  def host_filter do
+    :host_filter
+    |> get(@defaults.host_filter)
+    |> ensure_atom
   end
 
   @spec host_provider() :: module

@@ -1,6 +1,10 @@
-defmodule Deli.HostFilterTest do
+defmodule Deli.HostFilter.DefaultTest do
   use DeliCase
-  alias Deli.HostFilter
+  alias Deli.HostFilter.Default, as: HostFilter
+
+  test "behaviour" do
+    assert behaves?(HostFilter, Deli.HostFilter)
+  end
 
   describe "hosts/2" do
     property "all hosts when not filtering" do

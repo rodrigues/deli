@@ -13,8 +13,8 @@ defmodule Mix.DeliStartTest do
       put_config(:app_user, [{env, app_user}])
       put_config(:default_target, env)
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       for host <- hosts do
         ControllerMock
@@ -38,9 +38,7 @@ defmodule Mix.DeliStartTest do
         end)
         |> Enum.join("")
 
-      assert output ==
-               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nstart #{app} at #{env}? [Yn] y\n" <>
-                 log
+      assert output == "start #{app} at #{env}? [Yn] y\n" <> log
     end
   end
 
@@ -49,8 +47,8 @@ defmodule Mix.DeliStartTest do
               hosts <- hosts() do
       put_config(:default_target, env)
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       for host <- hosts do
         ControllerMock
@@ -74,9 +72,7 @@ defmodule Mix.DeliStartTest do
         end)
         |> Enum.join("")
 
-      assert output ==
-               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nstart deli at #{env}? [Yn] " <>
-                 log
+      assert output == "start deli at #{env}? [Yn] " <> log
     end
   end
 
@@ -85,8 +81,8 @@ defmodule Mix.DeliStartTest do
               hosts <- hosts() do
       put_config(:default_target, env)
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       for host <- hosts do
         ControllerMock
@@ -100,9 +96,7 @@ defmodule Mix.DeliStartTest do
           :ok = Start.run([])
         end)
 
-      assert output ==
-               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nstart deli at #{env}? [Yn] " <>
-                 "\e[32mstart cancelled by user\e[0m\n"
+      assert output == "start deli at #{env}? [Yn] \e[32mstart cancelled by user\e[0m\n"
     end
   end
 end

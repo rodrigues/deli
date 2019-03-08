@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli.Version do
   use Mix.Task
   import Deli.Shell
-  alias Deli.{Config, HostFilter}
+  alias Deli.Config
 
   @moduledoc """
   To check version app in all staging hosts, do:
@@ -37,7 +37,7 @@ defmodule Mix.Tasks.Deli.Version do
   end
 
   defp check_version(env, args) do
-    {:ok, hosts} = env |> HostFilter.hosts(args)
+    {:ok, hosts} = env |> Config.host_filter().hosts(args)
     app = Config.app()
 
     IO.puts("checking version of #{app} at target #{env}")
@@ -45,7 +45,7 @@ defmodule Mix.Tasks.Deli.Version do
   end
 
   defp compare_versions(env, args) do
-    {:ok, hosts} = env |> HostFilter.hosts(args)
+    {:ok, hosts} = env |> Config.host_filter().hosts(args)
     hosts |> Enum.each(&compare_host_version(env, &1))
   end
 

@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli do
   use Mix.Task
   import Deli.Shell
-  alias Deli.HostFilter
+  alias Deli.Config
   alias Mix.Tasks.Deli.{Deploy, Release}
 
   @moduledoc """
@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Deli do
     # Although deploy is the one that needs hosts,
     # calling this before so operation stops fast
     # in case there are no valid hosts given filter
-    {:ok, _} = target |> HostFilter.hosts(args)
+    {:ok, _} = target |> Config.host_filter().hosts(args)
     :ok = args |> Release.run()
 
     Deploy.run(args)

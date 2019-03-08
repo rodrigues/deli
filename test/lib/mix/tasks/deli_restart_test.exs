@@ -13,8 +13,8 @@ defmodule Mix.DeliRestartTest do
       put_config(:app_user, [{env, app_user}])
       put_config(:default_target, env)
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       for host <- hosts do
         ControllerMock
@@ -38,9 +38,7 @@ defmodule Mix.DeliRestartTest do
         end)
         |> Enum.join("")
 
-      assert output ==
-               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nrestart #{app} at #{env}? [Yn] y\n" <>
-                 log
+      assert output == "restart #{app} at #{env}? [Yn] y\n" <> log
     end
   end
 
@@ -49,8 +47,8 @@ defmodule Mix.DeliRestartTest do
               hosts <- hosts() do
       put_config(:default_target, env)
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       for host <- hosts do
         ControllerMock
@@ -74,9 +72,7 @@ defmodule Mix.DeliRestartTest do
         end)
         |> Enum.join("")
 
-      assert output ==
-               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nrestart deli at #{env}? [Yn] " <>
-                 log
+      assert output == "restart deli at #{env}? [Yn] " <> log
     end
   end
 
@@ -85,17 +81,15 @@ defmodule Mix.DeliRestartTest do
               hosts <- hosts() do
       put_config(:default_target, env)
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       output =
         capture_io([input: "n\n", capture_prompt: true], fn ->
           :ok = Restart.run([])
         end)
 
-      assert output ==
-               "# hosts\n## #{hosts |> Enum.join("\n## ")}\nrestart deli at #{env}? [Yn] " <>
-                 "\e[32mrestart cancelled by user\e[0m\n"
+      assert output == "restart deli at #{env}? [Yn] \e[32mrestart cancelled by user\e[0m\n"
     end
   end
 end

@@ -1,6 +1,6 @@
 defmodule Deli.Command do
   import Deli, only: [is_env: 1, is_host: 1]
-  alias Deli.{Config, HostFilter, Shell}
+  alias Deli.{Config, Shell}
 
   @moduledoc ~S"""
   Run commands locally or remotely.
@@ -57,7 +57,7 @@ defmodule Deli.Command do
     mod = mod |> to_string |> String.replace(~r/^Elixir\./, "")
     mfa = ~s("#{mod}.run/1")
     terms = args |> Enum.map(&to_string/1) |> Enum.join(" ")
-    {:ok, hosts} = env |> HostFilter.hosts(args)
+    {:ok, hosts} = env |> Config.host_filter().hosts(args)
     hosts |> Enum.each(&call_host(env, &1, mfa, terms))
   end
 

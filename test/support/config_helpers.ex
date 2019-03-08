@@ -11,6 +11,7 @@ defmodule ConfigHelpers do
     default_target
     docker_build
     hosts
+    host_filter
     host_provider
     output_commands
     release

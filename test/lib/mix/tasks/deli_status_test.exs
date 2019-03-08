@@ -15,8 +15,8 @@ defmodule Mix.DeliStatusTest do
       put_config(:default_target, env)
       put_config(:verbose, verbose?)
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       ControllerMock
       |> stub(:service_running?, fn ^env, _ -> running? end)
@@ -44,7 +44,7 @@ defmodule Mix.DeliStatusTest do
         end)
         |> Enum.join("")
 
-      assert output == "# hosts\n## #{hosts |> Enum.join("\n## ")}\n#{log}"
+      assert output == log
     end
   end
 
@@ -62,8 +62,8 @@ defmodule Mix.DeliStatusTest do
       put_config(:app_user, [{env, app_user}])
       put_config(:verbose, verbose?)
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       ControllerMock
       |> stub(:service_running?, fn ^env, _ -> running? end)
@@ -91,7 +91,7 @@ defmodule Mix.DeliStatusTest do
         end)
         |> Enum.join("")
 
-      assert output == "# hosts\n## #{hosts |> Enum.join("\n## ")}\n#{log}"
+      assert output == log
     end
   end
 end

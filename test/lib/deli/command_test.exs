@@ -51,8 +51,8 @@ defmodule Deli.CommandTest do
             {"", 1}
         end)
 
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> hosts end)
+        HostFilterMock
+        |> expect(:hosts, fn ^env, ^args -> {:ok, hosts} end)
 
         output =
           capture_io(fn ->

@@ -20,8 +20,8 @@ defmodule Mix.DeliPingTest do
       put_config(:verbose, verbose?)
       stub_cmd({status, 0})
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       output =
         capture_io(fn ->
@@ -45,7 +45,7 @@ defmodule Mix.DeliPingTest do
         end)
         |> Enum.join("")
 
-      assert output == "# hosts\n## #{hosts |> Enum.join("\n## ")}\n#{log}"
+      assert output == log
     end
   end
 
@@ -64,8 +64,8 @@ defmodule Mix.DeliPingTest do
       put_config(:verbose, verbose?)
       stub_cmd({status, 0})
 
-      HostProviderMock
-      |> stub(:hosts, fn ^env -> hosts end)
+      HostFilterMock
+      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
       output =
         capture_io(fn ->
@@ -89,7 +89,7 @@ defmodule Mix.DeliPingTest do
         end)
         |> Enum.join("")
 
-      assert output == "# hosts\n## #{hosts |> Enum.join("\n## ")}\n#{log}"
+      assert output == log
     end
   end
 end

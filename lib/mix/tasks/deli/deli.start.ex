@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli.Start do
   use Mix.Task
   import Deli.Shell
-  alias Deli.{Check, Config, HostFilter}
+  alias Deli.{Check, Config}
 
   @moduledoc """
   To start app in all staging hosts, do:
@@ -26,7 +26,7 @@ defmodule Mix.Tasks.Deli.Start do
     _ = :deli |> ensure_all_started
     options = args |> parse_options
     target = options |> Keyword.fetch!(:target)
-    {:ok, hosts} = target |> HostFilter.hosts(args)
+    {:ok, hosts} = target |> Config.host_filter().hosts(args)
 
     if :start |> confirm?(options) do
       hosts |> Enum.each(&start_host(target, &1))
