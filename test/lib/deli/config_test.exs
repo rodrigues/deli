@@ -221,7 +221,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "docker build port when configured correctly" do
-      check all port <- 0..65_535 |> integer() do
+      check all port <- port() do
         put_config(:docker_build, port: port)
         assert Config.docker_build_port() == port
       end

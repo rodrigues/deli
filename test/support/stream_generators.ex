@@ -40,6 +40,8 @@ defmodule StreamGenerators do
     end
   end
 
+  def port, do: 0..65_535 |> integer()
+
   def version do
     gen all major <- 0..128 |> integer(),
             minor <- 0..256 |> integer(),

@@ -32,7 +32,7 @@ defmodule Deli.Config.EnsureTest do
 
   describe "ensure_port_number/0" do
     property "port number when receives port number" do
-      check all a <- 0..65_535 |> integer() do
+      check all a <- port() do
         assert Ensure.ensure_port_number(a) == a
       end
     end
