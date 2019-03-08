@@ -70,6 +70,7 @@ defmodule Deli.Command do
     |> OptionParser.parse(aliases: [t: :target], switches: [target: :string])
     |> elem(0)
     |> Keyword.get(:target)
+    |> Kernel.||(:dev)
     |> Config.mix_env()
     |> call(command, args)
   end
