@@ -59,8 +59,8 @@ defmodule Deli.CommandTest do
             :ok = CommandExample |> Command.run(args)
           end)
 
-        results = hosts |> Enum.map(fn _ -> "#{result}\n" end)
-        assert output == "# hosts\n## #{hosts |> Enum.join("\n## ")}\n#{results}"
+        results = hosts |> Enum.map(fn _ -> "#{result}\n" end) |> Enum.join("")
+        assert output == results
 
         refute_received {:command_example_call, _}
       end
