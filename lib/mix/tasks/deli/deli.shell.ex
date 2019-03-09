@@ -102,7 +102,8 @@ defmodule Mix.Tasks.Deli.Shell do
   end
 
   defp whoami do
-    'whoami' |> :os.cmd() |> to_string |> String.trim()
+    {:ok, result} = :whoami |> cmd_result([])
+    result |> String.trim()
   end
 
   defp fetch_ports(env, host) do
