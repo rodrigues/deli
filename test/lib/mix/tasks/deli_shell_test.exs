@@ -45,7 +45,7 @@ defmodule Mix.DeliShellTest do
           {"", 0}
 
         "ps", ["aux"], _ ->
-          {"", 0}
+          {"proc1nono\nproc2nono\n", 0}
 
         "whoami", [], _ ->
           {whoami, 0}
@@ -59,6 +59,8 @@ defmodule Mix.DeliShellTest do
       assert output ==
                "iex --name #{whoami}@127.0.0.1 --cookie #{cookie} " <>
                  "--remsh #{app}@127.0.0.1"
+
+      assert_received :ssh_port_forwarded
     end
   end
 end
