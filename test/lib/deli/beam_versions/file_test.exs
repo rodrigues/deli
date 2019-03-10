@@ -9,14 +9,18 @@ defmodule Deli.BeamVersions.FileTest do
     put_config(:__code_handler__, CodeStub)
   end
 
+  def versions do
+    map_of(
+      atom(),
+      list_of(tuple({nonempty_string(), nonempty_string()}), max_length: 5),
+      min_length: 1,
+      max_length: 5
+    )
+  end
+
   describe "versions_from_file/0..1" do
     property "persisted versions" do
-      check all versions <-
-                  map_of(
-                    atom(),
-                    list_of(tuple({nonempty_string(), nonempty_string()}), max_length: 5),
-                    max_length: 5
-                  ) do
+      check all versions <- versions() do
         :ok = :eval_file |> TestAgent.set(fn @path -> {versions, []} end)
         assert File.versions_from_file() == versions
       end
@@ -24,13 +28,7 @@ defmodule Deli.BeamVersions.FileTest do
 
     property "adds empty list to new keys passed in args" do
       check all key_b <- atom(),
-                versions <-
-                  map_of(
-                    atom(),
-                    list_of(tuple({nonempty_string(), nonempty_string()}), max_length: 5),
-                    min_length: 1,
-                    max_length: 5
-                  ),
+                versions <- versions(),
                 not Map.has_key?(versions, key_b) do
         key_a = versions |> Map.keys() |> Enum.at(0)
         :ok = :eval_file |> TestAgent.set(fn @path -> {versions, []} end)
@@ -48,13 +46,7 @@ defmodule Deli.BeamVersions.FileTest do
 
   describe "persist_versions/1" do
     property "writes formatted versions" do
-      check all versions <-
-                  map_of(
-                    atom(),
-                    list_of(tuple({nonempty_string(), nonempty_string()}), max_length: 5),
-                    min_length: 1,
-                    max_length: 5
-                  ) do
+      check all versions <- versions() do
         :ok = versions |> File.persist_versions()
         content = inspect(versions)
 
