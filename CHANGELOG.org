@@ -1,3 +1,10 @@
+*** v0.2.0-rc.2
+
+- [QUALITY] Make CI build fail if deli code has warnings
+- [QUALITY] Increate significantly test coverage
+- [NEW] Allow to configure HostFilter
+- [NEW] Allow to specify custom node version
+
 *** v0.2.0-rc.1
 
 - [NEW] Added Travis CI build matrix: ex_unit, format, credo, dialyzer
