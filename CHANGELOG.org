@@ -1,3 +1,7 @@
+*** v0.2.0-rc.3
+
+- [QUALITY] Bump dev/test dependencies, new ex_doc
+
 *** v0.2.0-rc.2
 
 - [QUALITY] Make CI build fail if deli code has warnings
