@@ -1,23 +1,24 @@
-*** v0.2.0-rc.x
+** v0.2.0-rc.x
 
-Pending extensive tests on docker build options before actual release.
+- Pending extensive tests on different docker build options before actual release.
+- Pending property test coverage at important areas.
 
-**** rc.4
+*** rc.4
 
 - Update OTP versions
 
-**** rc.3
+*** rc.3
 
 - Bump dev/test dependencies, new ex_doc
 
-**** rc.2
+*** rc.2
 
 - Make CI build fail if deli code has warnings
 - Increate significantly test coverage
 - Allow to configure HostFilter
 - Allow to specify custom node version
 
-**** rc.1
+*** rc.1
 
 - Added Travis CI build matrix: ex_unit, format, credo, dialyzer
 - Start covering with properties and tests
@@ -32,6 +33,8 @@ Pending extensive tests on docker build options before actual release.
 - Allow a different build user (either docker or remote)
 - Debian managed docker build image
 - Allow use a non-deli-managed docker image to build
+
+** v0.1.x
 
 *** v0.1.28
 
