@@ -1,161 +1,169 @@
-*** v0.2.0-rc.3
+*** v0.2.0-rc.x
 
-- [QUALITY] Bump dev/test dependencies, new ex_doc
+Pending extensive tests on docker build options before actual release.
 
-*** v0.2.0-rc.2
+**** rc.4
 
-- [QUALITY] Make CI build fail if deli code has warnings
-- [QUALITY] Increate significantly test coverage
-- [NEW] Allow to configure HostFilter
-- [NEW] Allow to specify custom node version
+- Update OTP versions
 
-*** v0.2.0-rc.1
+**** rc.3
 
-- [NEW] Added Travis CI build matrix: ex_unit, format, credo, dialyzer
-- [NEW] Start covering with properties and tests
-- [NEW] =mix deli.version --compare= for comparing local version with target
-- [NEW] =mix deli.version= handle dev target
-- [NEW] =mix deli.ping= to call release bin ping specifically, no matter controller
-- [NEW] Store specific files under =.deli/= from now on
-- [NEW] Ensure user configuration obeys to typespecs when fetching
-- [NEW] Simplify host provider behaviour (=Stream= -> =List=)
-- [NEW] Support configuring beam versions (Elixir =1.8+=, OTP =20+=, Rebar3 =3.6.1+=)
-- [NEW] Allow a different release build strategy: =Deli.Release.Remote=
-- [NEW] Allow a different build user (either docker or remote)
-- [NEW] Debian managed docker build image
-- [NEW] Allow use a non-deli-managed docker image to build
+- Bump dev/test dependencies, new ex_doc
+
+**** rc.2
+
+- Make CI build fail if deli code has warnings
+- Increate significantly test coverage
+- Allow to configure HostFilter
+- Allow to specify custom node version
+
+**** rc.1
+
+- Added Travis CI build matrix: ex_unit, format, credo, dialyzer
+- Start covering with properties and tests
+- =mix deli.version --compare= for comparing local version with target
+- =mix deli.version= handle dev target
+- =mix deli.ping= to call release bin ping specifically, no matter controller
+- Store specific files under =.deli/= from now on
+- Ensure user configuration obeys to typespecs when fetching
+- Simplify host provider behaviour (=Stream= -> =List=)
+- Support configuring beam versions (Elixir =1.8+=, OTP =20+=, Rebar3 =3.6.1+=)
+- Allow a different release build strategy: =Deli.Release.Remote=
+- Allow a different build user (either docker or remote)
+- Debian managed docker build image
+- Allow use a non-deli-managed docker image to build
 
 *** v0.1.28
 
-- [NEW] CentOS build image updated OTP to 21.2.4 and Elixir to 1.8.1
-- [NEW] Configurable host provider
-- [NEW] Add typespecs in core parts
-- [NEW] =Config.output_commands?/0=
+- CentOS build image updated OTP to 21.2.4 and Elixir to 1.8.1
+- Configurable host provider
+- Add typespecs in core parts
+- =Config.output_commands?/0=
 
 *** v0.1.27
 
-- [NEW] Allow to configure a custom =versioning= behaviour
+- Allow to configure a custom =versioning= behaviour
 
 *** v0.1.26
 
-- [NEW] Accept regex pattern to =-h= to filter hosts affected by command
-- [NEW] Before confirmation, list all affected hosts
+- Accept regex pattern to =-h= to filter hosts affected by command
+- Before confirmation, list all affected hosts
 
 *** v0.1.25
 
-- [NEW] Provide =Config.yarn?/0= and install it on centos when needed
-- [NEW] Provide =Config.assets?/0=
-- [NEW] Wait between port forwarding spawn and shell command is configurable
+- Provide =Config.yarn?/0= and install it on centos when needed
+- Provide =Config.assets?/0=
+- Wait between port forwarding spawn and shell command is configurable
 
 *** v0.1.23
 
-- [NEW] Allow name for remote user different than app name
-- [NEW] Output full status response when verbose
-- [NEW] Run observer to remote node with a simple call
-- [FIX] Restart expects node to be running
+- Allow name for remote user different than app name
+- Output full status response when verbose
+- Run observer to remote node with a simple call
+- Restart expects node to be running
 
 *** v0.1.22
 
-- [NEW] Better failure details output
-- [NEW] =Deli.Command= for env-agnostic mix tasks
-- [NEW] Better output when confirming deploy
+- Better failure details output
+- =Deli.Command= for env-agnostic mix tasks
+- Better output when confirming deploy
 
 *** v0.1.21
 
-- [FIX] Fix edeliver tags in build command
+- Fix edeliver tags in build command
 
 *** v0.1.20
 
-- [FIX] Move user creation lower in dockerfile to adapt to another change
+- Move user creation lower in dockerfile to adapt to another change
 
 *** v0.1.19
 
-- [FIX] Do not ignore docker keys in git, that is needed
+- Do not ignore docker keys in git, that is needed
 
 *** v0.1.18
 
-- [NEW] Remove unused lang variables in dockerfile
-- [NEW] Avoid rebuilding image when keys change
+- Remove unused lang variables in dockerfile
+- Avoid rebuilding image when keys change
 
 *** v0.1.17
 
-- [NEW] mix deli.version
-- [NEW] mix deli.status
-- [NEW] mix deli.shell
-- [NEW] Enable customization of bin_path (default to =/opt/APP/bin/APP=)
-- [NEW] mix deli.restart
-- [NEW] Quiet(er) mode without verbose
-- [NEW] Generate ssh keys transparently to interface local with release builder (docker)
-- [NEW] Replace :os.cmd calls for System.cmd, now with better output management
-- [NEW] Organize shell commands
-- [NEW] =@moduledoc false= on internal modules
+- mix deli.version
+- mix deli.status
+- mix deli.shell
+- Enable customization of bin_path (default to =/opt/APP/bin/APP=)
+- mix deli.restart
+- Quiet(er) mode without verbose
+- Generate ssh keys transparently to interface local with release builder (docker)
+- Replace :os.cmd calls for System.cmd, now with better output management
+- Organize shell commands
+- =@moduledoc false= on internal modules
 
 *** v0.1.16
 
-- [NEW] Add subtasks deli.release and deli.deploy
+- Add subtasks deli.release and deli.deploy
 
 *** v0.1.15
 
-- [NEW] Binary default, systemctl as an option
+- Binary default, systemctl as an option
 
 *** v0.1.14
 
-- [NEW] Show previous status before start/stop
+- Show previous status before start/stop
 
 *** v0.1.13
 
-- [NEW] Convenience admin commands
-- [NEW] Simpler and reusable check
+- Convenience admin commands
+- Simpler and reusable check
 
 *** v0.1.12
 
-- [NEW] Simplify controller configuration
-- [NEW] Set runtime false in deps
-- [NEW] Pass on credo and dialyzer
+- Simplify controller configuration
+- Set runtime false in deps
+- Pass on credo and dialyzer
 
 *** v0.1.11
 
-- [NEW] Allow configuring another controller other than systemctl
-- [FIX] Ensure target prod and production are equivalent (edeliver<->mix lingo)
+- Allow configuring another controller other than systemctl
+- Ensure target prod and production are equivalent (edeliver<->mix lingo)
 
 *** v0.1.10
 
-- [NEW] Improve documentation
+- Improve documentation
 
 *** v0.1.9
 
-- [FIX] Fix error with restart
-- [NEW] Improve documentation
+- Fix error with restart
+- Improve documentation
 
 *** v0.1.8
 
-- [NEW] Improve logging on restart / status
+- Improve logging on restart / status
 
 *** v0.1.7
 
-- [FIX] Resolve warning and improve logging
+- Resolve warning and improve logging
 
 *** v0.1.6
 
-- [FIX] Resolve double pinging after deploy
-- [NEW] Nicer restart info
+- Resolve double pinging after deploy
+- Nicer restart info
 
 *** v0.1.5
 
-- [FIX] Remove absolute paths from gitignore
+- Remove absolute paths from gitignore
 
 *** v0.1.4
 
-- [FIX] Fix adding files to gitignore
+- Fix adding files to gitignore
 
 *** v0.1.3
 
-- [FIX] Fix generation of Dockerfile in case there isn't one in .deliver/Dockerfile
+- Fix generation of Dockerfile in case there isn't one in .deliver/Dockerfile
 
 *** v0.1.2
 
-- [NEW] Deployed app inferred from Mix project
+- Deployed app inferred from Mix project
 
 *** v0.1.1
 
-- [FIX] Application configuration
+- Application configuration
