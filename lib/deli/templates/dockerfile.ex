@@ -35,11 +35,18 @@ defmodule Deli.Templates.Dockerfile do
   EEx.function_from_file(:def, :build_debian, path.(:debian), @deli_bindings)
   EEx.function_from_file(:def, :build_custom, path.(:custom), @custom_bindings)
 
+  defguardp is_normal(app, user, yarn?, node_version)
+            when is_atom(app) and is_atom(user) and
+                   is_boolean(yarn?) and is_binary(node_version)
+
+  defguardp is_tag(tag) when is_atom(tag) or is_binary(tag)
+
+  defguardp is_docker_image(image) when is_atom(image) or is_binary(image)
+
   @spec build(Docker.build_target(), Deli.app(), atom, boolean, String.t()) :: String.t()
   def build({:deli, {deli_image, tag}, beam_versions_opts}, app, user, yarn?, node_version)
-      when deli_image in @deli_images and (is_atom(tag) or is_binary(tag)) and
-             is_atom(app) and is_atom(user) and is_boolean(yarn?) and
-             is_binary(node_version) and is_list(beam_versions_opts) do
+      when deli_image in @deli_images and is_list(beam_versions_opts) and
+             is_tag(tag) and is_normal(app, user, yarn?, node_version) do
     beam_versions = beam_versions_opts |> BeamVersions.fetch()
     builder = builder(deli_image)
     tag |> builder.(beam_versions, app, user, yarn?, node_version)
@@ -58,16 +65,14 @@ defmodule Deli.Templates.Dockerfile do
   end
 
   def build(docker_image, app, user, yarn?, node_version)
-      when (is_atom(docker_image) or is_binary(docker_image)) and
-             is_atom(app) and is_atom(user) and is_boolean(yarn?) and
-             is_binary(node_version) do
+      when is_docker_image(docker_image) and
+             is_normal(app, user, yarn?, node_version) do
     docker_image |> build_custom(app, user, yarn?, node_version)
   end
 
   def build({docker_image, tag}, app, user, yarn?, node_version)
-      when (is_atom(docker_image) or is_binary(docker_image)) and
-             is_atom(app) and is_atom(user) and is_boolean(yarn?) and
-             is_binary(node_version) do
+      when is_docker_image(docker_image) and is_tag(tag) and
+             is_normal(app, user, yarn?, node_version) do
     "#{docker_image}:#{tag}" |> build(app, user, yarn?, node_version)
   end
 
