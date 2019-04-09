@@ -130,6 +130,7 @@ defmodule Deli.Shell do
     |> ensure_target
   end
 
+  @spec ensure_all_started(app :: atom) :: {:ok, [app :: atom]}
   def ensure_all_started(app) do
     app |> Config.__application_handler__().ensure_all_started()
   end
