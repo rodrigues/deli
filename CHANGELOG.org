@@ -1,7 +1,7 @@
 ** v0.2.0-rc.x
 
-- Pending extensive tests on different docker build options before actual release.
-- Pending property test coverage at important areas.
+- Pending extensive tests on different docker build options before actual release
+- Pending property test coverage at important areas
 
 *** rc.4
 
@@ -14,7 +14,7 @@
 *** rc.2
 
 - Make CI build fail if deli code has warnings
-- Increate significantly test coverage
+- Increase significantly test coverage
 - Allow to configure HostFilter
 - Allow to specify custom node version
 
