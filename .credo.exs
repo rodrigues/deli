@@ -140,9 +140,9 @@
         # experimenting the ones below
         {Credo.Check.Design.DuplicatedCode, []},
         {Credo.Check.Refactor.DoubleBooleanNegation, []},
+        {Credo.Check.Consistency.MultiAliasImportRequireUse, []},
         # the ones below good to run from time to time
         {Credo.Check.Readability.Specs, false},
-        {Credo.Check.Consistency.MultiAliasImportRequireUse, false},
         {Credo.Check.Refactor.ABCSize, false},
         # this ones not so sure
         {Credo.Check.Refactor.AppendSingleItem, false},

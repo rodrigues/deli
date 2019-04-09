@@ -1,6 +1,5 @@
 defmodule Deli.BeamVersions.File do
-  alias Deli.BeamVersions
-  alias Deli.Config
+  alias Deli.{BeamVersions, Config}
 
   @moduledoc false
 
