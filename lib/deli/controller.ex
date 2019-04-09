@@ -3,7 +3,7 @@ defmodule Deli.Controller do
 
   @callback service_running?(env :: Deli.env(), host :: Deli.host()) :: boolean
   @callback service_status(env :: Deli.env(), host :: Deli.host()) :: String.t()
-  @callback start_host(env :: Deli.env(), host :: Deli.host()) :: :ok | no_return
-  @callback stop_host(env :: Deli.env(), host :: Deli.host()) :: :ok | no_return
-  @callback restart_host(env :: Deli.env(), host :: Deli.host()) :: :ok | no_return
+  @callback start_host(env :: Deli.env(), host :: Deli.host()) :: :ok
+  @callback stop_host(env :: Deli.env(), host :: Deli.host()) :: :ok
+  @callback restart_host(env :: Deli.env(), host :: Deli.host()) :: :ok
 end
