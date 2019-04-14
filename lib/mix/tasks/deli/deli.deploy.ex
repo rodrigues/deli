@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli.Deploy do
   use Mix.Task
   import Deli.Shell
-  alias Deli.{Config, Deploy}
+  alias Deli.Config
 
   @moduledoc """
   To deploy current master into staging, do:
@@ -27,17 +27,21 @@ defmodule Mix.Tasks.Deli.Deploy do
     options = args |> parse_options
     target = options |> Keyword.fetch!(:target)
 
+    deploy = Config.deploy()
+    host_filter = Config.host_filter()
+    versioning = Config.versioning()
+
     {:ok, tag} =
       options[:version]
-      |> Config.versioning().version_tag()
+      |> versioning.version_tag()
 
     IO.puts("version: #{tag}")
 
-    {:ok, hosts} = target |> Config.host_filter().hosts(args)
+    {:ok, hosts} = target |> host_filter.hosts(args)
 
     if :deploy |> confirm?(options) do
       IO.puts("🤞")
-      hosts |> Enum.each(&Deploy.run(target, &1))
+      hosts |> Enum.each(&deploy.run(target, &1))
     else
       cancelled!(:deploy)
     end

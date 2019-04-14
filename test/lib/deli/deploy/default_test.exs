@@ -1,9 +1,13 @@
-defmodule Deli.DeployTest do
+defmodule Deli.Deploy.DefaultTest do
   use DeliCase
-  alias Deli.Deploy
+  alias Deli.Deploy.Default, as: Deploy
 
   setup do
     put_config(:__system_handler__, SystemStub)
+  end
+
+  test "behaviour" do
+    assert behaves?(Deploy, Deli.Deploy)
   end
 
   describe "run/2" do

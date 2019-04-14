@@ -6,9 +6,11 @@ defmodule ConfigHelpers do
     app_user
     assets
     bin_path
+    check
     controller
     cookie
     default_target
+    deploy
     docker_build
     hosts
     host_filter
@@ -16,7 +18,6 @@ defmodule ConfigHelpers do
     output_commands
     release
     remote_build
-    target
     verbose
     versioning
     waits

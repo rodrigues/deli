@@ -200,6 +200,27 @@ defmodule Deli.ConfigTest do
     end
   end
 
+  describe "deploy/0" do
+    test "default deploy when not configured" do
+      delete_config(:deploy)
+      assert Config.deploy() == Deli.Deploy.Default
+    end
+
+    property "deploy when configured correctly" do
+      check all deploy <- atom() do
+        put_config(:deploy, deploy)
+        assert Config.deploy() == deploy
+      end
+    end
+
+    property "fails when invalid" do
+      check all deploy <- term_except(&is_atom/1) do
+        put_config(:deploy, deploy)
+        assert_raise RuntimeError, &Config.deploy/0
+      end
+    end
+  end
+
   describe "docker_build_image/0" do
     test "default image when not configured" do
       delete_config(:docker_build)

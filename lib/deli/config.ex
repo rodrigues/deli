@@ -6,10 +6,12 @@ defmodule Deli.Config do
 
   @defaults %{
     assets?: false,
-    # by default uses controller service functions
+    # use controller service functions by default
     check: Deli.Check.Default,
     # use release binary by default
     controller: Deli.Controller.Bin,
+    # use edeliver deploy by default
+    deploy: Deli.Deploy.Default,
     # used when `release` is configured as `Deli.Release.Docker`
     docker_build: [
       # check `Deli.Release.Docker.build_target()` type for all options
@@ -121,6 +123,13 @@ defmodule Deli.Config do
   def default_target do
     :default_target
     |> get(@defaults.target)
+    |> ensure_atom
+  end
+
+  @spec deploy() :: module
+  def deploy do
+    :deploy
+    |> get(@defaults.deploy)
     |> ensure_atom
   end
 
