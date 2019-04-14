@@ -3,7 +3,7 @@ elixir:
   - 1.8
 otp_release:
   - 20.3
-  - 21
+  - 21.3
 sudo: false
 env:
   global:
