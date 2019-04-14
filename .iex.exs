@@ -1,0 +1,1 @@
+alias Deli.BeamVersions.Updater
