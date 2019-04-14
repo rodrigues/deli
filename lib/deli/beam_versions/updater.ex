@@ -56,6 +56,7 @@ defmodule Deli.BeamVersions.Updater do
   end
 
   defp add_version(dep, version) do
+    IO.puts("Download #{dep}@#{version}...")
     {_, 0} = dep |> download_version(version)
     :ok = dep |> append_version(version, checksum())
   end
