@@ -4,6 +4,7 @@ defmodule Mix.DeliPingTest do
 
   setup do
     put_config(:__system_handler__, SystemStub)
+    put_config(:check, Deli.Check.Default)
   end
 
   property "pings application in all default target hosts by default" do

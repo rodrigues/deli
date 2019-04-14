@@ -1,6 +1,10 @@
-defmodule Deli.CheckTest do
+defmodule Deli.Check.DefaultTest do
   use DeliCase
-  alias Deli.Check
+  alias Deli.Check.Default, as: Check
+
+  test "behaviour" do
+    assert behaves?(Check, Deli.Check)
+  end
 
   describe "run/2" do
     property "checks host and succeeds when service is running" do

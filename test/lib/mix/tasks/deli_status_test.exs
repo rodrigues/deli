@@ -7,8 +7,6 @@ defmodule Mix.DeliStatusTest do
               app_user <- app_user(),
               env <- env(),
               hosts <- hosts(),
-              status <- nonempty_string(),
-              running? <- boolean(),
               verbose? <- boolean() do
       put_config(:app, app)
       put_config(:app_user, [{env, app_user}])
@@ -18,33 +16,17 @@ defmodule Mix.DeliStatusTest do
       HostFilterMock
       |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
-      ControllerMock
-      |> stub(:service_running?, fn ^env, _ -> running? end)
-      |> stub(:service_status, fn ^env, _ -> status end)
+      for host <- hosts do
+        CheckMock
+        |> expect(:run, fn ^env, ^host -> :ok end)
+      end
 
       output =
         capture_io(fn ->
           :ok = Status.run([])
         end)
 
-      log =
-        hosts
-        |> Enum.map(fn host ->
-          id = "#{app_user}@#{host}"
-
-          if running? do
-            if verbose? do
-              "\e[32mrunning #{id}\e[0m\n#{status}\n"
-            else
-              "\e[32mrunning #{id}\e[0m\n"
-            end
-          else
-            "\e[31mnot running #{id}\e[0m\n#{status}\n"
-          end
-        end)
-        |> Enum.join("")
-
-      assert output == log
+      assert output == ""
     end
   end
 
@@ -53,9 +35,7 @@ defmodule Mix.DeliStatusTest do
               app_user <- app_user(),
               env <- env(),
               hosts <- hosts(),
-              status <- nonempty_string(),
               short? <- boolean(),
-              running? <- boolean(),
               verbose? <- boolean() do
       flag = if short?, do: "-t", else: "--target"
       put_config(:app, app)
@@ -65,33 +45,17 @@ defmodule Mix.DeliStatusTest do
       HostFilterMock
       |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
 
-      ControllerMock
-      |> stub(:service_running?, fn ^env, _ -> running? end)
-      |> stub(:service_status, fn ^env, _ -> status end)
+      for host <- hosts do
+        CheckMock
+        |> expect(:run, fn ^env, ^host -> :ok end)
+      end
 
       output =
         capture_io(fn ->
           :ok = [flag, env] |> Status.run()
         end)
 
-      log =
-        hosts
-        |> Enum.map(fn host ->
-          id = "#{app_user}@#{host}"
-
-          if running? do
-            if verbose? do
-              "\e[32mrunning #{id}\e[0m\n#{status}\n"
-            else
-              "\e[32mrunning #{id}\e[0m\n"
-            end
-          else
-            "\e[31mnot running #{id}\e[0m\n#{status}\n"
-          end
-        end)
-        |> Enum.join("")
-
-      assert output == log
+      assert output == ""
     end
   end
 end

@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli.Status do
   use Mix.Task
   import Deli.Shell
-  alias Deli.{Check, Config}
+  alias Deli.Config
 
   @moduledoc """
   To check status app in all staging hosts, do:
@@ -17,10 +17,11 @@ defmodule Mix.Tasks.Deli.Status do
 
   @impl true
   def run(args) do
+    check = Config.check()
     _ = :deli |> ensure_all_started
     options = args |> parse_options
     target = options |> Keyword.fetch!(:target)
     {:ok, hosts} = target |> Config.host_filter().hosts(args)
-    hosts |> Enum.each(&Check.run(target, &1))
+    hosts |> Enum.each(&check.run(target, &1))
   end
 end

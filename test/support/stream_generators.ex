@@ -55,7 +55,7 @@ defmodule StreamGenerators do
   end
 
   def strict_atom do
-    atom() |> except(&(is_nil(&1) || to_string(&1) =~ "@"))
+    atom() |> except(&(not strict_atom?(&1)))
   end
 
   def string do
@@ -76,4 +76,11 @@ defmodule StreamGenerators do
 
   defp empty_string?(""), do: true
   defp empty_string?(_), do: false
+
+  defp strict_atom?(nil), do: false
+  defp strict_atom?(:_), do: false
+
+  defp strict_atom?(atom) when is_atom(atom) do
+    not (to_string(atom) =~ "@")
+  end
 end

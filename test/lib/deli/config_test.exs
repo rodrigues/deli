@@ -113,6 +113,27 @@ defmodule Deli.ConfigTest do
     end
   end
 
+  describe "check/0" do
+    test "default check when not configured" do
+      delete_config(:check)
+      assert Config.check() == Deli.Check.Default
+    end
+
+    property "check when configured correctly" do
+      check all check <- atom() do
+        put_config(:check, check)
+        assert Config.check() == check
+      end
+    end
+
+    property "fails when invalid" do
+      check all check <- term_except(&is_atom/1) do
+        put_config(:check, check)
+        assert_raise RuntimeError, &Config.check/0
+      end
+    end
+  end
+
   describe "controller/0" do
     test "default controller when not configured" do
       delete_config(:controller)

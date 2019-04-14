@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Deli.Restart do
   use Mix.Task
   import Deli.Shell
-  alias Deli.{Check, Config}
+  alias Deli.Config
 
   @moduledoc """
   To restart app in all staging hosts, do:
@@ -36,15 +36,16 @@ defmodule Mix.Tasks.Deli.Restart do
   end
 
   defp restart_host(env, host) do
+    check = Config.check()
     controller = Config.controller()
     id = env |> Config.host_id(host)
 
-    Check.run(env, host)
+    check.run(env, host)
     IO.puts("restarting #{id}...")
     :ok = env |> controller.restart_host(host)
     IO.puts([IO.ANSI.green(), "restarted #{id}", IO.ANSI.reset()])
 
     :timer.sleep(Config.wait(:started_check))
-    Check.run(env, host)
+    check.run(env, host)
   end
 end

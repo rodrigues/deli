@@ -4,6 +4,7 @@ defmodule Deli.PingTest do
 
   setup do
     put_config(:__system_handler__, SystemStub)
+    put_config(:check, Deli.Check.Default)
   end
 
   describe "run/2" do

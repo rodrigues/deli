@@ -1,3 +1,4 @@
+Mox.defmock(CheckMock, for: Deli.Check)
 Mox.defmock(ControllerMock, for: Deli.Controller)
 Mox.defmock(HostFilterMock, for: Deli.HostFilter)
 Mox.defmock(HostProviderMock, for: Deli.HostProvider)

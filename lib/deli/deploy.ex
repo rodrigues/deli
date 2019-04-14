@@ -1,7 +1,7 @@
 defmodule Deli.Deploy do
   import Deli, only: [is_env: 1, is_host: 1]
   import Deli.Shell, only: [edeliver: 2]
-  alias Deli.{Check, Config}
+  alias Deli.Config
 
   @moduledoc false
 
@@ -13,6 +13,7 @@ defmodule Deli.Deploy do
   end
 
   defp restart_host(env, host) when is_env(env) and is_host(host) do
+    check = Config.check()
     controller = Config.controller()
     id = env |> Config.host_id(host)
 
@@ -20,7 +21,7 @@ defmodule Deli.Deploy do
     :ok = env |> controller.restart_host(host)
     IO.puts([IO.ANSI.green(), "restarted #{id}", IO.ANSI.reset()])
 
-    :timer.sleep(1_000)
-    Check.run(env, host)
+    :timer.sleep(Config.wait(:started_check))
+    check.run(env, host)
   end
 end

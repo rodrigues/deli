@@ -6,6 +6,8 @@ defmodule Deli.Config do
 
   @defaults %{
     assets?: false,
+    # by default uses controller service functions
+    check: Deli.Check.Default,
     # use release binary by default
     controller: Deli.Controller.Bin,
     # used when `release` is configured as `Deli.Release.Docker`
@@ -92,6 +94,13 @@ defmodule Deli.Config do
       path when is_binary(path) ->
         path
     end
+  end
+
+  @spec check() :: module
+  def check do
+    :check
+    |> get(@defaults.check)
+    |> ensure_atom
   end
 
   @spec controller() :: module

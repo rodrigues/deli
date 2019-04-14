@@ -2,6 +2,22 @@ defmodule Mix.DeliStartTest do
   use DeliCase
   alias Mix.Tasks.Deli.Start
 
+  def setup_hosts(env, hosts, setup_mocks? \\ true) do
+    HostFilterMock
+    |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
+
+    if setup_mocks? do
+      for host <- hosts do
+        CheckMock
+        |> expect(:run, fn ^env, ^host, false -> :ok end)
+        |> expect(:run, fn ^env, ^host -> :ok end)
+
+        ControllerMock
+        |> expect(:start_host, fn ^env, ^host -> :ok end)
+      end
+    end
+  end
+
   property "starts application in all default target hosts by default" do
     check all app <- app(),
               app_user <- app_user(),
@@ -12,16 +28,7 @@ defmodule Mix.DeliStartTest do
       put_config(:app, app)
       put_config(:app_user, [{env, app_user}])
       put_config(:default_target, env)
-
-      HostFilterMock
-      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
-
-      for host <- hosts do
-        ControllerMock
-        |> expect(:service_running?, fn ^env, ^host -> false end)
-        |> expect(:start_host, fn ^env, ^host -> :ok end)
-        |> expect(:service_running?, fn ^env, ^host -> true end)
-      end
+      setup_hosts(env, hosts)
 
       output =
         capture_io(fn ->
@@ -32,9 +39,7 @@ defmodule Mix.DeliStartTest do
         hosts
         |> Enum.map(fn host ->
           id = "#{app_user}@#{host}"
-
-          "\e[32mnot running #{id}\e[0m\nstarting #{id}...\n" <>
-            "\e[32mstarted #{id}\e[0m\n\e[32mrunning #{id}\e[0m\n"
+          "starting #{id}...\n\e[32mstarted #{id}\e[0m\n"
         end)
         |> Enum.join("")
 
@@ -46,16 +51,7 @@ defmodule Mix.DeliStartTest do
     check all env <- env(),
               hosts <- hosts() do
       put_config(:default_target, env)
-
-      HostFilterMock
-      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
-
-      for host <- hosts do
-        ControllerMock
-        |> expect(:service_running?, fn ^env, ^host -> false end)
-        |> expect(:start_host, fn ^env, ^host -> :ok end)
-        |> expect(:service_running?, fn ^env, ^host -> true end)
-      end
+      setup_hosts(env, hosts)
 
       output =
         capture_io([input: "y\n", capture_prompt: true], fn ->
@@ -66,9 +62,7 @@ defmodule Mix.DeliStartTest do
         hosts
         |> Enum.map(fn host ->
           id = "deli@#{host}"
-
-          "\e[32mnot running #{id}\e[0m\nstarting #{id}...\n" <>
-            "\e[32mstarted #{id}\e[0m\n\e[32mrunning #{id}\e[0m\n"
+          "starting #{id}...\n\e[32mstarted #{id}\e[0m\n"
         end)
         |> Enum.join("")
 
@@ -80,16 +74,7 @@ defmodule Mix.DeliStartTest do
     check all env <- env(),
               hosts <- hosts() do
       put_config(:default_target, env)
-
-      HostFilterMock
-      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
-
-      for host <- hosts do
-        ControllerMock
-        |> expect(:service_running?, fn ^env, ^host -> false end)
-        |> expect(:start_host, fn ^env, ^host -> :ok end)
-        |> expect(:service_running?, fn ^env, ^host -> true end)
-      end
+      setup_hosts(env, hosts)
 
       output =
         capture_io([input: "n\n", capture_prompt: true], fn ->
