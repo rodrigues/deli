@@ -14,15 +14,15 @@ defmodule Mix.Tasks.Deli.Shell do
 
   @impl true
   def run(args) do
-    _ = :deli |> ensure_all_started
+    _ = ensure_all_started(:deli)
 
-    options = args |> parse_options
-    extra_options = args |> parse_extra_options
-    env = options |> Keyword.fetch!(:target)
+    options = parse_options(args)
+    extra_options = parse_extra_options(args)
+    env = Keyword.fetch!(options, :target)
 
     Application.put_env(:deli, :verbose, true)
 
-    {:ok, host} = env |> Config.host_filter().host(args)
+    {:ok, host} = Config.host_filter().host(env, args)
 
     spawn(fn -> port_forwarding(env, host) end)
 
@@ -39,9 +39,9 @@ defmodule Mix.Tasks.Deli.Shell do
   end
 
   defp port_forwarding(env, host) do
-    {epmd_port, app_port} = env |> fetch_ports(host)
+    {epmd_port, app_port} = fetch_ports(env, host)
 
-    {:ok, processes} = :ps |> cmd_result([:aux])
+    {:ok, processes} = cmd_result(:ps, [:aux])
 
     args = [
       Config.host_id(env, host),
@@ -55,13 +55,13 @@ defmodule Mix.Tasks.Deli.Shell do
       |> Enum.any?(&matching_ssh_command?(&1, args))
 
     unless running? do
-      :ssh |> cmd(args, [0], into: "", parallelism: true)
+      cmd(:ssh, args, [0], into: "", parallelism: true)
     end
   end
 
   defp matching_ssh_command?(command, [_timeout | args]) do
-    args = args |> Enum.join(" ")
-    command |> String.contains?(args)
+    args = Enum.join(args, " ")
+    String.contains?(command, args)
   end
 
   defp command(:remote, _env, _host) do
@@ -98,35 +98,35 @@ defmodule Mix.Tasks.Deli.Shell do
   end
 
   defp print_command(command) do
-    IO.write(command |> Enum.join(" "))
+    command |> Enum.join(" ") |> IO.write()
   end
 
   defp whoami do
-    {:ok, result} = :whoami |> cmd_result([])
-    result |> String.trim()
+    {:ok, result} = cmd_result(:whoami, [])
+    String.trim(result)
   end
 
   defp fetch_ports(env, host) do
-    id = env |> Config.host_id(host)
+    id = Config.host_id(env, host)
 
-    {:ok, erts_result} = :ssh |> cmd_result([id, "ps ax | grep epmd | grep erts"])
+    {:ok, erts_result} = cmd_result(:ssh, [id, "ps ax | grep epmd | grep erts"])
 
     epmd_path =
       erts_result
       |> String.split(" ", trim: true)
       |> Enum.find(&String.ends_with?(&1, "/epmd"))
 
-    {:ok, epmd_names} = :ssh |> cmd_result([id, "#{epmd_path} -names"])
+    {:ok, epmd_names} = cmd_result(:ssh, [id, "#{epmd_path} -names"])
 
-    lines = epmd_names |> String.split("\n")
-    epmd = lines |> Enum.at(0) |> epmd_port
-    app = lines |> Enum.find_value(&app_port/1)
+    [epmd_line | app_lines] = String.split(epmd_names, "\n")
+    epmd = epmd_port(epmd_line)
+    app = Enum.find_value(app_lines, &app_port/1)
 
     {epmd, app}
   end
 
   defp epmd_port(line) do
-    [[_, port]] = ~r/port\s(\d+)/ |> Regex.scan(line)
+    [[_, port]] = Regex.scan(~r/port\s(\d+)/, line)
     port
   end
 
@@ -134,20 +134,13 @@ defmodule Mix.Tasks.Deli.Shell do
     app = Config.app()
     prefix = "name #{app} at port "
 
-    if line |> String.starts_with?(prefix) do
-      line |> String.replace_prefix(prefix, "")
+    if String.starts_with?(line, prefix) do
+      String.replace_prefix(line, prefix, "")
     end
   end
 
-  defp determine_shell(extra_options) do
-    case extra_options |> Enum.at(0) do
-      {shell, true} ->
-        shell
-
-      _ ->
-        :remote
-    end
-  end
+  defp determine_shell([{shell, true} | _]) when is_atom(shell), do: shell
+  defp determine_shell(_), do: :remote
 
   defp parse_extra_options(args) do
     options = [

@@ -10,7 +10,7 @@ defmodule Deli.Shell do
 
   @spec cmd(command, args, ok_signals, Keyword.t()) :: :ok
   def cmd(command, args \\ [], ok_signals \\ [0], opts \\ []) do
-    {:ok, _} = command |> do_cmd(args, ok_signals, opts)
+    {:ok, _} = do_cmd(command, args, ok_signals, opts)
     :ok
   end
 
@@ -18,27 +18,27 @@ defmodule Deli.Shell do
           {:ok, Collectable.t()}
   def cmd_result(command, args \\ [], ok_signals \\ [0], opts \\ []) do
     opts = [into: ""] ++ opts
-    command |> do_cmd(args, ok_signals, opts)
+    do_cmd(command, args, ok_signals, opts)
   end
 
   defp do_cmd(command, args, ok_signals, opts)
        when (is_atom(command) or is_binary(command)) and
               is_list(args) and is_list(ok_signals) and is_list(opts) do
     system = Config.__system_handler__()
-    command = command |> to_string
-    args = args |> Enum.map(&to_string/1)
+    command = to_string(command)
+    args = Enum.map(args, &to_string/1)
     verbose_inspect([command | args])
 
-    {content, signal} = command |> system.cmd(args, verbose_opts(opts))
+    {content, signal} = system.cmd(command, args, verbose_opts(opts))
 
-    if ok_signals |> Enum.member?(signal) do
+    if Enum.member?(ok_signals, signal) do
       content =
         case content do
           %IO.Stream{} ->
             content
 
           _ ->
-            content |> to_string
+            to_string(content)
         end
 
       {:ok, content}
@@ -52,14 +52,14 @@ defmodule Deli.Shell do
       when (is_atom(command) or is_binary(command)) and is_list(args) do
     verbose = if Config.verbose?(), do: ["--verbose"], else: []
     edeliver_args = ["edeliver", command] ++ args ++ verbose
-    "mix" |> cmd(edeliver_args)
+    cmd("mix", edeliver_args)
   end
 
   @spec docker_compose(command, args, ok_signals) :: :ok
   def docker_compose(command, args \\ [], ok_signals \\ [0]) do
     args = ["-f", ".deli/docker-compose.yml"] ++ [command] ++ args
     env = [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]
-    "docker-compose" |> cmd(args, ok_signals, env: env)
+    cmd("docker-compose", args, ok_signals, env: env)
   end
 
   @spec file_exists?(Path.t()) :: boolean
@@ -75,7 +75,7 @@ defmodule Deli.Shell do
   @spec expand_path(Path.t()) :: Path.t()
   def expand_path(path) do
     cwd = file_handler().cwd!()
-    path |> Path.expand(cwd)
+    Path.expand(path, cwd)
   end
 
   @spec error!(String.t()) :: no_return
@@ -87,14 +87,14 @@ defmodule Deli.Shell do
   @spec confirm?(atom, Keyword.t()) :: boolean
   def confirm?(operation, options) when is_atom(operation) and is_list(options) do
     app = Config.app()
-    target = options |> Keyword.fetch!(:target)
+    target = Keyword.fetch!(options, :target)
     message = "#{operation} #{app} at #{target}?"
 
     if options[:yes] do
       IO.puts("#{message} [Yn] y")
       true
     else
-      message |> Mix.shell().yes?()
+      Mix.shell().yes?(message)
     end
   end
 
@@ -132,12 +132,12 @@ defmodule Deli.Shell do
 
   @spec ensure_all_started(app :: atom) :: {:ok, [app :: atom]}
   def ensure_all_started(app) do
-    app |> Config.__application_handler__().ensure_all_started()
+    Config.__application_handler__().ensure_all_started(app)
   end
 
   defp ensure_target(opts) do
     target = opts |> Keyword.get(:target, Config.default_target()) |> Config.mix_env()
-    opts |> Keyword.put(:target, target)
+    Keyword.put(opts, :target, target)
   end
 
   @spec command_failed!(command, args, exit_signal, Collectable.t()) :: no_return
@@ -177,11 +177,11 @@ defmodule Deli.Shell do
     if Config.verbose?() do
       [into: IO.stream(:stdio, :line), stderr_to_stdout: true] ++ opts
     else
-      opts |> Keyword.put_new(:into, "")
+      Keyword.put_new(opts, :into, "")
     end
   end
 
-  defp command_inspect(command) when is_list(command), do: command |> Enum.join(" ")
+  defp command_inspect(command) when is_list(command), do: Enum.join(command, " ")
 
   defp file_handler, do: Config.__file_handler__()
 end

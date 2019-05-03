@@ -13,15 +13,14 @@ defmodule Deli.Check.DefaultTest do
                 host <- host() do
         put_config(:app_user, app_user)
 
-        ControllerMock
-        |> expect(:service_running?, fn ^env, ^host -> true end)
+        expect(ControllerMock, :service_running?, fn ^env, ^host -> true end)
 
         output =
           capture_io(fn ->
-            :ok = env |> Check.run(host)
+            :ok = Check.run(env, host)
           end)
 
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
         assert output == "\e[32mrunning #{id}\e[0m\n"
       end
     end
@@ -33,18 +32,15 @@ defmodule Deli.Check.DefaultTest do
                 status <- string() do
         put_config(:app_user, app_user)
 
-        ControllerMock
-        |> expect(:service_running?, fn ^env, ^host -> false end)
-
-        ControllerMock
-        |> expect(:service_status, fn ^env, ^host -> status end)
+        expect(ControllerMock, :service_running?, fn ^env, ^host -> false end)
+        expect(ControllerMock, :service_status, fn ^env, ^host -> status end)
 
         output =
           capture_io(fn ->
-            :ok = env |> Check.run(host)
+            :ok = Check.run(env, host)
           end)
 
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
         assert output == "\e[31mnot running #{id}\e[0m\n#{status}\n"
       end
     end
@@ -59,16 +55,14 @@ defmodule Deli.Check.DefaultTest do
 
         ControllerMock
         |> expect(:service_running?, fn ^env, ^host -> true end)
-
-        ControllerMock
         |> expect(:service_status, fn ^env, ^host -> status end)
 
         output =
           capture_io(fn ->
-            :ok = env |> Check.run(host, false)
+            :ok = Check.run(env, host, false)
           end)
 
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
         assert output == "\e[31mrunning #{id}\e[0m\n#{status}\n"
       end
     end
@@ -80,15 +74,14 @@ defmodule Deli.Check.DefaultTest do
                 host <- host() do
         put_config(:app_user, app_user)
 
-        ControllerMock
-        |> expect(:service_running?, fn ^env, ^host -> false end)
+        expect(ControllerMock, :service_running?, fn ^env, ^host -> false end)
 
         output =
           capture_io(fn ->
-            :ok = env |> Check.run(host, false)
+            :ok = Check.run(env, host, false)
           end)
 
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
         assert output == "\e[32mnot running #{id}\e[0m\n"
       end
     end

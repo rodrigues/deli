@@ -11,12 +11,12 @@ defmodule Deli.HostFilter.Default do
   @impl true
   def hosts(env, args, silent? \\ false)
       when is_env(env) and is_list(args) and is_boolean(silent?) do
-    hosts = env |> Config.host_provider().hosts()
+    hosts = Config.host_provider().hosts(env)
 
-    with %Regex{} = exp <- args |> host_filter do
-      with [_ | _] = filtered_hosts <- hosts |> Enum.filter(&(&1 =~ exp)) do
+    with %Regex{} = exp <- host_filter(args) do
+      with [_ | _] = filtered_hosts <- Enum.filter(hosts, &(&1 =~ exp)) do
         unless silent?, do: list_hosts(filtered_hosts)
-        {:ok, filtered_hosts |> Enum.map(&ensure_binary/1)}
+        {:ok, Enum.map(filtered_hosts, &ensure_binary/1)}
       else
         [] ->
           error!("""
@@ -32,15 +32,15 @@ defmodule Deli.HostFilter.Default do
 
           _ ->
             unless silent?, do: list_hosts(hosts)
-            {:ok, hosts |> Enum.map(&ensure_binary/1)}
+            {:ok, Enum.map(hosts, &ensure_binary/1)}
         end
     end
   end
 
   @impl true
   def host(env, args) when is_env(env) and is_list(args) do
-    {:ok, hosts} = env |> hosts(args, true)
-    length = hosts |> Enum.count()
+    {:ok, hosts} = hosts(env, args, true)
+    length = Enum.count(hosts)
 
     case length do
       0 ->
@@ -51,13 +51,13 @@ defmodule Deli.HostFilter.Default do
         {:ok, host}
 
       _ ->
-        hosts |> select_host
+        select_host(hosts)
     end
   end
 
   defp select_host(hosts) when is_list(hosts) do
     hosts |> Enum.with_index() |> Enum.each(&print_host_option/1)
-    count = hosts |> Enum.count()
+    count = Enum.count(hosts)
 
     {number, ""} =
       "Choose a number:"

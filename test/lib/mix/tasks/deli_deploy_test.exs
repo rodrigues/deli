@@ -3,16 +3,12 @@ defmodule Mix.DeliDeployTest do
   alias Mix.Tasks.Deli.Deploy
 
   def setup_hosts(env, hosts, tag, setup_mocks? \\ true) do
-    HostFilterMock
-    |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
-
-    VersioningMock
-    |> stub(:version_tag, fn nil -> {:ok, tag} end)
+    stub(HostFilterMock, :hosts, fn ^env, _ -> {:ok, hosts} end)
+    stub(VersioningMock, :version_tag, fn nil -> {:ok, tag} end)
 
     if setup_mocks? do
       for host <- hosts do
-        DeployMock
-        |> expect(:run, fn ^env, ^host -> :ok end)
+        expect(DeployMock, :run, fn ^env, ^host -> :ok end)
       end
     end
   end
@@ -30,7 +26,7 @@ defmodule Mix.DeliDeployTest do
 
       output =
         capture_io(fn ->
-          :ok = [flag] |> Deploy.run()
+          :ok = Deploy.run([flag])
         end)
 
       assert output == "version: #{tag}\ndeploy #{app} at #{env}? [Yn] y\n🤞\n"

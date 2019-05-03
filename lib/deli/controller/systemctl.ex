@@ -28,13 +28,13 @@ defmodule Deli.Controller.Systemctl do
 
   @impl true
   def service_status(env, host) do
-    [command | args] = env |> systemctl(host, :status)
-    {:ok, result} = command |> cmd_result(args, [0, 3])
+    [command | args] = systemctl(env, host, :status)
+    {:ok, result} = cmd_result(command, args, [0, 3])
     result
   end
 
   defp sudo_systemctl(env, host, op) do
-    [command | args] = env |> systemctl(host, op, true)
+    [command | args] = systemctl(env, host, op, true)
     cmd(command, args)
   end
 

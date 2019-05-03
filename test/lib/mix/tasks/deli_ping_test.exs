@@ -21,8 +21,7 @@ defmodule Mix.DeliPingTest do
       put_config(:verbose, verbose?)
       stub_cmd({status, 0})
 
-      HostFilterMock
-      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
+      stub(HostFilterMock, :hosts, fn ^env, _ -> {:ok, hosts} end)
 
       output =
         capture_io(fn ->
@@ -65,12 +64,11 @@ defmodule Mix.DeliPingTest do
       put_config(:verbose, verbose?)
       stub_cmd({status, 0})
 
-      HostFilterMock
-      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
+      stub(HostFilterMock, :hosts, fn ^env, _ -> {:ok, hosts} end)
 
       output =
         capture_io(fn ->
-          :ok = [flag, env] |> Ping.run()
+          :ok = Ping.run([flag, env])
         end)
 
       log =

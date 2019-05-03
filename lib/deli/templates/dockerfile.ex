@@ -47,33 +47,37 @@ defmodule Deli.Templates.Dockerfile do
   def build({:deli, {deli_image, tag}, beam_versions_opts}, app, user, yarn?, node_version)
       when deli_image in @deli_images and is_list(beam_versions_opts) and
              is_tag(tag) and is_normal(app, user, yarn?, node_version) do
-    beam_versions = beam_versions_opts |> BeamVersions.fetch()
+    beam_versions = BeamVersions.fetch(beam_versions_opts)
     builder = builder(deli_image)
-    tag |> builder.(beam_versions, app, user, yarn?, node_version)
+    builder.(tag, beam_versions, app, user, yarn?, node_version)
   end
 
   def build({:deli, {deli_image, tag}}, app, user, yarn?, node_version) do
-    {:deli, {deli_image, tag}, []} |> build(app, user, yarn?, node_version)
+    image = {:deli, {deli_image, tag}, []}
+    build(image, app, user, yarn?, node_version)
   end
 
   def build({:deli, deli_image}, app, user, yarn?, node_version) do
-    {:deli, {deli_image, :latest}} |> build(app, user, yarn?, node_version)
+    image = {:deli, {deli_image, :latest}}
+    build(image, app, user, yarn?, node_version)
   end
 
   def build({:deli, deli_image, beam_versions}, app, user, yarn?, node_version) do
-    {:deli, deli_image, beam_versions} |> build(app, user, yarn?, node_version)
+    image = {:deli, deli_image, beam_versions}
+    build(image, app, user, yarn?, node_version)
   end
 
   def build(docker_image, app, user, yarn?, node_version)
       when is_docker_image(docker_image) and
              is_normal(app, user, yarn?, node_version) do
-    docker_image |> build_custom(app, user, yarn?, node_version)
+    build_custom(docker_image, app, user, yarn?, node_version)
   end
 
   def build({docker_image, tag}, app, user, yarn?, node_version)
       when is_docker_image(docker_image) and is_tag(tag) and
              is_normal(app, user, yarn?, node_version) do
-    "#{docker_image}:#{tag}" |> build(app, user, yarn?, node_version)
+    image = "#{docker_image}:#{tag}"
+    build(image, app, user, yarn?, node_version)
   end
 
   defp builder(:centos), do: &build_centos/6

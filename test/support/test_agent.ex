@@ -11,7 +11,7 @@ defmodule TestAgent do
 
   @spec clear() :: :ok
   def clear do
-    __MODULE__ |> Agent.update(fn _ -> @initial_state end)
+    Agent.update(__MODULE__, fn _ -> @initial_state end)
   end
 
   @spec get(atom, term) :: term
@@ -21,7 +21,6 @@ defmodule TestAgent do
 
   @spec set(atom, term) :: :ok
   def set(key, value) when is_atom(key) do
-    put = &Map.put(&1, key, value)
-    __MODULE__ |> Agent.update(put)
+    Agent.update(__MODULE__, &Map.put(&1, key, value))
   end
 end

@@ -20,7 +20,7 @@ defmodule Deli.CommandTest do
     property "runs command in all target env hosts when target specified" do
       check all app <- app(),
                 bin_path <- bin_path(),
-                env <- env() |> except(&(&1 == :dev)),
+                env <- except(env(), &(&1 == :dev)),
                 hosts <- hosts(),
                 args <- cmd_args(),
                 result <- string(),
@@ -30,7 +30,7 @@ defmodule Deli.CommandTest do
         args = ["-t", env | args]
         put_config(:app, app)
         put_config(:bin_path, bin_path)
-        app = app |> to_string
+        app = to_string(app)
 
         terms = [
           "eval",
@@ -43,8 +43,8 @@ defmodule Deli.CommandTest do
 
         TestAgent.set(:cmd, fn
           "ssh", [id, ^bin_path | ^terms], into: "" ->
-            with [^app, host] <- id |> String.split("@"),
-                 true <- hosts |> Enum.member?(host) do
+            with [^app, host] <- String.split(id, "@"),
+                 true <- Enum.member?(hosts, host) do
               {result, 0}
             else
               _ ->
@@ -55,12 +55,11 @@ defmodule Deli.CommandTest do
             {"", 1}
         end)
 
-        HostFilterMock
-        |> expect(:hosts, fn ^env, ^args -> {:ok, hosts} end)
+        expect(HostFilterMock, :hosts, fn ^env, ^args -> {:ok, hosts} end)
 
         output =
           capture_io(fn ->
-            :ok = CommandExample |> Command.run(args)
+            :ok = Command.run(CommandExample, args)
           end)
 
         results = hosts |> Enum.map(fn _ -> "#{result}\n" end) |> Enum.join("")
@@ -90,12 +89,11 @@ defmodule Deli.CommandTest do
 
         TestAgent.set(:ensure_all_started, fn ^app -> {:ok, [app]} end)
 
-        HostFilterMock
-        |> expect(:hosts, fn ^env, ^args -> {:ok, hosts} end)
+        expect(HostFilterMock, :hosts, fn ^env, ^args -> {:ok, hosts} end)
 
         output =
           capture_io(fn ->
-            :ok = CommandExample |> Command.run(args)
+            :ok = Command.run(CommandExample, args)
           end)
 
         assert output == "COMMAND_EXAMPLE_RESULT\n"

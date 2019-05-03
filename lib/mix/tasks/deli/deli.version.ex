@@ -17,10 +17,10 @@ defmodule Mix.Tasks.Deli.Version do
 
   @impl true
   def run(args) do
-    _ = :deli |> ensure_all_started
+    _ = ensure_all_started(:deli)
 
     target = args |> parse_options |> Keyword.fetch!(:target)
-    opts = args |> parse_extra_options
+    opts = parse_extra_options(args)
 
     if opts[:compare] do
       compare_versions(target, args)
@@ -37,23 +37,23 @@ defmodule Mix.Tasks.Deli.Version do
   end
 
   defp check_version(env, args) do
-    {:ok, hosts} = env |> Config.host_filter().hosts(args)
+    {:ok, hosts} = Config.host_filter().hosts(env, args)
     app = Config.app()
 
     IO.puts("checking version of #{app} at target #{env}")
-    hosts |> Enum.each(&print_host_version(env, &1))
+    Enum.each(hosts, &print_host_version(env, &1))
   end
 
   defp compare_versions(env, args) do
-    {:ok, hosts} = env |> Config.host_filter().hosts(args)
-    hosts |> Enum.each(&compare_host_version(env, &1))
+    {:ok, hosts} = Config.host_filter().hosts(env, args)
+    Enum.each(hosts, &compare_host_version(env, &1))
   end
 
   defp compare_host_version(env, host) do
-    {:ok, version} = env |> host_version(host)
+    {:ok, version} = host_version(env, host)
     local = Config.version()
 
-    case local |> Version.compare(version) do
+    case Version.compare(local, version) do
       :lt ->
         IO.puts([
           IO.ANSI.bright(),
@@ -98,7 +98,7 @@ defmodule Mix.Tasks.Deli.Version do
   end
 
   defp print_host_version(env, host) do
-    with {:ok, version} <- env |> host_version(host) do
+    with {:ok, version} <- host_version(env, host) do
       print_version(version)
     else
       {:error, error} ->
@@ -112,14 +112,19 @@ defmodule Mix.Tasks.Deli.Version do
 
   defp host_version(env, host) do
     app = Config.app()
-    app_user = env |> Config.app_user()
+    app_user = Config.app_user(env)
     code = ~s|":application.get_key(:#{app}, :vsn)"|
     args = ["#{app_user}@#{host}", Config.bin_path(), :rpc, code]
-    {:ok, result} = :ssh |> cmd_result(args)
+    {:ok, result} = cmd_result(:ssh, args)
 
     case result do
       "{:ok, '" <> rest ->
-        version = rest |> String.split("'", parts: 2) |> Enum.at(0) |> Version.parse!()
+        version =
+          rest
+          |> String.split("'", parts: 2)
+          |> Enum.at(0)
+          |> Version.parse!()
+
         {:ok, version}
 
       other ->

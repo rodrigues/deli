@@ -31,16 +31,15 @@ defmodule Mix.Tasks.Deli do
 
   @impl true
   def run(args) do
-    _ = :deli |> ensure_all_started
-    options = args |> parse_options
-    target = options |> Keyword.fetch!(:target)
+    _ = ensure_all_started(:deli)
+    options = parse_options(args)
+    target = Keyword.fetch!(options, :target)
 
     # Although deploy is the one that needs hosts,
     # calling this before so operation stops fast
     # in case there are no valid hosts given filter
-    {:ok, _} = target |> Config.host_filter().hosts(args)
-    :ok = args |> Release.run()
-
+    {:ok, _} = Config.host_filter().hosts(target, args)
+    :ok = Release.run(args)
     Deploy.run(args)
   end
 end

@@ -9,14 +9,14 @@ defmodule StreamGenerators do
   def app, do: strict_atom()
 
   def app_user do
-    [strict_atom(), nonempty_string()] |> one_of()
+    one_of([strict_atom(), nonempty_string()])
   end
 
   def bin_path, do: path()
 
   def cmd, do: nonempty_string()
 
-  def cmd_args, do: nonempty_string() |> list_of()
+  def cmd_args, do: list_of(nonempty_string())
 
   def cmd_with_args, do: tuple({cmd(), cmd_args()})
 
@@ -36,42 +36,44 @@ defmodule StreamGenerators do
 
   def path do
     gen all parts <- nonempty_string() |> list_of() |> nonempty() do
-      "/#{parts |> Enum.join("/")}"
+      "/#{Enum.join(parts, "/")}"
     end
   end
 
-  def port, do: 0..65_535 |> integer()
+  def port, do: integer(0..65_535)
+
+  def signal, do: integer(1..500)
+
+  def signal(signals) do
+    signals |> Enum.map(&constant/1) |> one_of()
+  end
 
   def version do
-    gen all major <- 0..128 |> integer(),
-            minor <- 0..256 |> integer(),
-            patch <- 0..512 |> integer() do
+    gen all major <- integer(0..128),
+            minor <- integer(0..256),
+            patch <- integer(0..512) do
       "#{major}.#{minor}.#{patch}"
     end
   end
 
-  def atom do
-    :alphanumeric |> atom()
-  end
+  def atom, do: atom(:alphanumeric)
 
   def strict_atom do
-    atom() |> except(&(not strict_atom?(&1)))
+    except(atom(), &(not strict_atom?(&1)))
   end
 
-  def string do
-    :alphanumeric |> string()
-  end
+  def string, do: string(:alphanumeric)
 
   def nonempty_string(type \\ :alphanumeric) do
     type |> string() |> except(&empty_string?/1)
   end
 
   def term_except(predicate) do
-    term() |> except(predicate)
+    except(term(), predicate)
   end
 
   def except(data, predicate) do
-    data |> filter(&(not predicate.(&1)), @limit_mismatches)
+    filter(data, &(not predicate.(&1)), @limit_mismatches)
   end
 
   defp empty_string?(""), do: true

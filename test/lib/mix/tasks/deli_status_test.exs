@@ -13,12 +13,10 @@ defmodule Mix.DeliStatusTest do
       put_config(:default_target, env)
       put_config(:verbose, verbose?)
 
-      HostFilterMock
-      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
+      stub(HostFilterMock, :hosts, fn ^env, _ -> {:ok, hosts} end)
 
       for host <- hosts do
-        CheckMock
-        |> expect(:run, fn ^env, ^host -> :ok end)
+        expect(CheckMock, :run, fn ^env, ^host -> :ok end)
       end
 
       output =
@@ -42,17 +40,15 @@ defmodule Mix.DeliStatusTest do
       put_config(:app_user, [{env, app_user}])
       put_config(:verbose, verbose?)
 
-      HostFilterMock
-      |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
+      stub(HostFilterMock, :hosts, fn ^env, _ -> {:ok, hosts} end)
 
       for host <- hosts do
-        CheckMock
-        |> expect(:run, fn ^env, ^host -> :ok end)
+        expect(CheckMock, :run, fn ^env, ^host -> :ok end)
       end
 
       output =
         capture_io(fn ->
-          :ok = [flag, env] |> Status.run()
+          :ok = Status.run([flag, env])
         end)
 
       assert output == ""

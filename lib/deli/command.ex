@@ -48,8 +48,8 @@ defmodule Deli.Command do
   """
   @spec call(Deli.env(), module, OptionParser.argv()) :: :ok
   def call(:dev, mod, args) when is_atom(mod) and is_list(args) do
-    {:ok, _} = Config.app() |> Shell.ensure_all_started()
-    :ok = mod |> apply(:run, [args])
+    {:ok, _} = Shell.ensure_all_started(Config.app())
+    :ok = apply(mod, :run, [args])
     :ok
   end
 
@@ -57,8 +57,8 @@ defmodule Deli.Command do
     mod = mod |> to_string |> String.replace(~r/^Elixir\./, "")
     mfa = ~s("#{mod}.run/1")
     terms = args |> Enum.map(&to_string/1) |> Enum.join(" ")
-    {:ok, hosts} = env |> Config.host_filter().hosts(args)
-    hosts |> Enum.each(&call_host(env, &1, mfa, terms))
+    {:ok, hosts} = Config.host_filter().hosts(env, args)
+    Enum.each(hosts, &call_host(env, &1, mfa, terms))
   end
 
   @doc ~S"""
@@ -89,7 +89,7 @@ defmodule Deli.Command do
       terms
     ]
 
-    {:ok, result} = :ssh |> Shell.cmd_result(cmd_args)
+    {:ok, result} = Shell.cmd_result(:ssh, cmd_args)
     IO.puts(result)
   end
 end

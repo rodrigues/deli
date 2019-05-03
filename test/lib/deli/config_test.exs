@@ -547,14 +547,14 @@ defmodule Deli.ConfigTest do
 
   describe "wait/0" do
     property "default wait when not configured" do
-      check all key <- waits() |> member_of() do
+      check all key <- member_of(waits()) do
         delete_config(:waits)
         assert Config.wait(key) > @min_wait
       end
     end
 
     property "defined wait when configured" do
-      check all key <- waits() |> member_of(),
+      check all key <- member_of(waits()),
                 wait <- positive_integer() do
         put_config(:waits, [{key, wait}])
         assert Config.wait(key) == wait
@@ -562,7 +562,7 @@ defmodule Deli.ConfigTest do
     end
 
     property "fails when is invalid" do
-      check all key <- waits() |> member_of(),
+      check all key <- member_of(waits()),
                 wait <- term_except(&(is_integer(&1) and &1 > 0)) do
         put_config(:waits, [{key, wait}])
         assert catch_error(Config.wait(key))

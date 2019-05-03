@@ -16,7 +16,7 @@ defmodule Deli.Release.Remote do
 
   @spec edeliver_build(Versioning.tag(), Deli.env()) :: :ok
   def edeliver_build(tag, target) do
-    target_mix_env = target |> Config.mix_env()
+    target_mix_env = Config.mix_env(target)
     edeliver(:build, [:release, "--tag=#{tag}", "--mix-env=#{target_mix_env}"])
   end
 
@@ -24,9 +24,9 @@ defmodule Deli.Release.Remote do
   def ensure_edeliver_config(remote? \\ true) do
     path = ".deliver/config"
 
-    unless path |> file_exists? do
+    unless file_exists?(path) do
       host_provider = Config.host_provider()
-      hosts = fn env -> env |> host_provider.hosts() end
+      hosts = fn env -> host_provider.hosts(env) end
       staging_hosts = hosts.(:staging)
       prod_hosts = hosts.(:prod)
 
@@ -44,7 +44,7 @@ defmodule Deli.Release.Remote do
           Config.remote_build_user()
         )
 
-      dir = path |> Path.dirname()
+      dir = Path.dirname(path)
       :ok = file_handler().mkdir_p(dir)
       write_file(path, content)
       add_to_gitignore(path)
@@ -62,7 +62,7 @@ defmodule Deli.Release.Remote do
     gitignore = ".gitignore"
     content = gitignore |> expand_path |> file_handler().read!()
 
-    unless content |> String.contains?(path) do
+    unless String.contains?(content, path) do
       write_file(gitignore, "#{path}\n", [:append])
     end
   end

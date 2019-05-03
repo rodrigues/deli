@@ -9,7 +9,7 @@ defmodule Deli.Deploy.Default do
 
   @impl true
   def run(target, host) when is_env(target) and is_host(host) do
-    edeliver_target = target |> Config.edeliver_target()
+    edeliver_target = Config.edeliver_target(target)
     edeliver(:deploy, [:release, :to, edeliver_target, "--host=#{host}"])
     restart_host(target, host)
   end
@@ -17,10 +17,10 @@ defmodule Deli.Deploy.Default do
   defp restart_host(env, host) when is_env(env) and is_host(host) do
     check = Config.check()
     controller = Config.controller()
-    id = env |> Config.host_id(host)
+    id = Config.host_id(env, host)
 
     IO.puts("restarting #{id}...")
-    :ok = env |> controller.restart_host(host)
+    :ok = controller.restart_host(env, host)
     IO.puts([IO.ANSI.green(), "restarted #{id}", IO.ANSI.reset()])
 
     :timer.sleep(Config.wait(:started_check))

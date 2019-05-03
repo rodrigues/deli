@@ -19,15 +19,12 @@ defmodule Deli.Deploy.DefaultTest do
         put_config(:app, app)
         put_config(:app_user, app_user)
 
-        ControllerMock
-        |> expect(:restart_host, fn ^env, ^host -> :ok end)
-
-        CheckMock
-        |> expect(:run, fn ^env, ^host -> :ok end)
+        expect(ControllerMock, :restart_host, fn ^env, ^host -> :ok end)
+        expect(CheckMock, :run, fn ^env, ^host -> :ok end)
 
         output =
           capture_io(fn ->
-            :ok = env |> Deploy.run(host)
+            :ok = Deploy.run(env, host)
           end)
 
         cmd = "mix"

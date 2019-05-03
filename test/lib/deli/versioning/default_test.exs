@@ -15,7 +15,7 @@ defmodule Deli.Versioning.DefaultTest do
       check all version <- version(),
                 prefix? <- boolean() do
         informed_version = if prefix?, do: "v#{version}", else: version
-        {:ok, sanitized_version} = informed_version |> Versioning.version_tag()
+        {:ok, sanitized_version} = Versioning.version_tag(informed_version)
 
         assert sanitized_version == "v#{version}"
 
@@ -120,7 +120,7 @@ defmodule Deli.Versioning.DefaultTest do
 
       output =
         capture_io(fn ->
-          {:ok, ^version_tag} = nil |> Versioning.version_tag()
+          {:ok, ^version_tag} = Versioning.version_tag(nil)
         end)
 
       assert output == ""
@@ -159,7 +159,7 @@ defmodule Deli.Versioning.DefaultTest do
 
       output =
         capture_io(fn ->
-          {:ok, ^version_tag} = nil |> Versioning.version_tag()
+          {:ok, ^version_tag} = Versioning.version_tag(nil)
         end)
 
       assert output == ""

@@ -23,25 +23,23 @@ defmodule Mix.Tasks.Deli.Deploy do
 
   @impl true
   def run(args) do
-    _ = :deli |> ensure_all_started
-    options = args |> parse_options
-    target = options |> Keyword.fetch!(:target)
+    _ = ensure_all_started(:deli)
+    options = parse_options(args)
+    target = Keyword.fetch!(options, :target)
 
     deploy = Config.deploy()
     host_filter = Config.host_filter()
     versioning = Config.versioning()
 
-    {:ok, tag} =
-      options[:version]
-      |> versioning.version_tag()
+    {:ok, tag} = versioning.version_tag(options[:version])
 
     IO.puts("version: #{tag}")
 
-    {:ok, hosts} = target |> host_filter.hosts(args)
+    {:ok, hosts} = host_filter.hosts(target, args)
 
-    if :deploy |> confirm?(options) do
+    if confirm?(:deploy, options) do
       IO.puts("🤞")
-      hosts |> Enum.each(&deploy.run(target, &1))
+      Enum.each(hosts, &deploy.run(target, &1))
     else
       cancelled!(:deploy)
     end

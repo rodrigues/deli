@@ -22,11 +22,11 @@ defmodule DeliCase do
 
   setup opts do
     clear_config()
-    mock? = opts |> Map.get(:mock, true)
+    mock? = Map.get(opts, :mock, true)
     if mock?, do: setup_mocks()
 
     :ok = TestAgent.clear()
-    :ok = :pid |> TestAgent.set(self())
+    :ok = TestAgent.set(:pid, self())
   end
 
   def setup_mocks do
@@ -40,6 +40,6 @@ defmodule DeliCase do
   end
 
   def stub_cmd(result) do
-    :ok = :cmd |> TestAgent.set(fn _, _, _ -> result end)
+    :ok = TestAgent.set(:cmd, fn _, _, _ -> result end)
   end
 end

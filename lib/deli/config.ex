@@ -56,14 +56,14 @@ defmodule Deli.Config do
 
   @spec app() :: Deli.app()
   def app do
-    app = :app |> get()
+    app = get(:app)
     app = app || project()[:app]
-    app |> ensure_atom
+    ensure_atom(app)
   end
 
   @spec app_user(Deli.env()) :: atom
   def app_user(env) when is_env(env) do
-    app_user = :app_user |> get()
+    app_user = get(:app_user)
 
     app_user =
       case app_user do
@@ -71,14 +71,14 @@ defmodule Deli.Config do
           user || app()
 
         options when is_list(options) ->
-          user = options |> Keyword.get(env)
+          user = Keyword.get(options, env)
           user || app()
 
         _ ->
           app()
       end
 
-    app_user |> ensure_atom_or_binary
+    ensure_atom_or_binary(app_user)
   end
 
   @spec assets?() :: boolean
@@ -88,7 +88,7 @@ defmodule Deli.Config do
 
   @spec bin_path :: String.t()
   def bin_path do
-    case :bin_path |> get() do
+    case get(:bin_path) do
       nil ->
         app = app()
         "/opt/#{app}/bin/#{app}"
@@ -114,9 +114,9 @@ defmodule Deli.Config do
 
   @spec cookie() :: atom
   def cookie do
-    cookie = :cookie |> get()
+    cookie = get(:cookie)
     cookie = cookie || app()
-    cookie |> ensure_atom
+    ensure_atom(cookie)
   end
 
   @spec default_target() :: Deli.env()
@@ -283,12 +283,12 @@ defmodule Deli.Config do
 
   @spec get(Application.key(), Application.value()) :: Application.value()
   def get(key, default \\ nil) when is_atom(key) do
-    :deli |> Application.get_env(key, default)
+    Application.get_env(:deli, key, default)
   end
 
   @spec fetch!(Application.key()) :: Application.value()
   def fetch!(key) when is_atom(key) do
-    :deli |> Application.fetch_env!(key)
+    Application.fetch_env!(:deli, key)
   end
 
   @spec mix_env(Deli.env() | String.t()) :: Deli.env()
@@ -305,7 +305,7 @@ defmodule Deli.Config do
   @spec edeliver_target(Deli.env() | String.t()) :: String.t()
   def edeliver_target("prod"), do: "production"
   def edeliver_target(:prod), do: "production"
-  def edeliver_target(env) when is_env(env), do: env |> Atom.to_string()
+  def edeliver_target(env) when is_env(env), do: Atom.to_string(env)
   def edeliver_target(target) when is_binary(target), do: target
 
   @spec project(module | nil) :: Keyword.t()
@@ -316,6 +316,6 @@ defmodule Deli.Config do
 
   @spec version(module | nil) :: Version.t()
   def version(mix_project \\ nil) do
-    project(mix_project)[:version] |> Version.parse!()
+    Version.parse!(project(mix_project)[:version])
   end
 end

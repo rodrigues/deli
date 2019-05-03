@@ -17,10 +17,10 @@ defmodule Mix.Tasks.Deli.Ping do
 
   @impl true
   def run(args) do
-    _ = :deli |> ensure_all_started
-    options = args |> parse_options
-    target = options |> Keyword.fetch!(:target)
-    {:ok, hosts} = target |> Config.host_filter().hosts(args)
-    hosts |> Enum.each(&Ping.run(target, &1))
+    _ = ensure_all_started(:deli)
+    options = parse_options(args)
+    target = Keyword.fetch!(options, :target)
+    {:ok, hosts} = Config.host_filter().hosts(target, args)
+    Enum.each(hosts, &Ping.run(target, &1))
   end
 end

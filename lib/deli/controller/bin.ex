@@ -28,13 +28,13 @@ defmodule Deli.Controller.Bin do
 
   @impl true
   def service_status(env, host) do
-    [command | args] = env |> bin(host, :ping)
-    {:ok, content} = command |> cmd_result(args, [0, 1, 127])
+    [command | args] = bin(env, host, :ping)
+    {:ok, content} = cmd_result(command, args, [0, 1, 127])
     content
   end
 
   defp bin_cmd(env, host, op) do
-    [command | args] = env |> bin(host, op)
+    [command | args] = bin(env, host, op)
     cmd(command, args)
   end
 

@@ -48,14 +48,14 @@ defmodule Deli.Release.Docker do
     docker_compose(:up, ["-d", :deli])
     :timer.sleep(1_000)
     cmd("ssh-keygen", ["-R", "\[0.0.0.0\]:#{port}"])
-    {:ok, scan} = "ssh-keyscan" |> cmd_result(["-p", port, "0.0.0.0"])
+    {:ok, scan} = cmd_result("ssh-keyscan", ["-p", port, "0.0.0.0"])
     write_file("~/.ssh/known_hosts", "\n#{scan}\n", [:append])
   end
 
   defp ensure_dockerfile do
     path = ".deli/Dockerfile"
 
-    unless path |> file_exists? do
+    unless file_exists?(path) do
       content =
         Dockerfile.build(
           Config.docker_build_image(),
@@ -74,7 +74,7 @@ defmodule Deli.Release.Docker do
   defp ensure_docker_compose do
     path = ".deli/docker-compose.yml"
 
-    unless path |> file_exists? do
+    unless file_exists?(path) do
       content =
         Compose.build(
           Config.app(),
@@ -99,7 +99,7 @@ defmodule Deli.Release.Docker do
       4096
     ]
 
-    unless path |> file_exists? do
+    unless file_exists?(path) do
       cmd(:mkdir, ["-p", ".deli/authorized_keys"])
       cmd("ssh-keygen", keygen_args)
       error!("Commit authorized keys before proceeding")

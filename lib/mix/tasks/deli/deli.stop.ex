@@ -23,13 +23,13 @@ defmodule Mix.Tasks.Deli.Stop do
 
   @impl true
   def run(args) do
-    _ = :deli |> ensure_all_started
-    options = args |> parse_options
-    target = options |> Keyword.fetch!(:target)
-    {:ok, hosts} = target |> Config.host_filter().hosts(args)
+    _ = ensure_all_started(:deli)
+    options = parse_options(args)
+    target = Keyword.fetch!(options, :target)
+    {:ok, hosts} = Config.host_filter().hosts(target, args)
 
-    if :stop |> confirm?(options) do
-      hosts |> Enum.each(&stop_host(target, &1))
+    if confirm?(:stop, options) do
+      Enum.each(hosts, &stop_host(target, &1))
     else
       cancelled!(:stop)
     end
@@ -38,11 +38,11 @@ defmodule Mix.Tasks.Deli.Stop do
   defp stop_host(env, host) do
     check = Config.check()
     controller = Config.controller()
-    id = env |> Config.host_id(host)
+    id = Config.host_id(env, host)
 
     check.run(env, host)
     IO.puts("stopping #{id}...")
-    :ok = env |> controller.stop_host(host)
+    :ok = controller.stop_host(env, host)
     IO.puts([IO.ANSI.green(), "stopped #{id}", IO.ANSI.reset()])
 
     :timer.sleep(Config.wait(:stopped_check))

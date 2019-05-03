@@ -12,7 +12,7 @@ defmodule Deli.BeamVersions do
   @type beam_version :: {dep, [{:version, version} | {:checksum, checksum}]}
   @type versions :: %{required(dep) => [{version(), checksum()}]}
 
-  @versions @deps |> File.versions_from_file()
+  @versions File.versions_from_file(@deps)
 
   defguardp is_dep(dep) when dep in @deps
 
@@ -24,25 +24,22 @@ defmodule Deli.BeamVersions do
 
   @spec fetch([opt]) :: [beam_version]
   def fetch(opts \\ []) when is_list(opts) do
-    deps() |> Enum.map(&fetch_version({&1, opts[&1]}))
+    Enum.map(deps(), &fetch_version({&1, opts[&1]}))
   end
 
   defp fetch_version({dep, nil}) when is_dep(dep) do
-    {dep, :latest} |> fetch_version
+    fetch_version({dep, :latest})
   end
 
   defp fetch_version({dep, :latest}) when is_dep(dep) do
-    {version, _} =
-      @versions[dep]
-      |> Enum.find(fn {v, _} -> not String.contains?(v, "rc") end)
-
-    {dep, version} |> fetch_version
+    {version, _} = Enum.find(@versions[dep], fn {v, _} -> not String.contains?(v, "rc") end)
+    fetch_version({dep, version})
   end
 
   defp fetch_version({dep, version}) when is_dep(dep) and is_binary(version) do
-    case @versions[dep] |> Enum.find(fn {v, _} -> v == version end) do
+    case Enum.find(@versions[dep], fn {v, _} -> v == version end) do
       {_, checksum} when is_binary(checksum) ->
-        {dep, version, checksum} |> fetch_version
+        fetch_version({dep, version, checksum})
 
       _ ->
         raise """

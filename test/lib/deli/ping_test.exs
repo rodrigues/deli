@@ -19,10 +19,10 @@ defmodule Deli.PingTest do
 
         output =
           capture_io(fn ->
-            :ok = env |> Ping.run(host)
+            :ok = Ping.run(env, host)
           end)
 
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
         assert_receive {
           :__system_handler__,
@@ -49,10 +49,10 @@ defmodule Deli.PingTest do
 
         output =
           capture_io(fn ->
-            :ok = env |> Ping.run(host)
+            :ok = Ping.run(env, host)
           end)
 
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
         assert_receive {
           :__system_handler__,

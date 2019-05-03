@@ -13,10 +13,10 @@ defmodule Deli.Controller.SystemctlTest do
                 host <- host() do
         put_config(:app, app)
         stub_cmd({"", 0})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
-        :ok = env |> Systemctl.start_host(host)
+        :ok = Systemctl.start_host(env, host)
 
         assert_receive {
           :__system_handler__,
@@ -32,15 +32,15 @@ defmodule Deli.Controller.SystemctlTest do
       check all app <- app(),
                 env <- env(),
                 host <- host(),
-                signal <- 1..500 |> integer() do
+                signal <- signal() do
         put_config(:app, app)
         stub_cmd({"", signal})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Systemctl.start_host(host)
+            Systemctl.start_host(env, host)
           end)
         end
 
@@ -64,10 +64,10 @@ defmodule Deli.Controller.SystemctlTest do
                 host <- host() do
         put_config(:app, app)
         stub_cmd({"", 0})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
-        :ok = env |> Systemctl.stop_host(host)
+        :ok = Systemctl.stop_host(env, host)
 
         assert_receive {
           :__system_handler__,
@@ -83,15 +83,15 @@ defmodule Deli.Controller.SystemctlTest do
       check all app <- app(),
                 env <- env(),
                 host <- host(),
-                signal <- 1..500 |> integer() do
+                signal <- signal() do
         put_config(:app, app)
         stub_cmd({"", signal})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Systemctl.stop_host(host)
+            Systemctl.stop_host(env, host)
           end)
         end
 
@@ -115,10 +115,10 @@ defmodule Deli.Controller.SystemctlTest do
                 host <- host() do
         put_config(:app, app)
         stub_cmd({"", 0})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
-        :ok = env |> Systemctl.restart_host(host)
+        :ok = Systemctl.restart_host(env, host)
 
         assert_receive {
           :__system_handler__,
@@ -134,15 +134,15 @@ defmodule Deli.Controller.SystemctlTest do
       check all app <- app(),
                 env <- env(),
                 host <- host(),
-                signal <- 1..500 |> integer() do
+                signal <- signal() do
         put_config(:app, app)
         stub_cmd({"", signal})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Systemctl.restart_host(host)
+            Systemctl.restart_host(env, host)
           end)
         end
 
@@ -165,13 +165,13 @@ defmodule Deli.Controller.SystemctlTest do
                 env <- env(),
                 host <- host(),
                 status <- string(),
-                [signal] = [0, 3] |> Enum.take_random(1) do
+                signal <- signal([0, 3]) do
         put_config(:app, app)
         stub_cmd({status, signal})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
-        ^status = env |> Systemctl.service_status(host)
+        ^status = Systemctl.service_status(env, host)
 
         assert_receive {
           :__system_handler__,
@@ -187,15 +187,15 @@ defmodule Deli.Controller.SystemctlTest do
       check all app <- app(),
                 env <- env(),
                 host <- host(),
-                signal <- 1..500 |> integer() |> except(&(&1 == 3)) do
+                signal <- except(signal(), &(&1 == 3)) do
         put_config(:app, app)
         stub_cmd({"", signal})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Systemctl.service_status(host)
+            Systemctl.service_status(env, host)
           end)
         end
 
@@ -217,11 +217,11 @@ defmodule Deli.Controller.SystemctlTest do
       check all app <- app(),
                 env <- env(),
                 host <- host(),
-                [signal] = [0, 3] |> Enum.take_random(1) do
+                signal <- signal([0, 3]) do
         put_config(:app, app)
         stub_cmd({"Active: active (running)", signal})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
         assert Systemctl.service_running?(env, host)
 
@@ -239,11 +239,11 @@ defmodule Deli.Controller.SystemctlTest do
       check all app <- app(),
                 env <- env(),
                 host <- host(),
-                [signal] = [0, 3] |> Enum.take_random(1) do
+                signal <- signal([0, 3]) do
         put_config(:app, app)
         stub_cmd({"pang", signal})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
         refute Systemctl.service_running?(env, host)
 
@@ -261,15 +261,15 @@ defmodule Deli.Controller.SystemctlTest do
       check all app <- app(),
                 env <- env(),
                 host <- host(),
-                signal <- 1..500 |> integer() |> except(&(&1 == 3)) do
+                signal <- except(signal(), &(&1 == 3)) do
         put_config(:app, app)
         stub_cmd({"", signal})
-        app = app |> to_string
-        id = env |> Config.host_id(host)
+        app = to_string(app)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Systemctl.service_running?(host)
+            Systemctl.service_running?(env, host)
           end)
         end
 

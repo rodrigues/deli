@@ -23,13 +23,13 @@ defmodule Mix.Tasks.Deli.Restart do
 
   @impl true
   def run(args) do
-    _ = :deli |> ensure_all_started
-    options = args |> parse_options
-    target = options |> Keyword.fetch!(:target)
-    {:ok, hosts} = target |> Config.host_filter().hosts(args)
+    _ = ensure_all_started(:deli)
+    options = parse_options(args)
+    target = Keyword.fetch!(options, :target)
+    {:ok, hosts} = Config.host_filter().hosts(target, args)
 
-    if :restart |> confirm?(options) do
-      hosts |> Enum.each(&restart_host(target, &1))
+    if confirm?(:restart, options) do
+      Enum.each(hosts, &restart_host(target, &1))
     else
       cancelled!(:restart)
     end
@@ -38,11 +38,11 @@ defmodule Mix.Tasks.Deli.Restart do
   defp restart_host(env, host) do
     check = Config.check()
     controller = Config.controller()
-    id = env |> Config.host_id(host)
+    id = Config.host_id(env, host)
 
     check.run(env, host)
     IO.puts("restarting #{id}...")
-    :ok = env |> controller.restart_host(host)
+    :ok = controller.restart_host(env, host)
     IO.puts([IO.ANSI.green(), "restarted #{id}", IO.ANSI.reset()])
 
     :timer.sleep(Config.wait(:started_check))

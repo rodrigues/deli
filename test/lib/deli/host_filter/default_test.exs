@@ -6,6 +6,12 @@ defmodule Deli.HostFilter.DefaultTest do
     assert behaves?(HostFilter, Deli.HostFilter)
   end
 
+  def a_z, do: nonempty_string(?a..?z)
+  def a_k, do: nonempty_string(?a..?k)
+  def l_z, do: nonempty_string(?l..?z)
+  def digit, do: nonempty_string(?0..?9)
+  def position, do: 0..1 |> Enum.take_random(1) |> Enum.at(0)
+
   describe "hosts/2" do
     property "all hosts when not filtering" do
       check all env <- env(),
@@ -13,12 +19,11 @@ defmodule Deli.HostFilter.DefaultTest do
                 h2 <- host() do
         h3 = h1 <> h2
 
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> [h1, h2, h3] end)
+        expect(HostProviderMock, :hosts, fn ^env -> [h1, h2, h3] end)
 
         output =
           capture_io(fn ->
-            {:ok, [^h1, ^h2, ^h3]} = env |> HostFilter.hosts([])
+            {:ok, [^h1, ^h2, ^h3]} = HostFilter.hosts(env, [])
           end)
 
         assert output == "# hosts\n## #{h1}\n## #{h2}\n## #{h3}\n"
@@ -27,19 +32,18 @@ defmodule Deli.HostFilter.DefaultTest do
 
     property "filters hosts" do
       check all env <- env(),
-                h1 <- ?a..?k |> nonempty_string(),
-                h2 <- ?l..?z |> nonempty_string(),
-                term_size <- 1..5 |> integer() do
+                h1 <- a_k(),
+                h2 <- l_z(),
+                term_size <- integer(1..5) do
         h3 = h1 <> h2
 
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> [h1, h2, h3] end)
+        expect(HostProviderMock, :hosts, fn ^env -> [h1, h2, h3] end)
 
-        {filter, _} = h1 |> String.split_at(term_size)
+        {filter, _} = String.split_at(h1, term_size)
 
         output =
           capture_io(fn ->
-            {:ok, [^h1, ^h3]} = env |> HostFilter.hosts(["-h", filter])
+            {:ok, [^h1, ^h3]} = HostFilter.hosts(env, ["-h", filter])
           end)
 
         assert output == "# hosts\n## #{h1}\n## #{h3}\n"
@@ -48,13 +52,12 @@ defmodule Deli.HostFilter.DefaultTest do
 
     property "fails if all hosts are excluded after filter" do
       check all env <- env(),
-                h1 <- ?a..?k |> nonempty_string(),
-                h2 <- ?l..?z |> nonempty_string(),
-                filter <- ?0..?9 |> nonempty_string() do
+                h1 <- a_k(),
+                h2 <- l_z(),
+                filter <- digit() do
         h3 = h1 <> h2
 
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> [h1, h2, h3] end)
+        expect(HostProviderMock, :hosts, fn ^env -> [h1, h2, h3] end)
 
         call = fn ->
           capture_io(:stderr, fn ->
@@ -68,9 +71,8 @@ defmodule Deli.HostFilter.DefaultTest do
 
     property "fails if no hosts are defined for env and filtering" do
       check all env <- env(),
-                filter <- ?a..?z |> nonempty_string() do
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> [] end)
+                filter <- digit() do
+        expect(HostProviderMock, :hosts, fn ^env -> [] end)
 
         call = fn ->
           capture_io(:stderr, fn ->
@@ -84,8 +86,7 @@ defmodule Deli.HostFilter.DefaultTest do
 
     property "fails if no hosts are defined for env and not filtering" do
       check all env <- env() do
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> [] end)
+        expect(HostProviderMock, :hosts, fn ^env -> [] end)
 
         call = fn ->
           capture_io(:stderr, fn ->
@@ -102,32 +103,28 @@ defmodule Deli.HostFilter.DefaultTest do
     property "host when only one configured and no filter" do
       check all env <- env(),
                 h1 <- nonempty_string() do
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> [h1] end)
-
-        assert {:ok, h1} == env |> HostFilter.host([])
+        expect(HostProviderMock, :hosts, fn ^env -> [h1] end)
+        assert {:ok, h1} == HostFilter.host(env, [])
       end
     end
 
     property "host when only one configured and filter matches" do
       check all env <- env(),
                 h1 <- nonempty_string(),
-                term_size <- 1..5 |> integer() do
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> [h1] end)
+                term_size <- integer(1..5) do
+        expect(HostProviderMock, :hosts, fn ^env -> [h1] end)
 
-        {filter, _} = h1 |> String.split_at(term_size)
+        {filter, _} = String.split_at(h1, term_size)
 
-        assert {:ok, h1} == env |> HostFilter.host(["-h", filter])
+        assert {:ok, h1} == HostFilter.host(env, ["-h", filter])
       end
     end
 
     property "error when only one configured and filter doesn't match" do
       check all env <- env(),
-                h1 <- ?a..?z |> nonempty_string(),
-                filter <- ?0..?9 |> nonempty_string() do
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> [h1] end)
+                h1 <- a_z(),
+                filter <- digit() do
+        expect(HostProviderMock, :hosts, fn ^env -> [h1] end)
 
         call = fn ->
           capture_io(:stderr, fn ->
@@ -141,11 +138,10 @@ defmodule Deli.HostFilter.DefaultTest do
 
     property "error when several configured and filter doesn't match any" do
       check all env <- env(),
-                h1 <- ?a..?z |> nonempty_string(),
-                h2 <- ?a..?z |> nonempty_string(),
-                filter <- ?0..?9 |> nonempty_string() do
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> [h1, h2] end)
+                h1 <- a_z(),
+                h2 <- a_z(),
+                filter <- digit() do
+        expect(HostProviderMock, :hosts, fn ^env -> [h1, h2] end)
 
         call = fn ->
           capture_io(:stderr, fn ->
@@ -162,13 +158,12 @@ defmodule Deli.HostFilter.DefaultTest do
                 filter <- nonempty_string(),
                 h1_suffix <- nonempty_string(),
                 h2_prefix <- nonempty_string() do
-        [position] = 0..1 |> Enum.take_random(1)
+        position = position()
         h1 = filter <> h1_suffix
         h2 = h2_prefix <> filter
         hosts = [h1, h2]
 
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> hosts end)
+        expect(HostProviderMock, :hosts, fn ^env -> hosts end)
 
         output =
           capture_io([input: "#{position}\n", capture_prompt: true], fn ->
@@ -189,7 +184,7 @@ defmodule Deli.HostFilter.DefaultTest do
                 h1_suffix <- nonempty_string(),
                 h2_prefix <- nonempty_string(),
                 bad_tries <- 2..42 |> integer() |> list_of() |> nonempty() do
-        [position] = 0..1 |> Enum.take_random(1)
+        position = position()
         h1 = filter <> h1_suffix
         h2 = h2_prefix <> filter
         hosts = [h1, h2]
@@ -203,8 +198,7 @@ defmodule Deli.HostFilter.DefaultTest do
           |> Enum.map(fn _ -> output end)
           |> Enum.join("")
 
-        HostProviderMock
-        |> expect(:hosts, fn ^env -> hosts end)
+        expect(HostProviderMock, :hosts, fn ^env -> hosts end)
 
         output =
           capture_io([input: "#{bad_input}#{position}\n", capture_prompt: true], fn ->

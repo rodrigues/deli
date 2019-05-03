@@ -22,16 +22,14 @@ defmodule Mix.Tasks.Deli.Release do
 
   @impl true
   def run(args) do
-    _ = :deli |> ensure_all_started
+    _ = ensure_all_started(:deli)
     system = Config.__system_handler__()
-    options = args |> parse_options
-    target = options |> Keyword.fetch!(:target)
+    options = parse_options(args)
+    target = Keyword.fetch!(options, :target)
 
     if assets?(options), do: system.put_env("ASSETS", "1")
 
-    {:ok, tag} =
-      options[:version]
-      |> Config.versioning().version_tag()
+    {:ok, tag} = Config.versioning().version_tag(options[:version])
 
     Config.release().build(tag, target)
   end

@@ -21,7 +21,7 @@ defmodule Deli.BeamVersions.FileTest do
   describe "versions_from_file/0..1" do
     property "persisted versions" do
       check all versions <- versions() do
-        :ok = :eval_file |> TestAgent.set(fn @path -> {versions, []} end)
+        :ok = TestAgent.set(:eval_file, fn @path -> {versions, []} end)
         assert File.versions_from_file() == versions
       end
     end
@@ -30,8 +30,8 @@ defmodule Deli.BeamVersions.FileTest do
       check all key_b <- atom(),
                 versions <- versions(),
                 not Map.has_key?(versions, key_b) do
-        key_a = versions |> Map.keys() |> Enum.at(0)
-        :ok = :eval_file |> TestAgent.set(fn @path -> {versions, []} end)
+        [key_a | _] = Map.keys(versions)
+        :ok = TestAgent.set(:eval_file, fn @path -> {versions, []} end)
         result = File.versions_from_file([key_a, key_b])
 
         assert result[key_a] == versions[key_a]
@@ -47,7 +47,7 @@ defmodule Deli.BeamVersions.FileTest do
   describe "persist_versions/1" do
     property "writes formatted versions" do
       check all versions <- versions() do
-        :ok = versions |> File.persist_versions()
+        :ok = File.persist_versions(versions)
         content = inspect(versions)
 
         assert_received {:__code_handler__, :format_string!, ^content}

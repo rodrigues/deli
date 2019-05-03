@@ -3,16 +3,12 @@ defmodule Mix.DeliRestartTest do
   alias Mix.Tasks.Deli.Restart
 
   def setup_hosts(env, hosts, setup_mocks? \\ true) do
-    HostFilterMock
-    |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
+    stub(HostFilterMock, :hosts, fn ^env, _ -> {:ok, hosts} end)
 
     if setup_mocks? do
       for host <- hosts do
-        CheckMock
-        |> expect(:run, 2, fn ^env, ^host -> :ok end)
-
-        ControllerMock
-        |> expect(:restart_host, fn ^env, ^host -> :ok end)
+        expect(CheckMock, :run, 2, fn ^env, ^host -> :ok end)
+        expect(ControllerMock, :restart_host, fn ^env, ^host -> :ok end)
       end
     end
   end
@@ -31,7 +27,7 @@ defmodule Mix.DeliRestartTest do
 
       output =
         capture_io(fn ->
-          :ok = [flag] |> Restart.run()
+          :ok = Restart.run([flag])
         end)
 
       log =

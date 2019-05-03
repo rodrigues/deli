@@ -6,6 +6,10 @@ defmodule Deli.Controller.BinTest do
     put_config(:__system_handler__, SystemStub)
   end
 
+  def nok_signal do
+    2..500 |> integer() |> except(&(&1 == 127))
+  end
+
   describe "start_host/2" do
     property "starts host" do
       check all app_user <- app_user(),
@@ -15,9 +19,9 @@ defmodule Deli.Controller.BinTest do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", 0})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
-        :ok = env |> Bin.start_host(host)
+        :ok = Bin.start_host(env, host)
 
         assert_receive {
           :__system_handler__,
@@ -34,15 +38,15 @@ defmodule Deli.Controller.BinTest do
                 bin_path <- bin_path(),
                 env <- env(),
                 host <- host(),
-                signal <- 1..500 |> integer() do
+                signal <- signal() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", signal})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Bin.start_host(host)
+            Bin.start_host(env, host)
           end)
         end
 
@@ -68,9 +72,9 @@ defmodule Deli.Controller.BinTest do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", 0})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
-        :ok = env |> Bin.stop_host(host)
+        :ok = Bin.stop_host(env, host)
 
         assert_receive {
           :__system_handler__,
@@ -87,15 +91,15 @@ defmodule Deli.Controller.BinTest do
                 bin_path <- bin_path(),
                 env <- env(),
                 host <- host(),
-                signal <- 1..500 |> integer() do
+                signal <- signal() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", signal})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Bin.stop_host(host)
+            Bin.stop_host(env, host)
           end)
         end
 
@@ -121,9 +125,9 @@ defmodule Deli.Controller.BinTest do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", 0})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
-        :ok = env |> Bin.restart_host(host)
+        :ok = Bin.restart_host(env, host)
 
         assert_receive {
           :__system_handler__,
@@ -140,15 +144,15 @@ defmodule Deli.Controller.BinTest do
                 bin_path <- bin_path(),
                 env <- env(),
                 host <- host(),
-                signal <- 1..500 |> integer() do
+                signal <- signal() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", signal})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Bin.restart_host(host)
+            Bin.restart_host(env, host)
           end)
         end
 
@@ -172,13 +176,13 @@ defmodule Deli.Controller.BinTest do
                 env <- env(),
                 host <- host(),
                 status <- string(),
-                [signal] = [0, 1, 127] |> Enum.take_random(1) do
+                signal <- signal([0, 1, 127]) do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({status, signal})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
-        ^status = env |> Bin.service_status(host)
+        ^status = Bin.service_status(env, host)
 
         assert_receive {
           :__system_handler__,
@@ -195,15 +199,15 @@ defmodule Deli.Controller.BinTest do
                 bin_path <- bin_path(),
                 env <- env(),
                 host <- host(),
-                signal <- 2..500 |> integer() |> except(&(&1 == 127)) do
+                signal <- nok_signal() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", signal})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Bin.service_status(host)
+            Bin.service_status(env, host)
           end)
         end
 
@@ -226,11 +230,11 @@ defmodule Deli.Controller.BinTest do
                 bin_path <- bin_path(),
                 env <- env(),
                 host <- host(),
-                [signal] = [0, 1, 127] |> Enum.take_random(1) do
+                signal <- signal([0, 1, 127]) do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"pong", signal})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
         assert Bin.service_running?(env, host)
 
@@ -249,11 +253,11 @@ defmodule Deli.Controller.BinTest do
                 bin_path <- bin_path(),
                 env <- env(),
                 host <- host(),
-                [signal] = [0, 1, 127] |> Enum.take_random(1) do
+                signal <- signal([0, 1, 127]) do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"pang", signal})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
         refute Bin.service_running?(env, host)
 
@@ -272,15 +276,15 @@ defmodule Deli.Controller.BinTest do
                 bin_path <- bin_path(),
                 env <- env(),
                 host <- host(),
-                signal <- 2..500 |> integer() |> except(&(&1 == 127)) do
+                signal <- nok_signal() do
         put_config(:app_user, app_user)
         put_config(:bin_path, bin_path)
         stub_cmd({"", signal})
-        id = env |> Config.host_id(host)
+        id = Config.host_id(env, host)
 
         call = fn ->
           capture_io(fn ->
-            env |> Bin.service_running?(host)
+            Bin.service_running?(env, host)
           end)
         end
 

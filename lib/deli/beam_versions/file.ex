@@ -8,8 +8,8 @@ defmodule Deli.BeamVersions.File do
   @spec versions_from_file([BeamVersions.dep()]) :: BeamVersions.versions()
   def versions_from_file(deps \\ []) when is_list(deps) do
     code_handler = Config.__code_handler__()
-    {%{} = versions, _} = @path |> code_handler.eval_file()
-    deps |> Enum.reduce(versions, &Map.put_new(&2, &1, []))
+    {%{} = versions, _} = code_handler.eval_file(@path)
+    Enum.reduce(deps, versions, &Map.put_new(&2, &1, []))
   end
 
   @spec persist_versions(BeamVersions.versions()) :: :ok
@@ -23,6 +23,6 @@ defmodule Deli.BeamVersions.File do
       |> code_handler.format_string!()
       |> IO.iodata_to_binary()
 
-    @path |> file_handler.write!(content, [])
+    file_handler.write!(@path, content, [])
   end
 end

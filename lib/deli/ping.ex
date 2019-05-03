@@ -7,6 +7,6 @@ defmodule Deli.Ping do
   def run(env, host) do
     check = Config.check()
     running_good? = true
-    env |> check.run(host, running_good?, Deli.Controller.Bin, :pong)
+    check.run(env, host, running_good?, Deli.Controller.Bin, :pong)
   end
 end

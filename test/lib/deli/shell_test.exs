@@ -8,27 +8,30 @@ defmodule Deli.ShellTest do
     put_config(:__system_handler__, SystemStub)
   end
 
-  def ok_signals, do: 0..999 |> integer() |> list_of() |> nonempty()
+  @ok_range 0..999
+  def ok_signals, do: @ok_range |> integer() |> list_of() |> nonempty()
+  def ok_signal, do: integer(@ok_range)
+  def ok_signal(signals), do: signals |> Enum.take_random(1) |> Enum.at(0)
 
   describe "cmd/1..4" do
     property "runs shell command without args as atom" do
       check all cmd <- atom() do
-        :ok = cmd |> Shell.cmd()
-        cmd = cmd |> to_string
+        :ok = Shell.cmd(cmd)
+        cmd = to_string(cmd)
         assert_received {:__system_handler__, :cmd, ^cmd, [], _}
       end
     end
 
     property "runs shell command without args as binary" do
       check all cmd <- cmd() do
-        :ok = cmd |> Shell.cmd()
+        :ok = Shell.cmd(cmd)
         assert_received {:__system_handler__, :cmd, ^cmd, [], _}
       end
     end
 
     property "accepts args" do
       check all {cmd, args} <- cmd_with_args() do
-        :ok = cmd |> Shell.cmd(args)
+        :ok = Shell.cmd(cmd, args)
         assert_received {:__system_handler__, :cmd, ^cmd, ^args, _}
       end
     end
@@ -40,10 +43,10 @@ defmodule Deli.ShellTest do
                 args <- nonempty_string() |> list_of() |> nonempty() do
         output =
           capture_io(fn ->
-            :ok = cmd |> Shell.cmd(args)
+            :ok = Shell.cmd(cmd, args)
           end)
 
-        argv = args |> Enum.join(" ")
+        argv = Enum.join(args, " ")
 
         assert output == "\e[1m$ \e[0m\e[4m#{cmd} #{argv}\e[0m\n"
         assert_received {:__system_handler__, :cmd, ^cmd, ^args, _}
@@ -54,7 +57,7 @@ defmodule Deli.ShellTest do
       put_config(:verbose, true)
 
       check all {cmd, args} <- cmd_with_args() do
-        :ok = cmd |> Shell.cmd(args)
+        :ok = Shell.cmd(cmd, args)
 
         assert_received {
           :__system_handler__,
@@ -69,7 +72,7 @@ defmodule Deli.ShellTest do
 
     property "does not output command output when not verbose" do
       check all {cmd, args} <- cmd_with_args() do
-        :ok = cmd |> Shell.cmd(args)
+        :ok = Shell.cmd(cmd, args)
 
         assert_received {:__system_handler__, :cmd, ^cmd, ^args, into: ""}
       end
@@ -78,7 +81,7 @@ defmodule Deli.ShellTest do
     property "ok when signal is in ok_signals" do
       check all {cmd, args} <- cmd_with_args(),
                 ok_signals <- ok_signals(),
-                [signal] = ok_signals |> Enum.take_random(1) do
+                [signal] = Enum.take_random(ok_signals, 1) do
         stub_cmd({"", signal})
         assert :ok == Shell.cmd(cmd, args, ok_signals)
       end
@@ -87,7 +90,7 @@ defmodule Deli.ShellTest do
     property "fails when signal not in ok_signals" do
       check all {cmd, args} <- cmd_with_args(),
                 ok_signals <- ok_signals(),
-                signal <- 0..999 |> integer(),
+                signal <- ok_signal(),
                 not Enum.member?(ok_signals, signal) do
         stub_cmd({"", signal})
 
@@ -103,11 +106,11 @@ defmodule Deli.ShellTest do
 
     property "propagates opts downstream" do
       check all {cmd, args} <- cmd_with_args(),
-                opts <- term() |> keyword_of(),
+                opts <- keyword_of(term()),
                 ok_signals <- ok_signals(),
-                [signal] = ok_signals |> Enum.take_random(1) do
+                signal = ok_signal(ok_signals) do
         stub_cmd({"", signal})
-        :ok = cmd |> Shell.cmd(args, ok_signals, opts)
+        :ok = Shell.cmd(cmd, args, ok_signals, opts)
         expected_opts = [into: ""] ++ opts
         assert_received {:__system_handler__, :cmd, ^cmd, ^args, ^expected_opts}
       end
@@ -117,13 +120,13 @@ defmodule Deli.ShellTest do
   describe "cmd_result/2..4" do
     property "result when succeeds" do
       check all {cmd, args} <- cmd_with_args(),
-                opts <- term() |> keyword_of(),
-                ok_signals <- ok_signals(),
+                opts <- keyword_of(term()),
                 result <- nonempty_string(),
-                [signal] = ok_signals |> Enum.take_random(1) do
+                ok_signals <- ok_signals(),
+                signal = ok_signal(ok_signals) do
         stub_cmd({result, signal})
 
-        {:ok, ^result} = cmd |> Shell.cmd_result(args, ok_signals, opts)
+        {:ok, ^result} = Shell.cmd_result(cmd, args, ok_signals, opts)
 
         expected_opts = [into: ""] ++ opts
         assert_received {:__system_handler__, :cmd, ^cmd, ^args, ^expected_opts}
@@ -132,13 +135,13 @@ defmodule Deli.ShellTest do
 
     property "stream when succeeds and result is a stream" do
       check all {cmd, args} <- cmd_with_args(),
-                opts <- term() |> keyword_of(),
+                opts <- keyword_of(term()),
                 ok_signals <- ok_signals(),
-                [signal] = ok_signals |> Enum.take_random(1) do
+                signal = ok_signal(ok_signals) do
         result = %IO.Stream{device: :standard_io, line_or_bytes: :line, raw: false}
         stub_cmd({result, signal})
 
-        {:ok, ^result} = cmd |> Shell.cmd_result(args, ok_signals, opts)
+        {:ok, ^result} = Shell.cmd_result(cmd, args, ok_signals, opts)
 
         expected_opts = [into: ""] ++ opts
         assert_received {:__system_handler__, :cmd, ^cmd, ^args, ^expected_opts}
@@ -150,7 +153,7 @@ defmodule Deli.ShellTest do
     property "calls edeliver with no args" do
       check all cmd <- nonempty_string() do
         stub_cmd({"", 0})
-        :ok = cmd |> Shell.edeliver()
+        :ok = Shell.edeliver(cmd)
         expected_opts = [into: ""]
 
         assert_received {
@@ -166,7 +169,7 @@ defmodule Deli.ShellTest do
     property "calls edeliver with args" do
       check all {cmd, args} <- cmd_with_args() do
         stub_cmd({"", 0})
-        :ok = cmd |> Shell.edeliver(args)
+        :ok = Shell.edeliver(cmd, args)
         expected_opts = [into: ""]
 
         assert_received {
@@ -181,7 +184,7 @@ defmodule Deli.ShellTest do
 
     property "fails on a signal different than 0" do
       check all {cmd, args} <- cmd_with_args(),
-                signal <- 1..999 |> integer() do
+                signal <- ok_signal() do
         stub_cmd({"", signal})
 
         call = fn ->
@@ -206,7 +209,7 @@ defmodule Deli.ShellTest do
 
         expected_args = ["edeliver", cmd] ++ args ++ ["--verbose"]
 
-        :ok = cmd |> Shell.edeliver(args)
+        :ok = Shell.edeliver(cmd, args)
 
         assert_received {
           :__system_handler__,
@@ -223,7 +226,7 @@ defmodule Deli.ShellTest do
     property "calls docker_compose with no args" do
       check all cmd <- nonempty_string() do
         stub_cmd({"", 0})
-        :ok = cmd |> Shell.docker_compose()
+        :ok = Shell.docker_compose(cmd)
         expected_opts = [into: "", env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]]
 
         assert_received {
@@ -239,7 +242,7 @@ defmodule Deli.ShellTest do
     property "calls docker_compose with args" do
       check all {cmd, args} <- cmd_with_args() do
         stub_cmd({"", 0})
-        :ok = cmd |> Shell.docker_compose(args)
+        :ok = Shell.docker_compose(cmd, args)
         expected_opts = [into: "", env: [{"COMPOSE_INTERACTIVE_NO_CLI", "1"}]]
 
         assert_received {
@@ -254,7 +257,7 @@ defmodule Deli.ShellTest do
 
     property "fails on a signal different than 0" do
       check all {cmd, args} <- cmd_with_args(),
-                signal <- 1..999 |> integer() do
+                signal <- ok_signal() do
         stub_cmd({"", signal})
 
         call = fn ->
@@ -269,8 +272,8 @@ defmodule Deli.ShellTest do
 
     property "ok on a signal in ok_signals" do
       check all {cmd, args} <- cmd_with_args(),
-                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
-                [signal] = ok_signals |> Enum.take_random(1) do
+                ok_signals <- ok_signals() do
+        signal = ok_signal(ok_signals)
         stub_cmd({"", signal})
 
         assert Shell.docker_compose(cmd, args, ok_signals) == :ok
@@ -279,8 +282,8 @@ defmodule Deli.ShellTest do
 
     property "fail on a signal not in ok_signals" do
       check all {cmd, args} <- cmd_with_args(),
-                ok_signals <- 0..999 |> integer() |> list_of() |> nonempty(),
-                signal <- 0..999 |> integer(),
+                ok_signals <- ok_signals(),
+                signal <- ok_signal(),
                 not Enum.member?(ok_signals, signal) do
         stub_cmd({"", signal})
 
@@ -298,12 +301,12 @@ defmodule Deli.ShellTest do
   describe "file_exists?/1" do
     property "whether file exists or not in app project" do
       check all path <- nonempty_string(),
-                cwd <- ?a..?z |> nonempty_string(),
+                cwd <- nonempty_string(?a..?z),
                 exists? <- boolean() do
         cwd = "/tmp/deli/#{cwd}"
         expanded = "#{cwd}/#{path}"
-        :ok = :cwd! |> TestAgent.set(fn -> cwd end)
-        :ok = :exists? |> TestAgent.set(fn ^expanded -> exists? end)
+        :ok = TestAgent.set(:cwd!, fn -> cwd end)
+        :ok = TestAgent.set(:exists?, fn ^expanded -> exists? end)
 
         assert Shell.file_exists?(path) == exists?
       end
@@ -313,15 +316,15 @@ defmodule Deli.ShellTest do
   describe "write_file/2..3" do
     property "writes content into file" do
       check all path <- nonempty_string(),
-                cwd <- ?a..?z |> nonempty_string(),
+                cwd <- nonempty_string(?a..?z),
                 content <- binary(),
                 result <- term() do
         cwd = "/tmp/deli/#{cwd}"
         expanded = "#{cwd}/#{path}"
-        :ok = :cwd! |> TestAgent.set(fn -> cwd end)
-        :ok = :write! |> TestAgent.set(fn ^expanded, ^content -> result end)
+        :ok = TestAgent.set(:cwd!, fn -> cwd end)
+        :ok = TestAgent.set(:write!, fn ^expanded, ^content -> result end)
 
-        ^result = path |> Shell.write_file(content)
+        ^result = Shell.write_file(path, content)
 
         assert_received {:__file_handler__, :write!, ^expanded, ^content, []}
       end
@@ -329,16 +332,16 @@ defmodule Deli.ShellTest do
 
     property "writes content into file with options" do
       check all path <- nonempty_string(),
-                cwd <- ?a..?z |> nonempty_string(),
+                cwd <- nonempty_string(?a..?z),
                 content <- binary(),
                 opts <- atom() |> list_of() |> nonempty(),
                 result <- term() do
         cwd = "/tmp/deli/#{cwd}"
         expanded = "#{cwd}/#{path}"
-        :ok = :cwd! |> TestAgent.set(fn -> cwd end)
-        :ok = :write! |> TestAgent.set(fn ^expanded, ^content -> result end)
+        :ok = TestAgent.set(:cwd!, fn -> cwd end)
+        :ok = TestAgent.set(:write!, fn ^expanded, ^content -> result end)
 
-        ^result = path |> Shell.write_file(content, opts)
+        ^result = Shell.write_file(path, content, opts)
 
         assert_received {:__file_handler__, :write!, ^expanded, ^content, ^opts}
       end
@@ -350,7 +353,7 @@ defmodule Deli.ShellTest do
       check all app <- app(),
                 target <- atom(),
                 operation <- atom(),
-                opts <- term() |> keyword_of() do
+                opts <- keyword_of(term()) do
         opts =
           opts
           |> Keyword.put(:target, target)
@@ -360,7 +363,7 @@ defmodule Deli.ShellTest do
 
         output =
           capture_io(fn ->
-            true = operation |> Shell.confirm?(opts)
+            true = Shell.confirm?(operation, opts)
           end)
 
         assert output == "#{operation} #{app} at #{target}? [Yn] y\n"
@@ -371,11 +374,9 @@ defmodule Deli.ShellTest do
       check all app <- app(),
                 target <- atom(),
                 operation <- atom(),
-                opts <- term() |> keyword_of(),
+                opts <- keyword_of(term()),
                 confirms? <- boolean() do
-        opts =
-          opts
-          |> Keyword.put(:target, target)
+        opts = Keyword.put(opts, :target, target)
 
         put_config(:app, app)
 
@@ -383,7 +384,7 @@ defmodule Deli.ShellTest do
 
         output =
           capture_io([input: input, capture_prompt: true], fn ->
-            ^confirms? = operation |> Shell.confirm?(opts)
+            ^confirms? = Shell.confirm?(operation, opts)
           end)
 
         assert output == "#{operation} #{app} at #{target}? [Yn] "
@@ -393,7 +394,7 @@ defmodule Deli.ShellTest do
     property "fails when target is not provided" do
       check all app <- app(),
                 operation <- atom(),
-                opts <- term() |> keyword_of(),
+                opts <- keyword_of(term()),
                 not Keyword.has_key?(opts, :target) do
         put_config(:app, app)
 
@@ -404,9 +405,9 @@ defmodule Deli.ShellTest do
 
   describe "cancelled!/1" do
     property "prints operation was cancelled by user" do
-      check all a <- atom() do
-        output = capture_io(fn -> Shell.cancelled!(a) end)
-        assert output == "\e[32m#{a} cancelled by user\e[0m\n"
+      check all operation <- atom() do
+        output = capture_io(fn -> Shell.cancelled!(operation) end)
+        assert output == "\e[32m#{operation} cancelled by user\e[0m\n"
       end
     end
   end
@@ -414,7 +415,7 @@ defmodule Deli.ShellTest do
   describe "ensure_all_started/1" do
     property "ensures application and dependencies started" do
       check all app <- app() do
-        {:ok, [^app]} = app |> Shell.ensure_all_started()
+        {:ok, [^app]} = Shell.ensure_all_started(app)
 
         assert_received {
           :__application_handler__,
@@ -429,11 +430,11 @@ defmodule Deli.ShellTest do
     property "user target when valid" do
       chars = [?_ | Enum.to_list(?a..?z)]
 
-      check all target <- chars |> nonempty_string(),
+      check all target <- nonempty_string(chars),
                 short? <- boolean() do
         flag = if short?, do: "-t", else: "--target"
         opts = [flag, target]
-        parsed_opts = opts |> Shell.parse_options()
+        parsed_opts = Shell.parse_options(opts)
 
         assert parsed_opts[:target] == String.to_atom(target)
       end
@@ -442,7 +443,7 @@ defmodule Deli.ShellTest do
     property "default target when not provided" do
       check all env <- env() do
         put_config(:default_target, env)
-        parsed_opts = [] |> Shell.parse_options()
+        parsed_opts = Shell.parse_options([])
 
         assert parsed_opts[:target] == env
       end
@@ -451,7 +452,7 @@ defmodule Deli.ShellTest do
     property "yes when passed" do
       check all short? <- boolean() do
         flag = if short?, do: "-y", else: "--yes"
-        parsed_opts = [flag] |> Shell.parse_options()
+        parsed_opts = Shell.parse_options([flag])
 
         assert parsed_opts[:yes]
       end
@@ -460,7 +461,7 @@ defmodule Deli.ShellTest do
     property "assets when passed" do
       check all short? <- boolean() do
         flag = if short?, do: "-a", else: "--assets"
-        parsed_opts = [flag] |> Shell.parse_options()
+        parsed_opts = Shell.parse_options([flag])
 
         assert parsed_opts[:assets]
       end
@@ -470,7 +471,7 @@ defmodule Deli.ShellTest do
       check all short? <- boolean(),
                 version <- nonempty_string() do
         flag = if short?, do: "-v", else: "--version"
-        parsed_opts = [flag, version] |> Shell.parse_options()
+        parsed_opts = Shell.parse_options([flag, version])
 
         assert parsed_opts[:version] == version
       end

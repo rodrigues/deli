@@ -26,8 +26,7 @@ defmodule Mix.DeliShellTest do
     put_config(:bin_path, bin_path)
     put_config(:default_target, env)
 
-    HostFilterMock
-    |> stub(:host, fn ^env, _ -> {:ok, host} end)
+    stub(HostFilterMock, :host, fn ^env, _ -> {:ok, host} end)
 
     id = "#{app_user}@#{host}"
 
@@ -120,7 +119,7 @@ defmodule Mix.DeliShellTest do
 
       output =
         capture_io(fn ->
-          :ok = [flag] |> Shell.run()
+          :ok = Shell.run([flag])
         end)
 
       assert output ==
@@ -160,7 +159,7 @@ defmodule Mix.DeliShellTest do
 
       output =
         capture_io(fn ->
-          :ok = [flag] |> Shell.run()
+          :ok = Shell.run([flag])
         end)
 
       assert output ==
@@ -200,7 +199,7 @@ defmodule Mix.DeliShellTest do
 
       output =
         capture_io(fn ->
-          :ok = [flag] |> Shell.run()
+          :ok = Shell.run([flag])
         end)
 
       assert output == "ssh #{app_user}@#{host} #{bin_path} remote_console"

@@ -3,8 +3,7 @@ defmodule Mix.DeliStopTest do
   alias Mix.Tasks.Deli.Stop
 
   def setup_hosts(env, hosts, setup_mocks? \\ true) do
-    HostFilterMock
-    |> stub(:hosts, fn ^env, _ -> {:ok, hosts} end)
+    stub(HostFilterMock, :hosts, fn ^env, _ -> {:ok, hosts} end)
 
     if setup_mocks? do
       for host <- hosts do
@@ -12,8 +11,7 @@ defmodule Mix.DeliStopTest do
         |> expect(:run, fn ^env, ^host -> :ok end)
         |> expect(:run, fn ^env, ^host, false -> :ok end)
 
-        ControllerMock
-        |> expect(:stop_host, fn ^env, ^host -> :ok end)
+        expect(ControllerMock, :stop_host, fn ^env, ^host -> :ok end)
       end
     end
   end
@@ -32,7 +30,7 @@ defmodule Mix.DeliStopTest do
 
       output =
         capture_io(fn ->
-          :ok = [flag] |> Stop.run()
+          :ok = Stop.run([flag])
         end)
 
       log =
