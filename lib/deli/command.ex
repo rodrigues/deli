@@ -16,7 +16,7 @@ defmodule Deli.Command do
         use Mix.Task
 
         def run(args) do
-          MyApp.Commands.XYZ |> Deli.Command.run(args)
+          Deli.Command.run(MyApp.Commands.XYZ, args)
         end
       end
 
