@@ -138,6 +138,9 @@ defmodule Deli.BeamVersions.Updater do
     generic_version_compare(version, min) != :lt
   end
 
+  defp generic_version("alpha" <> _), do: []
+  defp generic_version("beta" <> _), do: []
+
   defp generic_version(version) do
     version
     |> String.split("-")
