@@ -14,8 +14,9 @@ defmodule Deli.BeamVersions.Updater do
   @archive_path "src.tar.gz"
 
   @headers [
-    {'User-Agent', 'Delibot/0.2 (+https://github.com/rodrigues/deli)'},
-    {'Accepts', 'application/vnd.github.v3+json'}
+    {"User-Agent", "Delibot/0.2 (+https://github.com/rodrigues/deli)"},
+    {"Accepts", "application/vnd.github.v3+json"},
+    {"Connection", "close"}
   ]
 
   @repos %{
@@ -87,7 +88,8 @@ defmodule Deli.BeamVersions.Updater do
   end
 
   defp releases(dep, uri, acc) do
-    {:ok, {{_, 200, _}, headers, json}} = :httpc.request(:get, {uri, @headers}, [], [])
+    {:ok, %HTTPoison.Response{status_code: 200, body: json, headers: headers}} =
+      HTTPoison.get(uri, @headers)
 
     versions = json |> Jason.decode!() |> Enum.flat_map(&release_versions(dep, &1))
     acc = versions ++ acc

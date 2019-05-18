@@ -4,7 +4,7 @@ defmodule Deli.MixProject do
   def project do
     [
       app: :deli,
-      version: "0.2.0-rc.4",
+      version: "0.2.0-rc.5",
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -32,6 +32,7 @@ defmodule Deli.MixProject do
     [
       {:edeliver, "~> 1.6.0", runtime: false},
       {:distillery, "~> 2.0.10", runtime: false},
+      {:httpoison, "~> 1.5.1", only: :dev},
       {:ex_doc, "~> 0.20.1", only: :dev, runtime: false},
       {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},

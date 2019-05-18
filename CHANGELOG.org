@@ -3,6 +3,14 @@
 - Pending extensive tests on different docker build options before actual release
 - Pending property test coverage at important areas
 
+*** rc.5
+
+- Allow to configure =Deli.Check=
+- Increase test coverage
+- Fix rebar3 version updates
+- Add BEAM version updates
+- Update distillery 2.0.14
+
 *** rc.4
 
 - Update OTP versions
