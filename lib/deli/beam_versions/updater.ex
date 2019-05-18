@@ -4,11 +4,6 @@ defmodule Deli.BeamVersions.Updater do
 
   @moduledoc false
 
-  @http_apps ~w(
-    inets
-    ssl
-  )a
-
   @base_uri "https://github.com"
   @api "https://api.github.com/repos"
   @archive_path "src.tar.gz"
@@ -44,8 +39,6 @@ defmodule Deli.BeamVersions.Updater do
 
   @spec update(BeamVersions.dep()) :: :ok
   def update(dep) do
-    Enum.each(@http_apps, &Application.ensure_all_started/1)
-
     current_versions = Enum.map(BeamVersions.versions()[dep], &elem(&1, 0))
     new_version? = fn v -> not Enum.member?(current_versions, v) end
 
