@@ -82,7 +82,7 @@ defmodule Deli.BeamVersions.Updater do
 
   defp releases(dep, uri, acc) do
     {:ok, %HTTPoison.Response{status_code: 200, body: json, headers: headers}} =
-      HTTPoison.get(uri, @headers)
+      uri |> to_string |> HTTPoison.get(@headers)
 
     versions = json |> Jason.decode!() |> Enum.flat_map(&release_versions(dep, &1))
     acc = versions ++ acc
