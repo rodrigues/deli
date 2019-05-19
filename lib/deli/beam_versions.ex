@@ -1,6 +1,8 @@
 defmodule Deli.BeamVersions do
   alias Deli.BeamVersions.File
 
+  # Provides BEAM dependency version checksum information
+  # for docker build environment templates
   @moduledoc false
 
   @deps ~w(otp elixir rebar3)a

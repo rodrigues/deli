@@ -2,6 +2,8 @@ defmodule Deli.BeamVersions.Updater do
   alias Deli.{BeamVersions, Config}
   alias Deli.BeamVersions.File
 
+  # Calculates checksum for new BEAM dependencies
+  # and persists them in a file
   @moduledoc false
 
   @base_uri "https://github.com"

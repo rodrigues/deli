@@ -2,10 +2,10 @@
 
 By default, the release will happen creating a docker machine to build the release with distillery.
 
-You can change it by a custom one:
+You can skip the default strategy and choose a custom one instead:
 
 ```elixir
-# runs the release at a remote host
+# builds the release at a remote host
 config :deli, :release, Deli.Release.Remote
 
 # does something completely custom instead
