@@ -135,7 +135,7 @@ iex --name local@127.0.0.1 --cookie awesome_cookie --remsh myapp@127.0.0.1
 
 ### Run mix tasks (locally) in remote nodes
 
-By using [`Deli.Command`](https://hexdocs.pm/deli/Deli.Command.html), you can have this:
+By using [`Deli.Command`](https://hexdocs.pm/deli/0.2.0-rc.5/Deli.Command.html), you can have this:
 
 ```shell
 # runs locally
@@ -165,8 +165,9 @@ Checkout [Release configuration](https://hexdocs.pm/deli/0.2.0-rc.5/release.html
 
 ## Potential future work
 
-- Add more docs, tests, guards and typespecs
+- Add more documentation
 - Remove edeliver dependency, replacing its steps by local code
+- See about using elixir releases instead of distillery (1.9+)
 - Concurrent restarts / checks / ...
 - Retry / rollback strategy
 - Upgrades
