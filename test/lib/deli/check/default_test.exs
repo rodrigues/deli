@@ -7,6 +7,16 @@ defmodule Deli.Check.DefaultTest do
   end
 
   describe "run/2" do
+    def run(env, host, running_good? \\ true) do
+      output =
+        capture_io(fn ->
+          :ok = Check.run(env, host, running_good?)
+        end)
+
+      id = Config.host_id(env, host)
+      {id, output}
+    end
+
     property "checks host and succeeds when service is running" do
       check all env <- env(),
                 app_user <- app_user(),
@@ -14,13 +24,7 @@ defmodule Deli.Check.DefaultTest do
         put_config(:app_user, app_user)
 
         expect(ControllerMock, :service_running?, fn ^env, ^host -> true end)
-
-        output =
-          capture_io(fn ->
-            :ok = Check.run(env, host)
-          end)
-
-        id = Config.host_id(env, host)
+        {id, output} = run(env, host)
         assert output == "\e[32mrunning #{id}\e[0m\n"
       end
     end
@@ -34,13 +38,7 @@ defmodule Deli.Check.DefaultTest do
 
         expect(ControllerMock, :service_running?, fn ^env, ^host -> false end)
         expect(ControllerMock, :service_status, fn ^env, ^host -> status end)
-
-        output =
-          capture_io(fn ->
-            :ok = Check.run(env, host)
-          end)
-
-        id = Config.host_id(env, host)
+        {id, output} = run(env, host)
         assert output == "\e[31mnot running #{id}\e[0m\n#{status}\n"
       end
     end
@@ -56,13 +54,7 @@ defmodule Deli.Check.DefaultTest do
         ControllerMock
         |> expect(:service_running?, fn ^env, ^host -> true end)
         |> expect(:service_status, fn ^env, ^host -> status end)
-
-        output =
-          capture_io(fn ->
-            :ok = Check.run(env, host, false)
-          end)
-
-        id = Config.host_id(env, host)
+        {id, output} = run(env, host, false)
         assert output == "\e[31mrunning #{id}\e[0m\n#{status}\n"
       end
     end
@@ -75,13 +67,7 @@ defmodule Deli.Check.DefaultTest do
         put_config(:app_user, app_user)
 
         expect(ControllerMock, :service_running?, fn ^env, ^host -> false end)
-
-        output =
-          capture_io(fn ->
-            :ok = Check.run(env, host, false)
-          end)
-
-        id = Config.host_id(env, host)
+        {id, output} = run(env, host, false)
         assert output == "\e[32mnot running #{id}\e[0m\n"
       end
     end
