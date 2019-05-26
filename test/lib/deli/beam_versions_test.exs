@@ -21,10 +21,7 @@ defmodule Deli.BeamVersionsTest do
   end
 
   describe "fetch/0..1" do
-    test "brings fresh set of beam dependencies without opts" do
-      versions = BeamVersions.fetch()
-      assert Enum.count(versions) >= 3
-
+    def assert_versions(versions) do
       for {dep, version: version, checksum: sum} <- versions do
         assert is_atom(dep)
         assert is_binary(version)
@@ -32,18 +29,18 @@ defmodule Deli.BeamVersionsTest do
       end
     end
 
+    test "brings fresh set of beam dependencies without opts" do
+      versions = BeamVersions.fetch()
+      assert Enum.count(versions) >= 3
+      assert_versions(versions)
+    end
+
     test "keeps user set of beam dependencies when existing" do
       opts = [otp: "21.0"]
       versions = BeamVersions.fetch(opts)
       assert Enum.count(versions) >= 3
-
+      assert_versions(versions)
       assert versions[:otp][:version] == "21.0"
-
-      for {dep, version: version, checksum: sum} <- versions do
-        assert is_atom(dep)
-        assert is_binary(version)
-        assert is_binary(sum)
-      end
     end
 
     test "fails when user passes unexisting version" do
