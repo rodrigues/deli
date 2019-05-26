@@ -1,5 +1,5 @@
 defmodule Deli.Controller.BinTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.Controller.Bin
 
   setup do

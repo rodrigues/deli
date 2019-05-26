@@ -37,18 +37,16 @@ defmodule ConfigHelpers do
   def waits, do: @waits
 
   def clear_config do
-    Enum.each(config_keys(), &delete_config/1)
     Enum.each(waits(), &put_config(:waits, &1, 1))
-
     put_config(:verbose, false)
   end
 
   def get_config(key) do
-    Application.get_env(:deli, key)
+    ConfigProviderStub.get_env(:deli, key)
   end
 
   def put_config(key, value) do
-    :ok = Application.put_env(:deli, key, value)
+    :ok = ConfigProviderStub.put_env(:deli, key, value)
   end
 
   def put_config(outer_key, inner_key, inner_value) do
@@ -62,6 +60,6 @@ defmodule ConfigHelpers do
   end
 
   def delete_config(key) do
-    :ok = Application.delete_env(:deli, key)
+    :ok = ConfigProviderStub.delete_env(:deli, key)
   end
 end

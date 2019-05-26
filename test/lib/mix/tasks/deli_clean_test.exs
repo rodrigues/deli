@@ -1,5 +1,5 @@
 defmodule Mix.DeliCleanTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Mix.Tasks.Deli.Clean
 
   @clean_paths ~w(

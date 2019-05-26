@@ -1,5 +1,5 @@
 defmodule Mix.DeliStopTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Mix.Tasks.Deli.Stop
 
   def setup_hosts(env, hosts, setup_mocks? \\ true) do

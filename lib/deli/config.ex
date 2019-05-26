@@ -283,12 +283,7 @@ defmodule Deli.Config do
 
   @spec get(Application.key(), Application.value()) :: Application.value()
   def get(key, default \\ nil) when is_atom(key) do
-    Application.get_env(:deli, key, default)
-  end
-
-  @spec fetch!(Application.key()) :: Application.value()
-  def fetch!(key) when is_atom(key) do
-    Application.fetch_env!(:deli, key)
+    Deli.config_provider().get_env(:deli, key, default)
   end
 
   @spec mix_env(Deli.env() | String.t()) :: Deli.env()

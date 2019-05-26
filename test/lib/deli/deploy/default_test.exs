@@ -1,5 +1,5 @@
 defmodule Deli.Deploy.DefaultTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.Deploy.Default, as: Deploy
 
   setup do

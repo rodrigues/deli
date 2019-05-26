@@ -1,5 +1,5 @@
 defmodule Deli.Config.EnsureTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.Config.Ensure
 
   describe "ensure_boolean/0" do

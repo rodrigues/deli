@@ -1,5 +1,5 @@
 defmodule Deli.PingTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.Ping
 
   setup do

@@ -1,5 +1,5 @@
 defmodule Deli.HostFilter.DefaultTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.HostFilter.Default, as: HostFilter
 
   test "behaviour" do

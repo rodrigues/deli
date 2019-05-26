@@ -1,5 +1,5 @@
 defmodule Deli.Check.DefaultTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.Check.Default, as: Check
 
   test "behaviour" do

@@ -6,21 +6,30 @@ defmodule TestAgent do
   @initial_state %{}
 
   def start_link do
-    Agent.start_link(fn -> @initial_state end, name: __MODULE__)
+    Agent.start_link(fn -> @initial_state end)
   end
 
   @spec clear() :: :ok
   def clear do
-    Agent.update(__MODULE__, fn _ -> @initial_state end)
+    Agent.update(current_test_agent(), fn _ -> @initial_state end)
   end
 
-  @spec get(atom, term) :: term
-  def get(key, default \\ nil) when is_atom(key) do
-    __MODULE__ |> Agent.get(& &1) |> Map.get(key, default)
+  @spec get(term, term) :: term
+  def get(key, default \\ nil) do
+    current_test_agent() |> Agent.get(& &1) |> Map.get(key, default)
   end
 
-  @spec set(atom, term) :: :ok
-  def set(key, value) when is_atom(key) do
-    Agent.update(__MODULE__, &Map.put(&1, key, value))
+  @spec set(term, term) :: :ok
+  def set(key, value) do
+    Agent.update(current_test_agent(), &Map.put(&1, key, value))
+  end
+
+  @spec delete(term) :: :ok
+  def delete(key) do
+    Agent.update(current_test_agent(), &Map.delete(&1, key))
+  end
+
+  defp current_test_agent do
+    :erlang.get(:test_agent_pid)
   end
 end

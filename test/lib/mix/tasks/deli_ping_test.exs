@@ -1,5 +1,5 @@
 defmodule Mix.DeliPingTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Mix.Tasks.Deli.Ping
 
   setup do

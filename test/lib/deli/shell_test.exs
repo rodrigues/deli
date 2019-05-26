@@ -1,5 +1,5 @@
 defmodule Deli.ShellTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.Shell
 
   setup do
