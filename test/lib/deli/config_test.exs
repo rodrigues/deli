@@ -2,7 +2,6 @@ defmodule Deli.ConfigTest do
   use DeliCase, async: true
   import Deli, only: [is_app: 1, is_env: 1, is_host: 1]
 
-  @moduletag :wip
   describe "app/0" do
     test "uses mix project app when app not configured" do
       delete_config(:app)

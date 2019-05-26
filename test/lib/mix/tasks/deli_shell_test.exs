@@ -54,7 +54,6 @@ defmodule Mix.DeliShellTest do
     end)
   end
 
-  @moduletag :wip
   property "outputs shell command to connect to target remote node by default" do
     check all app <- app(),
               app_user <- app_user(),
