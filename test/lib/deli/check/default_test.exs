@@ -54,6 +54,7 @@ defmodule Deli.Check.DefaultTest do
         ControllerMock
         |> expect(:service_running?, fn ^env, ^host -> true end)
         |> expect(:service_status, fn ^env, ^host -> status end)
+
         {id, output} = run(env, host, false)
         assert output == "\e[31mrunning #{id}\e[0m\n#{status}\n"
       end
