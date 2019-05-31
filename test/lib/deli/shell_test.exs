@@ -257,7 +257,8 @@ defmodule Deli.ShellTest do
 
     property "fails on a signal different than 0" do
       check all {cmd, args} <- cmd_with_args(),
-                signal <- ok_signal() do
+                signal <- ok_signal(),
+                signal != 0 do
         stub_cmd({"", signal})
 
         call = fn ->
