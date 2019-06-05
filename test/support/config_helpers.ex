@@ -37,7 +37,8 @@ defmodule ConfigHelpers do
   def waits, do: @waits
 
   def clear_config do
-    Enum.each(waits(), &put_config(:waits, &1, 1))
+    waits_config = Enum.reduce(waits(), [], &Keyword.put(&2, &1, 1))
+    put_config(:waits, waits_config)
     put_config(:verbose, false)
   end
 
