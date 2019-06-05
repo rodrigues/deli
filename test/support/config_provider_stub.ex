@@ -4,7 +4,7 @@ defmodule ConfigProviderStub do
   @moduledoc false
 
   def get_env(:deli, key, default \\ nil) do
-    if get(:use_application_config) do
+    if use_application?() do
       Application.get_env(:deli, key, default)
     else
       get({:config, key}, default)
@@ -12,7 +12,7 @@ defmodule ConfigProviderStub do
   end
 
   def put_env(:deli, key, value) do
-    if get(:use_application_config) do
+    if use_application?() do
       Application.put_env(:deli, key, value)
     else
       TestAgent.set({:config, key}, value)
@@ -20,10 +20,12 @@ defmodule ConfigProviderStub do
   end
 
   def delete_env(:deli, key) do
-    if get(:use_application_config) do
+    if use_application?() do
       Application.delete_env(:deli, key)
     else
       TestAgent.delete({:config, key})
     end
   end
+
+  defp use_application?, do: get(:use_application_config)
 end
