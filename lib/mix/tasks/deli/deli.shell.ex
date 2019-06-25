@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Deli.Shell do
 
     {:ok, host} = Config.host_filter().host(env, args)
 
-    spawn(fn -> port_forwarding(env, host) end)
+    :proc_lib.spawn(__MODULE__, :port_forwarding, [env, host])
 
     :timer.sleep(Config.wait(:port_forwarding))
 
@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Deli.Shell do
     :timer.sleep(Config.wait(:port_forwarding))
   end
 
-  defp port_forwarding(env, host) do
+  def port_forwarding(env, host) do
     {epmd_port, app_port} = fetch_ports(env, host)
 
     {:ok, processes} = cmd_result(:ps, [:aux])

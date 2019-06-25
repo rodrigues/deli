@@ -2,11 +2,6 @@ defmodule Mix.DeliShellTest do
   use DeliCase, async: false
   alias Mix.Tasks.Deli.Shell
 
-  setup do
-    put_config(:waits, :port_forwarding, 1)
-    put_config(:__system_handler__, SystemStub)
-  end
-
   def setup_shell_test(%{
         app: app,
         app_user: app_user,
@@ -20,6 +15,9 @@ defmodule Mix.DeliShellTest do
         whoami: whoami,
         pid: pid
       }) do
+    setup_test_agent()
+    put_config(:waits, :port_forwarding, 1)
+    put_config(:__system_handler__, SystemStub)
     epmd_path = "#{epmd_base_path}/epmd"
     put_config(:app, app)
     put_config(:cookie, cookie)

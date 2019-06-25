@@ -30,6 +30,14 @@ defmodule TestAgent do
   end
 
   defp current_test_agent do
-    :erlang.get(:test_agent_pid)
+    case :erlang.get(:test_agent_pid) do
+      pid when is_pid(pid) ->
+        pid
+
+      :undefined ->
+        [parent_pid | _] = :erlang.get(:"$ancestors")
+        {:dictionary, list} = Process.info(parent_pid, :dictionary)
+        Keyword.get(list, :test_agent_pid)
+    end
   end
 end
