@@ -1,5 +1,5 @@
 defmodule Deli.BeamVersionsTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.BeamVersions
 
   describe "deps/0" do

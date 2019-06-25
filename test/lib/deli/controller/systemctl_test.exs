@@ -1,5 +1,5 @@
 defmodule Deli.Controller.SystemctlTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.Controller.Systemctl
 
   setup do

@@ -1,5 +1,5 @@
 defmodule Deli.HostProvider.ConfigTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.HostProvider.Config
 
   test "behaviour" do

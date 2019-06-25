@@ -1,5 +1,5 @@
 defmodule Deli.CommandTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.Command
 
   setup do

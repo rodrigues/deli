@@ -1,5 +1,5 @@
 defmodule Deli.ConfigTest do
-  use DeliCase
+  use DeliCase, async: true
   import Deli, only: [is_app: 1, is_env: 1, is_host: 1]
 
   describe "app/0" do
@@ -556,7 +556,7 @@ defmodule Deli.ConfigTest do
     property "defined wait when configured" do
       check all key <- member_of(waits()),
                 wait <- positive_integer() do
-        put_config(:waits, [{key, wait}])
+        put_config(:waits, key, wait)
         assert Config.wait(key) == wait
       end
     end
@@ -564,7 +564,7 @@ defmodule Deli.ConfigTest do
     property "fails when is invalid" do
       check all key <- member_of(waits()),
                 wait <- term_except(&(is_integer(&1) and &1 > 0)) do
-        put_config(:waits, [{key, wait}])
+        put_config(:waits, key, wait)
         assert catch_error(Config.wait(key))
       end
     end
@@ -655,6 +655,10 @@ defmodule Deli.ConfigTest do
   end
 
   describe "get/1" do
+    setup do
+      TestAgent.set(:use_application_config, true)
+    end
+
     property "deli application value for key when set" do
       check all key <- atom(),
                 value <- term() do
@@ -672,6 +676,10 @@ defmodule Deli.ConfigTest do
   end
 
   describe "get/2" do
+    setup do
+      TestAgent.set(:use_application_config, true)
+    end
+
     property "deli application value for key when set" do
       check all key <- atom(),
                 value <- term(),
@@ -686,23 +694,6 @@ defmodule Deli.ConfigTest do
                 default <- term() do
         delete_config(key)
         assert Config.get(key, default) == default
-      end
-    end
-  end
-
-  describe "fetch!/1" do
-    property "deli application value for key when set" do
-      check all key <- atom(),
-                value <- term() do
-        put_config(key, value)
-        assert Config.fetch!(key) == value
-      end
-    end
-
-    property "fails when there's no value set" do
-      check all key <- atom() do
-        delete_config(key)
-        assert_raise ArgumentError, fn -> Config.fetch!(key) end
       end
     end
   end

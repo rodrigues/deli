@@ -1,5 +1,5 @@
 defmodule Mix.DeliStatusTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Mix.Tasks.Deli.Status
 
   property "tells if application is running in all default target hosts by default" do

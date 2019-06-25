@@ -1,11 +1,6 @@
 defmodule Mix.DeliShellTest do
-  use DeliCase
+  use DeliCase, async: false
   alias Mix.Tasks.Deli.Shell
-
-  setup do
-    put_config(:waits, port_forwarding: 1)
-    put_config(:__system_handler__, SystemStub)
-  end
 
   def setup_shell_test(%{
         app: app,
@@ -17,8 +12,12 @@ defmodule Mix.DeliShellTest do
         app_port: app_port,
         env: env,
         host: host,
-        whoami: whoami
+        whoami: whoami,
+        pid: pid
       }) do
+    setup_test_agent()
+    put_config(:waits, :port_forwarding, 1)
+    put_config(:__system_handler__, SystemStub)
     epmd_path = "#{epmd_base_path}/epmd"
     put_config(:app, app)
     put_config(:cookie, cookie)
@@ -42,7 +41,7 @@ defmodule Mix.DeliShellTest do
         {"port #{epmd_port}\nname #{app} at port #{app_port}", 0}
 
       "ssh", [^id, ^epmd_fwd, ^app_fwd], _ ->
-        send(TestAgent.get(:pid), :ssh_port_forwarded)
+        send(pid, :ssh_port_forwarded)
         {"", 0}
 
       "ps", ["aux"], _ ->
@@ -74,7 +73,8 @@ defmodule Mix.DeliShellTest do
         app_port: app_port,
         env: env,
         host: host,
-        whoami: whoami
+        whoami: whoami,
+        pid: self()
       })
 
       output =
@@ -114,7 +114,8 @@ defmodule Mix.DeliShellTest do
         app_port: app_port,
         env: env,
         host: host,
-        whoami: whoami
+        whoami: whoami,
+        pid: self()
       })
 
       output =
@@ -154,7 +155,8 @@ defmodule Mix.DeliShellTest do
         app_port: app_port,
         env: env,
         host: host,
-        whoami: whoami
+        whoami: whoami,
+        pid: self()
       })
 
       output =
@@ -194,7 +196,8 @@ defmodule Mix.DeliShellTest do
         app_port: app_port,
         env: env,
         host: host,
-        whoami: whoami
+        whoami: whoami,
+        pid: self()
       })
 
       output =

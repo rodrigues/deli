@@ -1,5 +1,5 @@
 defmodule Deli.BeamVersions.FileTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.BeamVersions.File
 
   @path "lib/deli/beam_versions/data.exs"

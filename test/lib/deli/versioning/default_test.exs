@@ -1,5 +1,5 @@
 defmodule Deli.Versioning.DefaultTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Deli.Versioning.Default, as: Versioning
 
   setup do

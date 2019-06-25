@@ -18,15 +18,16 @@ defmodule DeliCase do
     end
   end
 
-  setup :set_mox_global
+  setup :set_mox_from_context
+  setup :setup_test_agent
 
-  setup opts do
-    clear_config()
-    mock? = Map.get(opts, :mock, true)
-    if mock?, do: setup_mocks()
-
-    :ok = TestAgent.clear()
+  def setup_test_agent(_opts \\ []) do
+    {:ok, pid} = TestAgent.start_link()
+    :erlang.put(:test_agent_pid, pid)
     :ok = TestAgent.set(:pid, self())
+    clear_config()
+    setup_mocks()
+    :ok
   end
 
   def setup_mocks do

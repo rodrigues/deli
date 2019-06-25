@@ -1,5 +1,5 @@
 defmodule Mix.DeliVersionTest do
-  use DeliCase
+  use DeliCase, async: true
   alias Mix.Tasks.Deli.Version
 
   setup do
