@@ -73,6 +73,20 @@ defmodule Deli.MixProject do
           Deli.Controller.Bin,
           Deli.Controller.Systemctl
         ],
+        Config: [
+          Deli.Config
+        ],
+        Command: [
+          Deli.Command
+        ],
+        Check: [
+          Deli.Check,
+          Deli.Check.Default
+        ],
+        Deploy: [
+          Deli.Deploy,
+          Deli.Deploy.Default
+        ],
         Release: [
           Deli.Release,
           Deli.Release.Remote,
