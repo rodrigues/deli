@@ -2,8 +2,6 @@ defmodule Deli.BeamVersions.FileTest do
   use DeliCase, async: true
   alias Deli.BeamVersions.File
 
-  @path "lib/deli/beam_versions/data.exs"
-
   setup do
     put_config(:__file_handler__, FileStub)
     put_config(:__code_handler__, CodeStub)
@@ -21,7 +19,7 @@ defmodule Deli.BeamVersions.FileTest do
   describe "versions_from_file/0..1" do
     property "persisted versions" do
       check all versions <- versions() do
-        :ok = TestAgent.set(:eval_file, fn @path -> {versions, []} end)
+        :ok = TestAgent.set(:eval_file, fn _ -> {versions, []} end)
         assert File.versions_from_file() == versions
       end
     end
@@ -31,7 +29,7 @@ defmodule Deli.BeamVersions.FileTest do
                 versions <- versions(),
                 not Map.has_key?(versions, key_b) do
         [key_a | _] = Map.keys(versions)
-        :ok = TestAgent.set(:eval_file, fn @path -> {versions, []} end)
+        :ok = TestAgent.set(:eval_file, fn _ -> {versions, []} end)
         result = File.versions_from_file([key_a, key_b])
 
         assert result[key_a] == versions[key_a]
@@ -51,7 +49,7 @@ defmodule Deli.BeamVersions.FileTest do
         content = inspect(versions)
 
         assert_received {:__code_handler__, :format_string!, ^content}
-        assert_received {:__file_handler__, :write!, @path, ^content, []}
+        assert_received {:__file_handler__, :write!, _, ^content, []}
       end
     end
   end

@@ -3,7 +3,7 @@ defmodule Deli.BeamVersions.File do
 
   @moduledoc false
 
-  @path "lib/deli/beam_versions/data.exs"
+  @path Path.expand("./data.exs", __DIR__)
 
   @spec versions_from_file([BeamVersions.dep()]) :: BeamVersions.versions()
   def versions_from_file(deps \\ []) when is_list(deps) do
