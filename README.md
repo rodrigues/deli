@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/rodrigues/deli.svg?branch=master)](https://travis-ci.org/rodrigues/deli)
 [![Hex.pm](https://img.shields.io/hexpm/v/deli.svg)](https://hex.pm/packages/deli)
-[![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/deli/0.2.0-rc.5)
+[![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/deli/0.2.0-rc.6)
 
 Provides a simple deployment solution for Elixir applications, using a couple of [`edeliver`](https://github.com/edeliver/edeliver) [tasks](https://hexdocs.pm/edeliver/Mix.Tasks.Edeliver.html#content) under the hood.
 
@@ -22,7 +22,7 @@ Add `deli` to your deps:
 def deps do
   [
     # ...
-    {:deli, "~> 0.2.0-rc.5", runtime: false}
+    {:deli, "~> 0.2.0-rc.6", runtime: false}
   ]
 end
 ```
@@ -135,7 +135,7 @@ iex --name local@127.0.0.1 --cookie awesome_cookie --remsh myapp@127.0.0.1
 
 ### Run mix tasks (locally) in remote nodes
 
-By using [`Deli.Command`](https://hexdocs.pm/deli/0.2.0-rc.5/Deli.Command.html), you can have this:
+By using [`Deli.Command`](https://hexdocs.pm/deli/0.2.0-rc.6/Deli.Command.html), you can have this:
 
 ```shell
 # runs locally
@@ -161,7 +161,7 @@ At the moment, this package exists for reusing among similarly configured apps. 
 
 ### Advanced configuration
 
-Checkout [Release configuration](https://hexdocs.pm/deli/0.2.0-rc.5/release.html#release-configuration) for more options.
+Checkout [Release configuration](https://hexdocs.pm/deli/0.2.0-rc.6/release.html#release-configuration) for more options.
 
 ## Potential future work
 

@@ -3,6 +3,14 @@
 - Pending extensive tests on different docker build options before actual release
 - Pending property test coverage at important areas
 
+
+*** rc.6
+
+- Add otp 22
+- Add elixir 1.9
+- Add rebar3 3.11
+- Allow ex_unit tests to run async
+
 *** rc.5
 
 - Allow to configure =Deli.Check=
