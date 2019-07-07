@@ -47,14 +47,6 @@ defmodule Deli.Shell do
     end
   end
 
-  @spec edeliver(command, args) :: :ok
-  def edeliver(command, args \\ [])
-      when (is_atom(command) or is_binary(command)) and is_list(args) do
-    verbose = if Config.verbose?(), do: ["--verbose"], else: []
-    edeliver_args = ["edeliver", command] ++ args ++ verbose
-    cmd("mix", edeliver_args)
-  end
-
   @spec docker_compose(command, args, ok_signals) :: :ok
   def docker_compose(command, args \\ [], ok_signals \\ [0]) do
     args = ["-f", ".deli/docker-compose.yml"] ++ [command] ++ args

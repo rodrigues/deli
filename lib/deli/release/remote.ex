@@ -1,7 +1,6 @@
 defmodule Deli.Release.Remote do
   import Deli.Shell
   alias Deli.{Config, Versioning}
-  alias Deli.Templates.EdeliverConfig
 
   @moduledoc "Release strategy that relies on a remote build host"
 
@@ -9,47 +8,56 @@ defmodule Deli.Release.Remote do
 
   @impl true
   def build(tag, target) do
-    ensure_edeliver_config()
+    ensure_release_config()
     clear_previous_releases()
-    edeliver_build(tag, target)
+
+    remote_build(
+      tag,
+      target,
+      Config.remote_build_user(),
+      Config.remote_build_host()
+    )
   end
 
-  @spec edeliver_build(Versioning.tag(), Deli.env()) :: :ok
-  def edeliver_build(tag, target) do
+  @spec remote_build(
+          Versioning.tag(),
+          Deli.env(),
+          user :: atom,
+          host :: Deli.host()
+        ) :: :ok
+  def remote_build(tag, target, user, host) do
+    app = Config.app()
+    build_path = Config.build_path()
+    id = "#{user}@#{host}"
     target_mix_env = Config.mix_env(target)
-    edeliver(:build, [:release, "--tag=#{tag}", "--mix-env=#{target_mix_env}"])
+    release = "#{app}-#{target_mix_env}-#{tag}"
+    path = "#{release}.tar.gz"
+    p = &Path.join(build_path, &1)
+
+    git_archive_args = [
+      :archive,
+      "--format=tar.gz",
+      "-o",
+      path,
+      tag
+    ]
+
+    cmd(:git, git_archive_args)
+    cmd(:ssh, [id, "rm -rf #{p.("*")}"])
+    cmd(:ssh, [id, "mkdir -p #{p.(release)}"])
+    cmd(:scp, [path, "#{id}:\"#{build_path}\""])
+    cmd(:ssh, [id, "tar --directory=\"#{p.(release)}\" -xvzf #{p.(path)}"])
+    cmd(:ssh, ["-t", id, "cd #{p.(release)}; MIX_ENV=#{target_mix_env} mix release"])
+
+    local_releases_path = ".deli/releases/#{release}"
+    cmd(:mkdir, ["-p", local_releases_path])
+    app_release_path = p.("_build/#{target_mix_env}/rel/#{app}")
+    cmd(:scp, ["-r", "#{id}:\"#{app_release_path}\"", local_releases_path])
   end
 
-  @spec ensure_edeliver_config(boolean) :: :ok
-  def ensure_edeliver_config(remote? \\ true) do
-    path = ".deliver/config"
-
-    unless file_exists?(path) do
-      host_provider = Config.host_provider()
-      hosts = fn env -> host_provider.hosts(env) end
-      staging_hosts = hosts.(:staging)
-      prod_hosts = hosts.(:prod)
-
-      content =
-        EdeliverConfig.build(
-          Config.app(),
-          staging_hosts,
-          prod_hosts,
-          Config.app_user(:staging),
-          Config.app_user(:prod),
-          Config.docker_build_user(),
-          Config.docker_build_port(),
-          remote?,
-          Config.remote_build_host(),
-          Config.remote_build_user()
-        )
-
-      dir = Path.dirname(path)
-      :ok = file_handler().mkdir_p(dir)
-      write_file(path, content)
-      add_to_gitignore(path)
-      add_to_gitignore(".deli/releases")
-    end
+  @spec ensure_release_config(boolean) :: :ok
+  def ensure_release_config(_remote? \\ true) do
+    add_to_gitignore(".deli/releases")
   end
 
   @spec clear_previous_releases() :: :ok

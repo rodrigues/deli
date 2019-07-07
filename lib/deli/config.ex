@@ -6,6 +6,8 @@ defmodule Deli.Config do
 
   @defaults %{
     assets?: false,
+    # where releases are built by default
+    build_path: "/usr/local/builds",
     # use controller service functions by default
     check: Deli.Check.Default,
     # use release binary by default
@@ -98,6 +100,11 @@ defmodule Deli.Config do
     end
   end
 
+  @spec build_path :: String.t()
+  def build_path do
+    :build_path |> get(@defaults.build_path) |> ensure_binary
+  end
+
   @spec check() :: module
   def check do
     :check
@@ -160,6 +167,17 @@ defmodule Deli.Config do
     |> get([])
     |> Keyword.get(:user, @defaults.docker_build[:user])
     |> ensure_atom
+  end
+
+  @spec docker_build_host() :: Deli.host()
+  def docker_build_host do
+    host =
+      :docker_build
+      |> get([])
+      |> Keyword.get(:host)
+
+    host = host || "#{app()}_deli"
+    ensure_binary(host)
   end
 
   @spec docker_build_yarn?() :: boolean

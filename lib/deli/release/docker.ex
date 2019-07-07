@@ -5,8 +5,8 @@ defmodule Deli.Release.Docker do
     only: [
       add_to_gitignore: 1,
       clear_previous_releases: 0,
-      edeliver_build: 2,
-      ensure_edeliver_config: 1
+      remote_build: 4,
+      ensure_release_config: 1
     ]
 
   alias Deli.Config
@@ -31,11 +31,17 @@ defmodule Deli.Release.Docker do
 
   @impl true
   def build(tag, target) do
-    ensure_edeliver_config(false)
+    ensure_release_config(false)
     clear_previous_releases()
     boot_docker()
     clear_remote_releases()
-    edeliver_build(tag, target)
+
+    remote_build(
+      tag,
+      target,
+      Config.docker_build_user(),
+      Config.docker_build_host()
+    )
   end
 
   defp boot_docker do
@@ -109,7 +115,9 @@ defmodule Deli.Release.Docker do
   end
 
   defp clear_remote_releases do
-    cmd = [:deli, :bash, "-c", "\"rm -rf /usr/local/builds/*\""]
+    build_path = Config.build_path()
+    rm_path = Path.join(build_path, "*")
+    cmd = [:deli, :bash, "-c", "\"rm -rf #{rm_path}\""]
     docker_compose(:exec, cmd, [0, 127])
   end
 end

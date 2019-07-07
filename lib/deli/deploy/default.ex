@@ -1,6 +1,6 @@
 defmodule Deli.Deploy.Default do
   import Deli, only: [is_env: 1, is_host: 1]
-  import Deli.Shell, only: [edeliver: 2]
+  # import Deli.Shell, only: [edeliver: 2]
   alias Deli.Config
 
   @moduledoc false
@@ -10,7 +10,8 @@ defmodule Deli.Deploy.Default do
   @impl true
   def run(target, host) when is_env(target) and is_host(host) do
     edeliver_target = Config.edeliver_target(target)
-    edeliver(:deploy, [:release, :to, edeliver_target, "--host=#{host}"])
+    # TODO deploy
+    #    edeliver(:deploy, [:release, :to, edeliver_target, "--host=#{host}"])
     restart_host(target, host)
   end
 
