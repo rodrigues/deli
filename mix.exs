@@ -33,7 +33,7 @@ defmodule Deli.MixProject do
       {:edeliver, "~> 1.6.0", runtime: false},
       {:distillery, "~> 2.0.10", runtime: false},
       {:httpoison, "~> 1.5.1", only: [:dev, :test]},
-      {:ex_doc, "~> 0.20.1", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.21.1", only: :dev, runtime: false},
       {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
       {:stream_data, "~> 0.4.2", only: [:dev, :test]},
