@@ -115,8 +115,7 @@ defmodule Deli.Release.Docker do
   end
 
   defp clear_remote_releases do
-    build_path = Config.build_path()
-    rm_path = Path.join(build_path, "*")
+    rm_path = Path.join(Config.build_path(), "*")
     cmd = [:deli, :bash, "-c", "\"rm -rf #{rm_path}\""]
     docker_compose(:exec, cmd, [0, 127])
   end
