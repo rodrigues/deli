@@ -7,6 +7,24 @@ defmodule Mix.DeliPingTest do
     put_config(:check, Deli.Check.Default)
   end
 
+  def ping_log(hosts, {app_user, pong?, status, verbose?}) do
+    hosts
+    |> Enum.map(fn host ->
+      id = "#{app_user}@#{host}"
+
+      if pong? do
+        if verbose? do
+          "\e[32mpong #{id}\e[0m\n#{status}\n"
+        else
+          "\e[32mpong #{id}\e[0m\n"
+        end
+      else
+        "\e[31mnot pong #{id}\e[0m\n#{status}\n"
+      end
+    end)
+    |> Enum.join("")
+  end
+
   property "pings application in all default target hosts by default" do
     check all app <- app(),
               app_user <- app_user(),
@@ -28,23 +46,7 @@ defmodule Mix.DeliPingTest do
           :ok = Ping.run([])
         end)
 
-      log =
-        hosts
-        |> Enum.map(fn host ->
-          id = "#{app_user}@#{host}"
-
-          if pong? do
-            if verbose? do
-              "\e[32mpong #{id}\e[0m\n#{status}\n"
-            else
-              "\e[32mpong #{id}\e[0m\n"
-            end
-          else
-            "\e[31mnot pong #{id}\e[0m\n#{status}\n"
-          end
-        end)
-        |> Enum.join("")
-
+      log = ping_log(hosts, {app_user, pong?, status, verbose?})
       assert output == log
     end
   end
@@ -71,23 +73,7 @@ defmodule Mix.DeliPingTest do
           :ok = Ping.run([flag, env])
         end)
 
-      log =
-        hosts
-        |> Enum.map(fn host ->
-          id = "#{app_user}@#{host}"
-
-          if pong? do
-            if verbose? do
-              "\e[32mpong #{id}\e[0m\n#{status}\n"
-            else
-              "\e[32mpong #{id}\e[0m\n"
-            end
-          else
-            "\e[31mnot pong #{id}\e[0m\n#{status}\n"
-          end
-        end)
-        |> Enum.join("")
-
+      log = ping_log(hosts, {app_user, pong?, status, verbose?})
       assert output == log
     end
   end
