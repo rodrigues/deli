@@ -194,6 +194,7 @@ defmodule Deli.Controller.BinTest do
       end
     end
 
+    # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
     property "fails to check status if signal not expected" do
       check all app_user <- app_user(),
                 bin_path <- bin_path(),
