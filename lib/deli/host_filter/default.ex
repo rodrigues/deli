@@ -12,28 +12,27 @@ defmodule Deli.HostFilter.Default do
   def hosts(env, args, silent? \\ false)
       when is_env(env) and is_list(args) and is_boolean(silent?) do
     hosts = Config.host_provider().hosts(env)
+    args |> host_filter |> filter_hosts(hosts, env, silent?)
+  end
 
-    with %Regex{} = exp <- host_filter(args) do
-      with [_ | _] = filtered_hosts <- Enum.filter(hosts, &(&1 =~ exp)) do
+  defp filter_hosts(nil, [], env, _), do: error!("No hosts defined for target #{env}")
+
+  defp filter_hosts(nil, hosts, _, silent?) do
+    unless silent?, do: list_hosts(hosts)
+    {:ok, Enum.map(hosts, &ensure_binary/1)}
+  end
+
+  defp filter_hosts(%Regex{} = exp, hosts, env, silent?) do
+    case Enum.filter(hosts, &(&1 =~ exp)) do
+      [_ | _] = filtered_hosts ->
         unless silent?, do: list_hosts(filtered_hosts)
         {:ok, Enum.map(filtered_hosts, &ensure_binary/1)}
-      else
-        [] ->
-          error!("""
-          Host filter #{inspect(exp)} excluded all hosts!
-          #{hosts_line(hosts)}
-          """)
-      end
-    else
-      nil ->
-        case hosts do
-          [] ->
-            error!("No hosts defined for target #{env}")
 
-          _ ->
-            unless silent?, do: list_hosts(hosts)
-            {:ok, Enum.map(hosts, &ensure_binary/1)}
-        end
+      [] ->
+        error!("""
+        Host filter #{inspect(exp)} excluded all hosts for target #{env}!
+        #{hosts_line(hosts)}
+        """)
     end
   end
 

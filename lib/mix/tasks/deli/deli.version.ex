@@ -98,9 +98,10 @@ defmodule Mix.Tasks.Deli.Version do
   end
 
   defp print_host_version(env, host) do
-    with {:ok, version} <- host_version(env, host) do
-      print_version(version)
-    else
+    case host_version(env, host) do
+      {:ok, version} ->
+        print_version(version)
+
       {:error, error} ->
         IO.puts([IO.ANSI.red(), inspect(error), IO.ANSI.reset()])
     end
